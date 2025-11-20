@@ -10,7 +10,6 @@ import BookSection from './components/BookSection';
 import AestheticGallery from './components/AestheticGallery';
 import Cliffhanger from './components/Cliffhanger';
 import TropeMatchmaker from './components/TropeMatchmaker';
-import RomanceTranslator from './components/RomanceTranslator';
 import ObjectPerspective from './components/ObjectPerspective';
 import FinishTheScene from './components/FinishTheScene';
 import UnspokenThoughts from './components/UnspokenThoughts';
@@ -56,7 +55,6 @@ const App: React.FC = () => {
           
           {/* The "Engagement" Phase */}
           <TropeMatchmaker />
-          <RomanceTranslator />
           <FinishTheScene />
           <ObjectPerspective /> 
           <LoveLetterMuse />

@@ -24,7 +24,6 @@ const AI_TOOLS = [
     { label: "Prediction Game", href: "#prediction", icon: Key, badge: "Game" },
     { label: "Tension Heatmap", href: "#heatmap", icon: Activity, badge: "Data" },
     { label: "Trope Matchmaker", href: "#tropematcher", icon: Search, badge: "Search" },
-    { label: "Jasmine Translator", href: "#translator", icon: Wand2, badge: "Style" },
     { label: "Co-Write Scene", href: "#finishscene", icon: PenTool, badge: "GenAI" },
     { label: "POV Shift", href: "#povshift", icon: Eye, badge: "Rewrite" },
     { label: "Sensory Immersion", href: "#sensory", icon: CloudRain, badge: "Vibe" },
