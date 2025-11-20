@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Jasmine Knot | Chintan Hart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2596be', // Cinematic Cerulean
+                        'primary-dark': '#186a8a',
+                        onyx: '#0F0F0F', // Deep Onyx (Secondary Base)
+                        blush: '#F4C2C2', // Pale Blush (Highlight)
+                        black: '#000000', // Infinite Black
+                        white: '#FFFFFF', // Stark White
+                    },
+                    fontFamily: {
+                        display: ['"Cinzel Decorative"', 'serif'],
+                        body: ['"Montserrat"', 'sans-serif'],
+                    },
+                    transitionTimingFunction: {
+                        'cinematic': 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', // Heavy Settle
+                        'snappy': 'cubic-bezier(0.19, 1, 0.22, 1)', // Snappy interaction
+                        'exit': 'cubic-bezier(0.55, 0.085, 0.68, 0.53)', // Sharp exit
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                        'fade-in-up': 'fadeInUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                        'ken-burns': 'kenBurns 20s ease-in-out infinite alternate',
+                        'pulse-slow': 'pulseGlow 4s ease-in-out infinite',
+                        'shimmer': 'shimmer 2s linear infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        kenBurns: {
+                            '0%': { transform: 'scale(1)' },
+                            '100%': { transform: 'scale(1.15)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 20px -5px rgba(37, 150, 190, 0.1)' },
+                            '50%': { boxShadow: '0 0 40px -5px rgba(37, 150, 190, 0.4)' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-1000px 0' },
+                            '100%': { backgroundPosition: '1000px 0' }
+                        }
+                    },
+                    boxShadow: {
+                        'glow': '0 0 30px -5px rgba(37, 150, 190, 0.3)',
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.5)',
+                        'volumetric': '0 20px 50px -5px rgba(37, 150, 190, 0.2)',
+                    },
+                    backgroundImage: {
+                        'vignette': 'radial-gradient(circle, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 100%)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+        }
+        
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+            overflow-x: hidden;
+        }
+
+        /* Cinematic Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #000000;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2596be;
+            border-radius: 2px;
+        }
+        
+        /* Spotlight Effect Logic */
+        .spotlight-overlay {
+            background: radial-gradient(
+                600px circle at var(--mouse-x) var(--mouse-y),
+                rgba(37, 150, 190, 0.06),
+                transparent 40%
+            );
+        }
+
+        /* Text selection for high contrast */
+        ::selection {
+            background: #2596be;
+            color: #ffffff;
+            text-shadow: none;
+        }
+        
+        /* Smooth Scroll Behavior Override */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.6.0/",
+    "framer-motion": "https://aistudiocdn.com/framer-motion@^11.0.8"
+  }
+}
+</script>
+</head>
+<body class="antialiased selection:bg-primary/30 selection:text-white">
+    <div id="root"></div>
+    <script>
+        // Global mouse tracking for spotlight effects
+        document.addEventListener('mousemove', (e) => {
+            document.documentElement.style.setProperty('--mouse-x', e.clientX + 'px');
+            document.documentElement.style.setProperty('--mouse-y', e.clientY + 'px');
+        });
+    </script>
+</body>
+</html>
