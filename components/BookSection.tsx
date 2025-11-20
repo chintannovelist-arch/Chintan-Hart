@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { X, BookOpen, ShoppingBag, Share2, Twitter, Facebook, Mail, Star, Heart } from 'lucide-react';
+import { X, BookOpen, ShoppingBag, Share2, Twitter, Facebook, Mail, Star, Heart, Instagram } from 'lucide-react';
 import { BOOKS, BOOK_SAMPLE, AUTHOR_NAME } from '../constants';
 
 const SampleModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
@@ -162,6 +162,7 @@ const BookSection: React.FC = () => {
                     
                     <div className="flex gap-6">
                         <a href={twitterUrl} target="_blank" rel="noreferrer" className="text-slate-600 hover:text-white transition-colors transform hover:scale-110 duration-300" aria-label="Share on Twitter"><Twitter size={18} /></a>
+                        <a href="https://instagram.com/chintannovelist" target="_blank" rel="noreferrer" className="text-slate-600 hover:text-white transition-colors transform hover:scale-110 duration-300" aria-label="Visit Instagram"><Instagram size={18} /></a>
                         <button className="text-slate-600 hover:text-white transition-colors transform hover:scale-110 duration-300" aria-label="Share on Facebook"><Facebook size={18} /></button>
                         <button className="text-slate-600 hover:text-white transition-colors transform hover:scale-110 duration-300" aria-label="Share via Email"><Mail size={18} /></button>
                     </div>

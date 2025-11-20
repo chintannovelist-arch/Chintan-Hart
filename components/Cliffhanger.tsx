@@ -100,13 +100,6 @@ const Cliffhanger: React.FC = () => {
                     )}
                 </div>
             </div>
-             {/* Keyframe for loading bar defined inline for simplicity or needs to be in global css */}
-             <style dangerouslySetInnerHTML={{__html: `
-                @keyframes loadingBar {
-                    0% { transform: translateX(-100%); }
-                    100% { transform: translateX(200%); }
-                }
-             `}} />
         </section>
     );
 };

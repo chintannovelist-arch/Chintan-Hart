@@ -112,6 +112,12 @@
         html {
             scroll-behavior: smooth;
         }
+
+        /* Global Animations */
+        @keyframes loadingBar {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(200%); }
+        }
     </style>
 <script type="importmap">
 {
@@ -136,5 +142,6 @@
             document.documentElement.style.setProperty('--mouse-y', e.clientY + 'px');
         });
     </script>
+    <script type="module" src="./index.tsx"></script>
 </body>
 </html>

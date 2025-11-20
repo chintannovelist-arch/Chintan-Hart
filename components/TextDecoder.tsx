@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { MessageSquare, Shield, Heart, Unlock, ScanEye } from 'lucide-react';
 import { callGeminiDecoder } from '../services/geminiService';
@@ -64,8 +65,8 @@ const TextDecoder: React.FC = () => {
                                          <div className="absolute inset-0 border-4 border-white/5 rounded-full"></div>
                                          <div className="absolute inset-0 border-t-4 border-primary rounded-full animate-spin"></div>
                                          <div className="absolute inset-0 flex items-center justify-center">
-                                            <Shield size={20} className="text-primary animate-pulse absolute opacity-0 animate-[fadeIn_2s_infinite]" />
-                                            <Heart size={20} className="text-blush animate-pulse absolute opacity-0 animate-[fadeIn_2s_infinite_1s]" />
+                                            <Shield size={20} className="text-primary animate-pulse absolute opacity-50" />
+                                            <Heart size={20} className="text-blush animate-pulse absolute opacity-50 delay-300" />
                                          </div>
                                      </div>
                                      <div className="text-xs uppercase tracking-[0.3em] text-slate-500 animate-pulse">Extracting Subtext...</div>
