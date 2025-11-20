@@ -4,7 +4,8 @@ import { NOVEL_SCENES } from '../constants';
 
 // Helper to safely initialize the client
 const getAiClient = () => {
-  const apiKey = process.env.API_KEY;
+  // Safely check for process.env to avoid crashing in browser environments
+  const apiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : undefined;
   if (!apiKey) {
       console.warn("[Gemini Service] API Key is missing. AI features will be disabled.");
       return null;

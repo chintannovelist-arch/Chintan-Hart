@@ -9,7 +9,7 @@ import Hero from './components/Hero';
 import BookSection from './components/BookSection';
 import AestheticGallery from './components/AestheticGallery';
 import Cliffhanger from './components/Cliffhanger';
-import TropeMatchmaker from './components/TropeMatchmaker';
+import TropeFinder from './components/TropeFinder'; // Corrected from TropeMatchmaker
 import ObjectPerspective from './components/ObjectPerspective';
 import FinishTheScene from './components/FinishTheScene';
 import UnspokenThoughts from './components/UnspokenThoughts';
@@ -24,6 +24,7 @@ import DatePlanner from './components/DatePlanner';
 import MoodPlaylist from './components/MoodPlaylist';
 import LoveLetterMuse from './components/LoveLetterMuse';
 import SensoryImmersion from './components/SensoryImmersion';
+import DestinyMatch from './components/DestinyMatch';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<any>(null);
@@ -54,11 +55,12 @@ const App: React.FC = () => {
           <MoodPlaylist />
           
           {/* The "Engagement" Phase */}
-          <TropeMatchmaker />
+          <TropeFinder /> 
           <FinishTheScene />
           <ObjectPerspective /> 
           <LoveLetterMuse />
           <DatePlanner />
+          <DestinyMatch />
           
           {/* The "Utility" Phase */}
           <TextDecoder />
