@@ -1,11 +1,15 @@
 
 
-import React, { useRef } from 'react';
-import { BookOpen, ChevronRight, ChevronDown } from 'lucide-react';
+import React from 'react';
+import { BookOpen, ChevronRight, ChevronDown, Sparkles } from 'lucide-react';
 import { TAGLINE } from '../constants';
 
-const Hero: React.FC = () => {
-  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+interface HeroProps {
+  onStartPresentation: () => void;
+}
+
+const Hero: React.FC<HeroProps> = ({ onStartPresentation }) => {
+  const scrollToSection = (e: React.MouseEvent<HTMLElement>, id: string) => {
     e.preventDefault();
     const element = document.getElementById(id);
     if (element) {
@@ -47,29 +51,24 @@ const Hero: React.FC = () => {
             </h2>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-8 mt-12 w-full sm:w-auto animate-fade-in-up opacity-0" style={{ animationDelay: '1.2s', animationFillMode: 'forwards' }}>
+        <div className="flex flex-col sm:flex-row gap-6 mt-12 w-full sm:w-auto animate-fade-in-up opacity-0" style={{ animationDelay: '1.2s', animationFillMode: 'forwards' }}>
           <a 
             href="#books" 
             onClick={(e) => scrollToSection(e, 'books')}
-            className="group relative px-10 py-4 bg-transparent overflow-hidden rounded-sm transition-all duration-500"
+            className="group relative px-8 py-4 bg-primary/20 backdrop-blur-sm overflow-hidden rounded-sm transition-all duration-500 border border-primary/30 hover:shadow-glow hover:border-primary"
           >
-            <div className="absolute inset-0 w-full h-full bg-primary/20 backdrop-blur-sm group-hover:bg-primary/30 transition-all duration-500"></div>
             <div className="absolute inset-0 w-0 bg-primary transition-all duration-[800ms] ease-out group-hover:w-full opacity-20"></div>
-            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
-            <div className="absolute bottom-0 right-0 w-full h-px bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
-            
             <span className="relative z-10 flex items-center justify-center gap-3 text-white text-sm font-bold tracking-[0.2em] uppercase font-body">
               Start Reading <ChevronRight size={16} className="text-blush group-hover:translate-x-2 transition-transform duration-500"/>
             </span>
           </a>
           
-          <a 
-            href="#experience" 
-            onClick={(e) => scrollToSection(e, 'experience')}
-            className="px-10 py-4 border border-white/10 hover:border-blush/50 text-slate-400 hover:text-white rounded-sm text-sm tracking-[0.2em] uppercase font-body font-medium transition-all duration-500 hover:bg-white/5 cursor-pointer"
+          <button
+            onClick={onStartPresentation}
+            className="px-8 py-4 border border-white/10 hover:border-blush/50 text-slate-400 hover:text-white rounded-sm text-sm tracking-[0.2em] uppercase font-body font-medium transition-all duration-500 hover:bg-white/5 cursor-pointer flex items-center justify-center gap-3"
           >
-             Enter World
-          </a>
+             <Sparkles size={14} className="opacity-70"/> Feature Tour
+          </button>
         </div>
       </div>
       

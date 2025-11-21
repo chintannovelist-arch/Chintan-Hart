@@ -1,10 +1,8 @@
 
-
-
-
-import React, { useState, useEffect, lazy } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, initializeAuth } from './services/firebase';
+import { AnimatePresence } from 'framer-motion';
 
 // Eagerly load critical components
 import FloatingMenu from './components/FloatingMenu'; 
@@ -13,6 +11,7 @@ import BookSection from './components/BookSection';
 import LazyLoad from './components/LazyLoad';
 import Newsletter from './components/Newsletter';
 import Footer from './components/Footer';
+import FeaturePresentation from './components/FeaturePresentation'; // Eager load for quick access
 
 // Lazily load below-the-fold components
 const CharacterProfiles = lazy(() => import('./components/CharacterProfiles'));
@@ -37,6 +36,7 @@ const DestinyMatch = lazy(() => import('./components/DestinyMatch'));
 
 const App: React.FC = () => {
   const [user, setUser] = useState<any>(null);
+  const [showPresentation, setShowPresentation] = useState(false);
 
   useEffect(() => {
     // --- START: Scroll-to-Top Fix ---
@@ -57,8 +57,12 @@ const App: React.FC = () => {
 
   return (
     <main className="bg-black min-h-screen text-slate-300 font-body selection:bg-primary/40 selection:text-white overflow-x-hidden">
+        <AnimatePresence>
+            {showPresentation && <FeaturePresentation onClose={() => setShowPresentation(false)} />}
+        </AnimatePresence>
+        
         <FloatingMenu />
-        <Hero />
+        <Hero onStartPresentation={() => setShowPresentation(true)} />
         <BookSection />
         <div className="relative bg-black shadow-[0_-50px_100px_rgba(0,0,0,1)]">
           {/* The "Hook" Phase */}

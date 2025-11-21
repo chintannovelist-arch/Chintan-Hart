@@ -92,8 +92,10 @@ const CharacterProfiles: React.FC = () => (
             <div className="space-y-8 mt-12">
               <div className="relative group cursor-pointer w-fit mx-auto">
                   <blockquote className="font-display text-xl text-slate-300 italic transition-all px-8 text-center group-hover:text-white">
-                      {/* Fix for missing children prop: The text was outside the component tags. Moved it inside to be passed as children. */}
-                      <ShimmeringText>"A gentleman on the outside. A wildfire underneath."</ShimmeringText>
+                      {/* FIX: Correctly nested the text inside the ShimmeringText component to provide the required 'children' prop. */}
+                      <ShimmeringText>
+                        "A gentleman on the outside. A wildfire underneath."
+                      </ShimmeringText>
                   </blockquote>
                   <Zap size={18} className="absolute top-1/2 -right-0 -translate-y-1/2 text-yellow-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300 motion-safe:animate-pulse" aria-hidden="true" />
               </div>
@@ -131,8 +133,10 @@ const CharacterProfiles: React.FC = () => (
             <div className="space-y-8 mt-12">
                <div className="relative group cursor-pointer w-fit mx-auto">
                   <blockquote className="font-display text-xl text-slate-300 italic transition-all px-8 text-center group-hover:text-white">
-                      {/* Fix for missing children prop: The text was outside the component tags. Moved it inside to be passed as children. */}
-                      <ShimmeringText>"A whisper in the beginning. A revolution by the end."</ShimmeringText>
+                      {/* FIX: Correctly nested the text inside the ShimmeringText component to provide the required 'children' prop. */}
+                      <ShimmeringText>
+                        "A whisper in the beginning. A revolution by the end."
+                      </ShimmeringText>
                   </blockquote>
                   <Flower2 size={18} className="absolute top-1/2 -right-0 -translate-y-1/2 text-blush opacity-0 group-hover:opacity-100 transition-opacity duration-300 motion-safe:animate-pulse" aria-hidden="true" />
               </div>
