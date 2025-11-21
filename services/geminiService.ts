@@ -1,25 +1,39 @@
-
-
-
 import { GoogleGenAI } from "@google/genai";
 import { NOVEL_SCENES } from '../constants';
 
 // This service centralizes all interactions with the Gemini API.
-// It uses a single, robust `safeGenerate` helper function to ensure that all
-// API calls have consistent error handling, API key validation, and fallback
-// messaging. This pattern makes adding new AI features scalable and maintainable.
+// UPDATED: Now supports multiple API keys for load balancing.
 
-// Helper to safely initialize the client
+// Helper to safely initialize the client with Key Rotation
 const getAiClient = () => {
-  // Safely check for process.env to avoid crashing in browser environments
-  const apiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : undefined;
-  if (!apiKey) {
-      console.warn("[Gemini Service] API Key is missing. AI features will be disabled.");
+  // 1. Gather all available keys from the environment
+  // We check for process.env to avoid browser crashes, then gather the list
+  const env = (typeof process !== 'undefined' && process.env) ? process.env : {};
+  
+  const availableKeys = [
+    env.GEMINI_KEY_1,
+    env.GEMINI_KEY_2,
+    env.GEMINI_KEY_3,
+    env.API_KEY // Keep original as a backup
+  ].filter(key => !!key); // Filter out any undefined/empty keys
+
+  // 2. check if we found any keys
+  if (availableKeys.length === 0) {
+      console.warn("[Gemini Service] No API Keys found. AI features will be disabled.");
       return null;
   }
-  return new GoogleGenAI({ apiKey });
+
+  // 3. Pick a Random Key (Load Balancing)
+  // This selects a different key randomly to spread your token usage
+  const randomKey = availableKeys[Math.floor(Math.random() * availableKeys.length)];
+  
+  // Optional: Log which key slot is being used (for debugging, remove in prod if you want)
+  // console.log(`[Gemini Service] Using Key Index: ${availableKeys.indexOf(randomKey)}`);
+
+  return new GoogleGenAI({ apiKey: randomKey });
 };
 
+// Initialize the client
 const ai = getAiClient();
 const MODEL_NAME = 'gemini-2.5-flash';
 
@@ -27,8 +41,7 @@ const MODEL_NAME = 'gemini-2.5-flash';
  * Safely executes a Gemini API generation call with enhanced, user-friendly error handling.
  * This function centralizes error detection for common issues like content filtering,
  * API key problems, and rate limiting, providing clear calls to action for the user.
- * 
- * @param prompt The user-facing prompt for the AI.
+ * * @param prompt The user-facing prompt for the AI.
  * @param systemInstruction The backend instructions guiding the AI's personality and format.
  * @param contextName A friendly name for logging purposes.
  * @param userErrorMessage A fallback message for generic, unhandled errors.
@@ -42,7 +55,7 @@ const safeGenerate = async (
 ): Promise<string> => {
   // 1. Handle missing API key - This is a developer/setup issue.
   if (!ai) {
-    console.error(`[${contextName}] Failed: Gemini API Client not initialized (Missing API Key).`);
+    console.error(`[${contextName}] Failed: Gemini API Client not initialized (Missing API Keys).`);
     return "Connection to the creative AI has failed. This may be a configuration issue. Please try again later.";
   }
 
@@ -72,7 +85,7 @@ const safeGenerate = async (
         details: error
     });
     
-    if (error.message?.includes('rate limit')) {
+    if (error.message?.includes('rate limit') || error.status === 429) {
         return "Our creative AI is experiencing high demand right now. Please wait a moment and try your request again.";
     }
     
