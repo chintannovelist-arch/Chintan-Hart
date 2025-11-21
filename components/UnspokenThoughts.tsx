@@ -1,17 +1,34 @@
 
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { Lock, Unlock, BrainCircuit, ChevronRight, Shield } from 'lucide-react';
 import { callGeminiUnspokenThoughts } from '../services/geminiService';
 import { UNSPOKEN_SCENES } from '../constants';
 
+const SceneButton = React.memo(({ scene, isSelected, isUnlocked, onSelect }: any) => (
+    <button 
+        onClick={() => onSelect(scene.id)}
+        className={`w-full text-left p-4 rounded-sm border-l-2 transition-all duration-300 group relative ${isSelected ? 'border-primary bg-white/5' : 'border-transparent hover:bg-white/5 hover:border-white/20'}`}
+    >
+        <span className={`block font-bold text-xs uppercase tracking-wider mb-1 ${isSelected ? 'text-primary' : 'text-slate-500'}`}>{scene.title.split(':')[0]}</span>
+        <span className={`block font-serif text-sm ${isSelected ? 'text-white' : 'text-slate-400'}`}>{scene.title.split(':')[1]}</span>
+        {isUnlocked && <Unlock size={12} className="absolute top-4 right-4 text-blush" />}
+    </button>
+));
+SceneButton.displayName = 'SceneButton';
+
 const UnspokenThoughts: React.FC = () => {
     const [selectedSceneId, setSelectedSceneId] = useState(UNSPOKEN_SCENES[0].id);
+    
+    // State to store unlocked thoughts, mapping scene ID to the generated text.
+    // e.g., { "ch8": "Her skin feels like...", "ch41": "I need to protect her..." }
     const [unlockedThoughts, setUnlockedThoughts] = useState<Record<string, string>>({});
+    
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const [loadingMessage, setLoadingMessage] = useState("Deciphering Silence...");
 
-    const currentScene = UNSPOKEN_SCENES.find(s => s.id === selectedSceneId) || UNSPOKEN_SCENES[0];
+    const selectedSceneData = UNSPOKEN_SCENES.find(s => s.id === selectedSceneId) || UNSPOKEN_SCENES[0];
     const isCurrentUnlocked = !!unlockedThoughts[selectedSceneId];
 
     const loadingMessages = [
@@ -22,6 +39,7 @@ const UnspokenThoughts: React.FC = () => {
         "Translating the unspoken..."
     ];
 
+    // Effect to cycle through different loading messages for better UX.
     useEffect(() => {
         let interval: any;
         if (isLoading) {
@@ -32,6 +50,7 @@ const UnspokenThoughts: React.FC = () => {
             }, 2000);
         }
         return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isLoading]);
 
     const handleReveal = async () => {
@@ -42,9 +61,8 @@ const UnspokenThoughts: React.FC = () => {
         setLoadingMessage("Deciphering Silence...");
         
         try {
-            const result = await callGeminiUnspokenThoughts(currentScene.title, currentScene.trigger);
+            const result = await callGeminiUnspokenThoughts(selectedSceneData.title, selectedSceneData.trigger);
             
-            // Check for specific thematic error messages returned by the service
             if (result.includes("guarded") || result.includes("silence remains") || !result) {
                  setError("His thoughts are too guarded right now. The silence remains unbroken.");
             } else {
@@ -56,6 +74,11 @@ const UnspokenThoughts: React.FC = () => {
         
         setIsLoading(false);
     };
+
+    const handleSceneSelect = useCallback((id: string) => {
+        setSelectedSceneId(id);
+        setError("");
+    }, []);
 
     return (
         <section id="unspoken" className="py-32 bg-black relative border-b border-white/5">
@@ -77,15 +100,13 @@ const UnspokenThoughts: React.FC = () => {
                         <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-4 px-2">Select a Moment</h3>
                         <div className="overflow-y-auto custom-scrollbar flex-1 pr-2 space-y-2">
                             {UNSPOKEN_SCENES.map((scene) => (
-                                <button 
+                                <SceneButton 
                                     key={scene.id}
-                                    onClick={() => { setSelectedSceneId(scene.id); setError(""); }}
-                                    className={`w-full text-left p-4 rounded-sm border-l-2 transition-all duration-300 group relative ${selectedSceneId === scene.id ? 'border-primary bg-white/5' : 'border-transparent hover:bg-white/5 hover:border-white/20'}`}
-                                >
-                                    <span className={`block font-bold text-xs uppercase tracking-wider mb-1 ${selectedSceneId === scene.id ? 'text-primary' : 'text-slate-500'}`}>{scene.title.split(':')[0]}</span>
-                                    <span className={`block font-serif text-sm ${selectedSceneId === scene.id ? 'text-white' : 'text-slate-400'}`}>{scene.title.split(':')[1]}</span>
-                                    {unlockedThoughts[scene.id] && <Unlock size={12} className="absolute top-4 right-4 text-blush" />}
-                                </button>
+                                    scene={scene}
+                                    isSelected={selectedSceneId === scene.id}
+                                    isUnlocked={unlockedThoughts[scene.id]}
+                                    onSelect={handleSceneSelect}
+                                />
                             ))}
                         </div>
                     </div>
@@ -101,18 +122,17 @@ const UnspokenThoughts: React.FC = () => {
                                 <div className="h-px flex-1 bg-white/10"></div>
                             </div>
                             <p className="font-serif text-lg text-slate-300 italic leading-relaxed border-l-2 border-white/10 pl-6">
-                                "{currentScene.context}"
+                                "{selectedSceneData.context}"
                             </p>
                             <div className="mt-6 bg-white/5 p-4 rounded-sm border border-white/5 inline-block">
                                 <span className="text-primary text-[10px] font-bold uppercase tracking-widest block mb-1">Trigger Action</span>
-                                <span className="text-white font-body text-sm">{currentScene.trigger}</span>
+                                <span className="text-white font-body text-sm">{selectedSceneData.trigger}</span>
                             </div>
                         </div>
 
                         {/* Interaction Zone */}
                         <div className="flex-1 flex items-center justify-center relative bg-black/20 rounded-sm border border-white/5 p-8">
                             
-                            {/* Locked State */}
                             {!isCurrentUnlocked && !isLoading && !error && (
                                 <div className="text-center z-20">
                                     <div className="mb-6 relative inline-block">
@@ -131,13 +151,11 @@ const UnspokenThoughts: React.FC = () => {
                                         <span className="relative flex items-center gap-3 text-primary font-bold uppercase text-xs tracking-[0.25em] group-hover:text-white transition-colors">
                                             Reveal His Thoughts <ChevronRight size={14} />
                                         </span>
-                                        {/* Pulse Animation */}
                                         <span className="absolute -inset-1 bg-primary/20 blur-md opacity-0 group-hover:opacity-100 animate-pulse transition-opacity duration-500"></span>
                                     </button>
                                 </div>
                             )}
 
-                            {/* Loading State */}
                             {isLoading && (
                                 <div className="text-center z-20">
                                     <div className="relative w-16 h-16 mx-auto mb-6">
@@ -146,11 +164,10 @@ const UnspokenThoughts: React.FC = () => {
                                         <BrainCircuit size={20} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary/50" />
                                     </div>
                                     <p className="text-xs font-bold uppercase tracking-[0.3em] text-slate-500 animate-pulse transition-all duration-500">{loadingMessage}</p>
-                                    <p className="text-[10px] text-slate-600 mt-2 font-serif italic">Accessing subtext from {currentScene.title}...</p>
+                                    <p className="text-[10px] text-slate-600 mt-2 font-serif italic">Accessing subtext from {selectedSceneData.title}...</p>
                                 </div>
                             )}
 
-                            {/* Error State - Thematic */}
                             {error && (
                                 <div className="text-center z-20 animate-fade-in">
                                     <Shield size={32} className="text-slate-600 mx-auto mb-4 opacity-70" />
@@ -164,7 +181,6 @@ const UnspokenThoughts: React.FC = () => {
                                 </div>
                             )}
 
-                            {/* Unlocked Content */}
                             {isCurrentUnlocked && (
                                 <div className="w-full animate-fade-in-up">
                                     <div className="flex items-center gap-2 mb-6 justify-center">
@@ -177,7 +193,6 @@ const UnspokenThoughts: React.FC = () => {
                                 </div>
                             )}
                             
-                            {/* Background texture for the box */}
                             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/noise.png')] opacity-10 pointer-events-none"></div>
                         </div>
                     </div>

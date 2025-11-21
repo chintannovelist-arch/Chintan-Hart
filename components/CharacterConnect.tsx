@@ -1,32 +1,81 @@
-import React, { useState, useRef, useEffect } from 'react';
+
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { MessageCircle, Send, MoreHorizontal, Circle } from 'lucide-react';
 import { ChatMessage } from '../types';
 import { callGeminiChat } from '../services/geminiService';
 
+// --- Sub-components for Performance Optimization ---
+
+const MessageBubble = React.memo(({ msg }: { msg: ChatMessage }) => {
+    return (
+        <div className={`flex items-end gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in-up`}>
+            <div className={`max-w-[80%] p-4 text-sm font-body leading-relaxed shadow-md ${
+                msg.role === 'user' 
+                ? 'bg-primary text-white rounded-2xl rounded-tr-none' 
+                : 'bg-onyx border border-white/10 text-slate-300 rounded-2xl rounded-tl-none'
+            }`}>
+                {msg.text}
+            </div>
+        </div>
+    );
+});
+MessageBubble.displayName = 'MessageBubble';
+
+const ChatInputForm = React.memo(({ onSend, selectedChar }: { onSend: (msg: string) => void; selectedChar: string; }) => {
+    const [message, setMessage] = useState("");
+
+    const handleSend = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!message.trim()) return;
+        onSend(message);
+        setMessage("");
+    };
+
+    return (
+        <form onSubmit={handleSend} className="p-4 border-t border-white/5 flex gap-4 bg-black/80 backdrop-blur-md">
+            <input 
+                type="text" 
+                value={message} 
+                onChange={(e) => setMessage(e.target.value)} 
+                placeholder={`Message ${selectedChar}...`} 
+                className="flex-1 p-4 bg-white/5 rounded-sm outline-none focus:bg-white/10 border border-white/5 focus:border-primary/30 text-white transition-all placeholder:text-slate-600 font-body text-sm focus:ring-1 focus:ring-primary/20" 
+                aria-label="Message input"
+            />
+            <button 
+                type="submit" 
+                disabled={!message.trim()} 
+                className="w-14 h-14 bg-primary text-white rounded-sm hover:bg-primary-dark transition-all flex items-center justify-center disabled:opacity-50 disabled:bg-slate-800 shadow-glow"
+                aria-label="Send message"
+            >
+                <Send size={20} className={message.trim() ? "ml-0.5" : ""} />
+            </button>
+        </form>
+    );
+});
+ChatInputForm.displayName = 'ChatInputForm';
+
+// --- Main Component ---
+
 const CharacterConnect: React.FC = () => {
     const [selectedChar, setSelectedChar] = useState("Vijay");
-    const [message, setMessage] = useState("");
     const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
     const [isTyping, setIsTyping] = useState(false);
     const chatEndRef = useRef<HTMLDivElement>(null);
 
-    const handleSend = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSend = useCallback(async (message: string) => {
         if (!message.trim()) return;
         const newUserMsg: ChatMessage = { role: 'user', text: message };
         setChatHistory(prev => [...prev, newUserMsg]);
-        setMessage("");
         setIsTyping(true);
         const response = await callGeminiChat(selectedChar, message);
         setIsTyping(false);
         setChatHistory(prev => [...prev, { role: 'char', text: response }]);
-    };
+    }, [selectedChar]);
 
     useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chatHistory, isTyping]);
 
     return (
         <section id="connect" className="py-32 bg-black relative">
-             {/* Gradient Glow */}
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
 
             <div className="max-w-5xl mx-auto px-6 relative z-10">
@@ -75,7 +124,7 @@ const CharacterConnect: React.FC = () => {
                         </div>
 
                         {/* Messages */}
-                        <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-fixed">
+                        <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-fixed">
                             {chatHistory.length === 0 && (
                                 <div className="h-full flex items-center justify-center flex-col text-slate-700 gap-4 opacity-50">
                                     <div className="p-4 border border-white/5 rounded-full"><MessageCircle size={32} strokeWidth={1} /></div>
@@ -83,15 +132,7 @@ const CharacterConnect: React.FC = () => {
                                 </div>
                             )}
                             {chatHistory.map((msg, idx) => (
-                                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in-up`}>
-                                    <div className={`max-w-[80%] p-5 text-sm font-body leading-relaxed shadow-md relative ${
-                                        msg.role === 'user' 
-                                        ? 'bg-primary text-white rounded-2xl rounded-tr-none' 
-                                        : 'bg-onyx border border-white/10 text-slate-300 rounded-2xl rounded-tl-none'
-                                    }`}>
-                                        {msg.text}
-                                    </div>
-                                </div>
+                                <MessageBubble key={idx} msg={msg} />
                             ))}
                             {isTyping && (
                                 <div className="flex justify-start animate-fade-in">
@@ -106,24 +147,7 @@ const CharacterConnect: React.FC = () => {
                         </div>
                         
                         {/* Input */}
-                        <form onSubmit={handleSend} className="p-4 border-t border-white/5 flex gap-4 bg-black/80 backdrop-blur-md">
-                            <input 
-                                type="text" 
-                                value={message} 
-                                onChange={(e) => setMessage(e.target.value)} 
-                                placeholder={`Message ${selectedChar}...`} 
-                                className="flex-1 p-4 bg-white/5 rounded-sm outline-none focus:bg-white/10 border border-white/5 focus:border-primary/30 text-white transition-all placeholder:text-slate-600 font-body text-sm focus:ring-1 focus:ring-primary/20" 
-                                aria-label="Message input"
-                            />
-                            <button 
-                                type="submit" 
-                                disabled={!message.trim()} 
-                                className="w-14 h-14 bg-primary text-white rounded-sm hover:bg-primary-dark transition-all flex items-center justify-center disabled:opacity-50 disabled:bg-slate-800 shadow-glow"
-                                aria-label="Send message"
-                            >
-                                <Send size={20} className={message.trim() ? "ml-0.5" : ""} />
-                            </button>
-                        </form>
+                        <ChatInputForm onSend={handleSend} selectedChar={selectedChar} />
                     </div>
                 </div>
             </div>

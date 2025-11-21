@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { X, BookOpen, ShoppingBag, Share2, Twitter, Facebook, Mail, Star, Heart, Instagram } from 'lucide-react';
 import { BOOKS, BOOK_SAMPLE, AUTHOR_NAME } from '../constants';
@@ -79,7 +80,7 @@ const BookSection: React.FC = () => {
     const handleShare = () => {
         setShareCount(prev => prev + 1);
     };
-
+    
     return (
     <section id="books" className="py-32 bg-onyx relative overflow-hidden">
       {/* Atmospheric Lighting */}
@@ -103,7 +104,7 @@ const BookSection: React.FC = () => {
                         alt={book.coverImages[0].alt} 
                         loading="lazy" 
                         decoding="async"
-                        className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-700" 
+                        className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105" 
                    />
                    {/* Overlay Gradient */}
                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-80"></div>
@@ -137,7 +138,7 @@ const BookSection: React.FC = () => {
                     {book.description}
                 </p>
                 
-                <div className="flex flex-col sm:flex-row gap-6 pt-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                <div className="flex flex-wrap gap-6 pt-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                     <a href={book.amazonLink} className="px-10 py-4 bg-primary hover:bg-primary-dark text-white text-xs font-bold uppercase tracking-[0.25em] rounded-sm shadow-glow transition-all duration-500 ease-snappy hover:-translate-y-1 flex items-center justify-center gap-3 group">
                         <ShoppingBag size={16} className="group-hover:animate-bounce"/> Buy on Amazon
                     </a>

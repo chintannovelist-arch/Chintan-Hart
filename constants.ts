@@ -1,4 +1,6 @@
 
+
+
 import { Book, Scenario, SneakPeek } from './types';
 
 export const AUTHOR_NAME = "Chintan Hart";
@@ -12,9 +14,9 @@ export const BOOKS: Book[] = [
     description: "In the humid heat of Chennai, Meena and Vijay are bound by a wedding knot, but separated by a wall of pillows. What starts as an arranged marriage governed by strict boundaries slowly unravels into a dangerous obsession as the scent of jasmine and the closeness of a small apartment break down their defenses. From the first tentative touch to the breaking of the storm, experience their journey of intimacy, high stakes, and passion.",
     coverImages: [
         {
-            src: "https://images.unsplash.com/photo-1616529323695-7c549a820955?q=80&w=1000&auto=format&fit=crop", 
-            srcSet: "https://images.unsplash.com/photo-1616529323695-7c549a820955?q=80&w=500&auto=format&fit=crop 500w, https://images.unsplash.com/photo-1616529323695-7c549a820955?q=80&w=1000&auto=format&fit=crop 1000w",
-            alt: "The Jasmine Knot - Couple Intimacy"
+            src: "https://images.unsplash.com/photo-1615875228545-9b3400a0e1ae?q=80&w=1000&auto=format&fit=crop", 
+            srcSet: "https://images.unsplash.com/photo-1615875228545-9b3400a0e1ae?q=80&w=500&auto=format&fit=crop 500w, https://images.unsplash.com/photo-1615875228545-9b3400a0e1ae?q=80&w=1000&auto=format&fit=crop 1000w",
+            alt: "The Jasmine Knot - A beautiful cover of a South Asian couple in a tender embrace."
         },
         {
             src: "https://images.unsplash.com/photo-1614246533105-51890d137541?q=80&w=1000&auto=format&fit=crop", 
@@ -26,24 +28,6 @@ export const BOOKS: Book[] = [
     sampleLink: "#",
     status: "Available Now",
     tags: ["Arranged Marriage", "Slow Burn", "Chennai Romance", "Intimacy"]
-  }
-];
-
-export const SNEAK_PEEKS: SneakPeek[] = [
-  {
-    title: "The Anklet Repair",
-    excerpt: "He knelt at her feet. It was a posture of submission, yet the way he held her ankle made it look incredibly dominant. 'Hold still,' he murmured, his fingers brushing against the sensitive skin of her ankle bone.",
-    chapter: "Chapter 9"
-  },
-  {
-    title: "The Saree Drape",
-    excerpt: "He reached around her, his large hands taking the sheaf of pleats from her tired fingers. His knuckles brushed against her bare waist. The contact was electric.",
-    chapter: "Chapter 8"
-  },
-  {
-    title: "The Rain",
-    excerpt: "They stood in the living room, dripping water onto the floor. The silence was heavy, filled only by their ragged breathing and the sound of rain hammering against the window.",
-    chapter: "Chapter 50"
   }
 ];
 
@@ -62,6 +46,26 @@ export const CLIFFHANGER_SCENARIOS = [
     "The Cufflink Struggle"
 ];
 
+// FIX: Add missing SNEAK_PEEKS export for the Snippets component.
+export const SNEAK_PEEKS: SneakPeek[] = [
+    {
+        chapter: "Chapter 8",
+        title: "The Saree Drape",
+        excerpt: "He reached around her, his large hands taking the sheaf of pleats from her tired fingers. 'Relax,' he murmured near her ear. 'Let go. I've got it.'..."
+    },
+    {
+        chapter: "Chapter 20",
+        title: "Between the Legs",
+        excerpt: "Vijay opened his legs slightly, creating a V-shape. Meena slid into the space between his legs, her back to him... a position of extreme intimacy."
+    },
+    {
+        chapter: "Chapter 54",
+        title: "The Slow Dance",
+        excerpt: "'Dance with me,' he repeated... He placed his left hand on her waist... 'Just sway,' he whispered. They began to move... The space between them evaporated."
+    }
+];
+
+// Data for the "Finish The Scene" interactive component.
 export const SCENARIOS: Record<string, Scenario[]> = {
     Meena: [
         { id: 1, title: "The Shirt Swap", context: "You spilled coffee on your blouse and are wearing Vijay's crisp white shirt. It's huge on you. Vijay walks in unexpectedly.", prompt: "How do you react to his gaze?" },
@@ -116,7 +120,8 @@ export const BOOK_SAMPLE = {
     content: `Chapter 1: The Scent of Jasmine... (Sample content here)`
 };
 
-// Authentic content extracted from PDF for AI context grounding
+// Provides authentic novel content to "ground" the AI, ensuring its responses
+// are contextually accurate and stylistically consistent with the book.
 export const NOVEL_SCENES: Record<string, string> = {
     "Chapter 4": `Chapter 4: The Pillow Wall. They awkwardly maneuvered into the bed... "Wait," Meena said, staring at the ceiling. "This feels... too close." Vijay sat up too. "Yeah. You're right. The gravity on this mattress is pulling us to the middle." He grabbed a couple of extra pillows from the headboard. "Let's build a fortress."`,
     "Chapter 8": `Chapter 8: The Saree Drape. He reached around her, his large hands taking the sheaf of pleats from her tired fingers. "Relax," he murmured near her ear. "Let go. I've got it."... He shook the pleats out... Then, he brought his hands to her waist to tuck them in. Meena stopped breathing. He had to tuck the fabric into the underskirt tied at her waist... His knuckles brushed against her bare skin.`,
@@ -131,7 +136,7 @@ export const NOVEL_SCENES: Record<string, string> = {
     "Chapter 79": `Chapter 79: The Consent. "Are you sure?" he asked... She rose on her tiptoes... She kissed him. It wasn't a gentle, tentative peck. It was a collision... His arms wrapped around her waist, crushing her against him.`,
 };
 
-// Detailed Data for the Tension Heatmap - Visualizing the "Slow Burn"
+// Powers the "Tension Heatmap" data visualization.
 export const TENSION_DATA = [
     { 
         chapter: 1, 
@@ -212,7 +217,7 @@ export const TENSION_DATA = [
     },
 ];
 
-// Scenarios for the Prediction Game
+// Content for the interactive "Prediction Game" component.
 export const PREDICTION_QUESTIONS = [
     {
         id: 1,
@@ -252,7 +257,7 @@ export const PREDICTION_QUESTIONS = [
     }
 ];
 
-// Expanded & Detailed Unspoken Thoughts
+// Powers the "Unspoken Thoughts" component, providing detailed prompts for the AI.
 export const UNSPOKEN_SCENES = [
     {
         id: "ch8",

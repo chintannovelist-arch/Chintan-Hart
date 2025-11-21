@@ -1,6 +1,13 @@
 
+
+
 import { GoogleGenAI } from "@google/genai";
 import { NOVEL_SCENES } from '../constants';
+
+// This service centralizes all interactions with the Gemini API.
+// It uses a single, robust `safeGenerate` helper function to ensure that all
+// API calls have consistent error handling, API key validation, and fallback
+// messaging. This pattern makes adding new AI features scalable and maintainable.
 
 // Helper to safely initialize the client
 const getAiClient = () => {
@@ -18,6 +25,11 @@ const MODEL_NAME = 'gemini-2.5-flash';
 
 /**
  * Safely executes a Gemini API generation call with error handling and fallback messaging.
+ * @param prompt The user-facing prompt for the AI.
+ * @param systemInstruction The backend instructions guiding the AI's personality and format.
+ * @param contextName A friendly name for logging purposes.
+ * @param userErrorMessage A fallback message to show the user if the API call fails.
+ * @returns A string containing the AI's response or the fallback error message.
  */
 const safeGenerate = async (
   prompt: string, 
@@ -56,7 +68,7 @@ const safeGenerate = async (
   }
 };
 
-// --- Existing Services ---
+// --- API Service Functions ---
 
 export const callGeminiPlaylist = async (mood: string) => {
     const system = `You are a musical curator for Chintan Hart's readers.
@@ -115,10 +127,9 @@ export const callGeminiDatePlanner = async (country: string, city: string, vibe:
     );
 };
 
-// --- NEW MARKETING FEATURES ---
-
 export const callGeminiTropeMatch = async (userFavorite: string) => {
-    // Constructing a context string from available scenes to guide the AI
+    // This is "Context Grounding". By providing actual snippets from the book,
+    // the AI can make more accurate and relevant connections instead of guessing.
     const bookContext = Object.entries(NOVEL_SCENES).map(([key, val]) => `${key}: ${val.substring(0, 150)}...`).join('\n');
 
     const system = `You are a literary matchmaker for 'The Jasmine Knot'.
@@ -146,20 +157,6 @@ export const callGeminiTropeMatch = async (userFavorite: string) => {
     );
 };
 
-export const callGeminiTranslator = async (inputText: string) => {
-    const system = `You are Chintan Hart, the author. Rewrite the user's boring text into the lush, sensory, over-the-top romantic prose of 'The Jasmine Knot'. 
-    Use words like: longing, humidity, gaze, electricity, silk, jasmine.
-    Make it sound like a dramatic excerpt from the book.`;
-    const prompt = `Rewrite this text: "${inputText}"`;
-    
-    return safeGenerate(
-        prompt, 
-        system, 
-        "Jasmine Translator",
-        "The words refuse to flow. The ink is dry."
-    );
-};
-
 export const callGeminiCliffhanger = async (scenario: string) => {
     const system = `You are writing a high-tension scene for 'The Jasmine Knot' between Meena and Vijay.
     Write 150 words of intense buildup based on the scenario.
@@ -173,6 +170,23 @@ export const callGeminiCliffhanger = async (scenario: string) => {
         system, 
         "Cliffhanger Engine",
         "They stood close, the air thick with unsaid words..."
+    );
+};
+
+// FIX: Add missing callGeminiTranslator function for the RomanceTranslator component.
+export const callGeminiTranslator = async (boringText: string) => {
+    const system = `You are a romantic novelist in the style of Chintan Hart, author of 'The Jasmine Knot'.
+    Your task is to transform a mundane, boring sentence into a lush, sensory, and romantic description.
+    Focus on sensory details (scent, touch, sight, sound), internal feelings, and heightened emotions.
+    The output should be a single, beautiful sentence or two.
+    Keep it under 50 words.`;
+    const prompt = `Transform this mundane text: "${boringText}"`;
+    
+    return safeGenerate(
+        prompt,
+        system,
+        "Romance Translator",
+        "The muse is unavailable to translate your words right now."
     );
 };
 
@@ -248,10 +262,9 @@ export const callGeminiSensory = async (sense: string) => {
 };
 
 export const callGeminiUnspokenThoughts = async (chapterTitle: string, sceneContext: string) => {
-    // Extract key for lookup (e.g. "Chapter 8")
+    // This is "Context Grounding". By providing the actual text from the novel,
+    // the AI can generate a more accurate and in-character internal monologue.
     const lookupKey = chapterTitle.includes(':') ? chapterTitle.split(':')[0] : chapterTitle;
-    
-    // Try to get exact text, otherwise fallback to description
     const novelText = NOVEL_SCENES[lookupKey] || "Context unavailable from text.";
     
     const system = `You are the 'Unspoken Thoughts' engine for the novel 'The Jasmine Knot'.

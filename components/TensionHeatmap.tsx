@@ -1,22 +1,76 @@
 
-import React, { useState } from 'react';
+
+import React, { useState, useMemo, useCallback } from 'react';
 import { Activity, Flame, Lock, Unlock } from 'lucide-react';
 import { TENSION_DATA } from '../constants';
+
+// --- Component Constants ---
+const SVG_WIDTH = 800;
+const SVG_HEIGHT = 300;
+const PADDING = 40;
+const MAX_Y_VALUE = 100;
+
+/**
+ * A memoized component for rendering individual data points on the graph.
+ * This prevents the entire complex SVG chart from re-rendering when the user
+ * simply hovers over a single point, significantly improving performance.
+ */
+const MemoizedGraphPoint = React.memo(({ d, i, isActive, getX, getY, onPointHover }: any) => (
+    <g 
+        onMouseEnter={() => onPointHover(d)} 
+        onClick={() => onPointHover(d)}
+        className="cursor-pointer group/point"
+    >
+        {/* Invisible larger touch target for easier hovering on mobile/desktop */}
+        <circle cx={getX(i)} cy={getY(d.tension)} r="24" fill="transparent" />
+        
+        {/* Active Halo Effect */}
+        <circle 
+            cx={getX(i)} 
+            cy={getY(d.tension)} 
+            r={isActive ? "12" : "0"} 
+            fill="rgba(244, 194, 194, 0.3)" 
+            className="transition-all duration-300"
+        />
+
+        {/* Visible Point */}
+        <circle 
+            cx={getX(i)} 
+            cy={getY(d.tension)} 
+            r="6" 
+            fill={isActive ? "#F4C2C2" : "#0F0F0F"} 
+            stroke={d.tension > 80 ? "#F4C2C2" : "#2596be"} 
+            strokeWidth="2" 
+            className={`transition-all duration-300 ${isActive ? 'scale-125 stroke-white' : 'group-hover/point:scale-125 group-hover/point:fill-white'}`} 
+        />
+    </g>
+));
+MemoizedGraphPoint.displayName = 'MemoizedGraphPoint';
 
 const TensionHeatmap: React.FC = () => {
     const [activePoint, setActivePoint] = useState<typeof TENSION_DATA[0] | null>(null);
 
-    // SVG Calculations
-    const width = 800;
-    const height = 300;
-    const padding = 40;
-    const maxY = 100;
+    // useCallback ensures the function reference is stable, which is crucial for
+    // passing it as a prop to the memoized child component `MemoizedGraphPoint`.
+    const handlePointHover = useCallback((point: typeof TENSION_DATA[0]) => {
+        setActivePoint(point);
+    }, []);
 
-    const getX = (index: number) => padding + (index / (TENSION_DATA.length - 1)) * (width - 2 * padding);
-    const getY = (val: number) => height - padding - (val / maxY) * (height - 2 * padding);
+    // useMemo prevents expensive SVG path calculations on every single render.
+    // The path strings are calculated only once, or when dependencies change (which they don't).
+    const { getX, getY, tensionLinePath, tensionAreaPath } = useMemo(() => {
+        // Helper function to map a data point's index to an X-coordinate.
+        const getX = (index: number) => PADDING + (index / (TENSION_DATA.length - 1)) * (SVG_WIDTH - 2 * PADDING);
+        
+        // Helper function to map a tension value to a Y-coordinate (inverted for SVG).
+        const getY = (val: number) => SVG_HEIGHT - PADDING - (val / MAX_Y_VALUE) * (SVG_HEIGHT - 2 * PADDING);
 
-    const points = TENSION_DATA.map((d, i) => `${getX(i)},${getY(d.tension)}`).join(" ");
-    const areaPoints = `${getX(0)},${height} ${points} ${getX(TENSION_DATA.length - 1)},${height}`;
+        const svgPoints = TENSION_DATA.map((d, i) => `${getX(i)},${getY(d.tension)}`).join(" ");
+        const svgAreaPoints = `${getX(0)},${SVG_HEIGHT} ${svgPoints} ${getX(TENSION_DATA.length - 1)},${SVG_HEIGHT}`;
+        
+        return { getX, getY, tensionLinePath: svgPoints, tensionAreaPath: svgAreaPoints };
+    }, []);
+
 
     return (
         <section id="heatmap" className="py-32 bg-black border-b border-white/5">
@@ -41,7 +95,6 @@ const TensionHeatmap: React.FC = () => {
                         <span className="text-blush flex items-center gap-2">Desire <Unlock size={10}/></span>
                     </div>
                     <div className="h-4 bg-black rounded-full overflow-hidden relative border border-white/10">
-                        {/* Meter Bar */}
                          <div className="absolute inset-0 bg-gradient-to-r from-primary via-purple-500 to-blush w-full transform origin-left scale-x-0 animate-[loadMeter_2.5s_ease-out_forwards]"></div>
                          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/diagonal-stripes.png')] opacity-20"></div>
                     </div>
@@ -55,8 +108,7 @@ const TensionHeatmap: React.FC = () => {
                 <div className="relative bg-onyx border border-white/10 rounded-sm p-8 md:p-12 shadow-2xl overflow-hidden group">
                     <div className="w-full overflow-x-auto custom-scrollbar pb-4">
                         <div className="min-w-[800px]">
-                            <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
-                                {/* Gradient Defs */}
+                            <svg width="100%" height="100%" viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} className="overflow-visible">
                                 <defs>
                                     <linearGradient id="tensionGradient" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="0%" stopColor="#F4C2C2" stopOpacity="0.3"/>
@@ -76,58 +128,30 @@ const TensionHeatmap: React.FC = () => {
                                     </filter>
                                 </defs>
 
-                                {/* Grid Lines */}
                                 {[0, 25, 50, 75, 100].map(val => (
-                                    <line key={val} x1={padding} y1={getY(val)} x2={width - padding} y2={getY(val)} stroke="#ffffff" strokeOpacity="0.05" strokeDasharray="4 4" />
+                                    <line key={val} x1={PADDING} y1={getY(val)} x2={SVG_WIDTH - PADDING} y2={getY(val)} stroke="#ffffff" strokeOpacity="0.05" strokeDasharray="4 4" />
                                 ))}
 
-                                {/* Area Fill */}
-                                <path d={areaPoints} fill="url(#tensionGradient)" className="opacity-40 transition-opacity duration-500" />
+                                <path d={tensionAreaPath} fill="url(#tensionGradient)" className="opacity-40 transition-opacity duration-500" />
+                                <path d={`M ${tensionLinePath}`} fill="none" stroke="url(#lineGradient)" strokeWidth="4" strokeLinecap="round" filter="url(#glow)" className="drop-shadow-lg" />
 
-                                {/* The Line */}
-                                <path d={`M ${points}`} fill="none" stroke="url(#lineGradient)" strokeWidth="4" strokeLinecap="round" filter="url(#glow)" className="drop-shadow-lg" />
-
-                                {/* Interactive Points */}
-                                {TENSION_DATA.map((d, i) => {
-                                    const isActive = activePoint === d;
-                                    return (
-                                        <g key={i} 
-                                           onMouseEnter={() => setActivePoint(d)} 
-                                           onClick={() => setActivePoint(d)}
-                                           className="cursor-pointer group/point"
-                                        >
-                                            {/* Invisible larger touch target for ease of use */}
-                                            <circle cx={getX(i)} cy={getY(d.tension)} r="24" fill="transparent" />
-                                            
-                                            {/* Active Halo Effect */}
-                                            <circle 
-                                                cx={getX(i)} 
-                                                cy={getY(d.tension)} 
-                                                r={isActive ? "12" : "0"} 
-                                                fill="rgba(244, 194, 194, 0.3)" 
-                                                className="transition-all duration-300"
-                                            />
-
-                                            {/* Visible Point */}
-                                            <circle 
-                                                cx={getX(i)} 
-                                                cy={getY(d.tension)} 
-                                                r="6" 
-                                                fill={isActive ? "#F4C2C2" : "#0F0F0F"} 
-                                                stroke={d.tension > 80 ? "#F4C2C2" : "#2596be"} 
-                                                strokeWidth="2" 
-                                                className={`transition-all duration-300 ${isActive ? 'scale-125 stroke-white' : 'group-hover/point:scale-125 group-hover/point:fill-white'}`} 
-                                            />
-                                        </g>
-                                    );
-                                })}
+                                {TENSION_DATA.map((d, i) => (
+                                    <MemoizedGraphPoint
+                                        key={i}
+                                        d={d}
+                                        i={i}
+                                        isActive={activePoint === d}
+                                        getX={getX}
+                                        getY={getY}
+                                        onPointHover={handlePointHover}
+                                    />
+                                ))}
                             </svg>
                         </div>
                     </div>
 
                     {/* Tooltip / Detail View */}
                     <div className="mt-8 min-h-[180px] bg-black/40 rounded-sm border border-white/5 p-8 flex flex-col items-center justify-center transition-all duration-500 relative overflow-hidden">
-                        {/* Background blur for tooltip */}
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/90"></div>
                         
                         {activePoint ? (
@@ -139,16 +163,12 @@ const TensionHeatmap: React.FC = () => {
                                         {activePoint.tension > 80 ? "Spicy Level: High" : "Spicy Level: Simmering"}
                                      </span>
                                 </div>
-                                
                                 <h3 className="text-3xl text-white font-display mb-4 tracking-wide drop-shadow-lg">{activePoint.title}</h3>
-                                
                                 <div className="bg-white/5 p-6 rounded-sm border-l-2 border-primary/50 mb-6">
                                     <p className="text-slate-300 font-serif italic text-lg leading-relaxed">
                                         "{activePoint.snippet}"
                                     </p>
                                 </div>
-                                
-                                {/* Dual Bar Comparison */}
                                 <div className="grid grid-cols-2 gap-4 max-w-md mx-auto mt-4">
                                     <div className="space-y-2">
                                         <div className="text-[9px] uppercase tracking-wider text-slate-500">Pact Integrity</div>

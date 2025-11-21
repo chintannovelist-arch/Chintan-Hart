@@ -1,25 +1,26 @@
 
+
 import React, { useState } from 'react';
 import { HelpCircle, CheckCircle2, XCircle, Gift } from 'lucide-react';
 import { PREDICTION_QUESTIONS } from '../constants';
 
 const PredictionGame: React.FC = () => {
-    const [currentQIndex, setCurrentQIndex] = useState(0);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [showResult, setShowResult] = useState(false);
 
-    const currentQ = PREDICTION_QUESTIONS[currentQIndex];
+    const currentQuestion = PREDICTION_QUESTIONS[currentQuestionIndex];
 
-    const handleSelect = (optId: string) => {
+    const handleSelect = (optionId: string) => {
         if (showResult) return;
-        setSelectedOption(optId);
+        setSelectedOption(optionId);
         setShowResult(true);
     };
 
     const nextQuestion = () => {
         setSelectedOption(null);
         setShowResult(false);
-        setCurrentQIndex((prev) => (prev + 1) % PREDICTION_QUESTIONS.length);
+        setCurrentQuestionIndex((prevIndex) => (prevIndex + 1) % PREDICTION_QUESTIONS.length);
     };
 
     return (
@@ -38,15 +39,15 @@ const PredictionGame: React.FC = () => {
                 <div className="bg-black/50 border border-white/10 rounded-sm p-8 md:p-12 shadow-2xl relative overflow-hidden min-h-[500px] flex flex-col">
                     {/* Question Header */}
                     <div className="mb-10">
-                        <span className="text-primary text-[10px] font-bold uppercase tracking-[0.2em] mb-2 block">{currentQ.chapter}</span>
-                        <h3 className="text-2xl text-white font-serif leading-relaxed">"{currentQ.context}"</h3>
+                        <span className="text-primary text-[10px] font-bold uppercase tracking-[0.2em] mb-2 block">{currentQuestion.chapter}</span>
+                        <h3 className="text-2xl text-white font-serif leading-relaxed">"{currentQuestion.context}"</h3>
                     </div>
 
                     {/* Options */}
                     <div className="space-y-4 flex-1">
-                        {currentQ.options.map((opt) => {
+                        {currentQuestion.options.map((opt) => {
                             const isSelected = selectedOption === opt.id;
-                            const isCorrect = opt.id === currentQ.correctOption;
+                            const isCorrect = opt.id === currentQuestion.correctOption;
                             let btnClass = "border-white/10 bg-white/5 hover:bg-white/10 text-slate-300"; // default
                             
                             if (showResult) {
@@ -83,7 +84,7 @@ const PredictionGame: React.FC = () => {
                                     <Gift size={12}/> The Actual Scene
                                 </h4>
                                 <p className="font-serif text-lg text-slate-200 italic leading-loose">
-                                    "{currentQ.answerExcerpt}"
+                                    "{currentQuestion.answerExcerpt}"
                                 </p>
                                 <div className="mt-6 text-right">
                                     <button onClick={nextQuestion} className="text-xs font-bold uppercase tracking-widest text-white hover:text-primary transition-colors">

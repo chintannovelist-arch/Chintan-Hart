@@ -1,3 +1,5 @@
+
+
 import React, { useRef } from 'react';
 import { BookOpen, ChevronRight, ChevronDown } from 'lucide-react';
 import { TAGLINE } from '../constants';
@@ -12,19 +14,22 @@ const Hero: React.FC = () => {
   };
 
   return (
-    <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black">
+    <section id="hero" className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black">
+      {/* Sentinel for Navigation scroll detection. More performant than scroll listeners. */}
+      <div id="nav-scroll-sentinel" className="absolute top-[20px] h-px w-full" aria-hidden="true"></div>
+
       {/* Interactive Spotlight Layer */}
       <div className="absolute inset-0 pointer-events-none z-20 spotlight-overlay mix-blend-soft-light opacity-80"></div>
 
       {/* Background Layer with Ken Burns Effect */}
       <div className="absolute inset-0 opacity-40 z-0">
-        <div className="w-full h-full bg-[url('https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center animate-ken-burns"></div>
+        <div className="w-full h-full bg-[url('https://images.unsplash.com/photo-1615875228545-9b3400a0e1ae?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center animate-ken-burns"></div>
         {/* Heavy Vignette for Focus */}
         <div className="absolute inset-0 bg-vignette"></div>
       </div>
       
       {/* Content Layer */}
-      <div className="relative z-30 max-w-6xl mx-auto px-6 text-center flex flex-col items-center gap-12 pt-20">
+      <div className="relative z-30 max-w-6xl mx-auto px-6 text-center flex flex-col items-center gap-6 pt-20">
         
         <div className="animate-fade-in-up opacity-0" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
              <div className="inline-flex items-center gap-3 px-4 py-1 border-l border-r border-primary/30 bg-black/20 backdrop-blur-md text-primary text-[10px] tracking-[0.4em] uppercase mb-6">
@@ -33,21 +38,19 @@ const Hero: React.FC = () => {
             </div>
         </div>
         
-        <div className="space-y-6 animate-fade-in-up opacity-0" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
-            <h1 className="font-display text-6xl md:text-8xl lg:text-9xl text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-600 leading-none drop-shadow-2xl tracking-wide">
+        <div className="space-y-4 animate-fade-in-up opacity-0" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
+            <h1 className="font-display font-bold text-6xl md:text-8xl lg:text-9xl text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 leading-none drop-shadow-2xl tracking-wide [text-shadow:0_4px_20px_rgba(255,255,255,0.3)]">
             The Jasmine Knot
             </h1>
-        </div>
-
-        <div className="max-w-2xl mx-auto relative animate-fade-in-up opacity-0" style={{ animationDelay: '0.8s', animationFillMode: 'forwards' }}>
-             <div className="absolute -left-8 top-0 text-6xl font-serif text-primary/20">"</div>
-             <p className="text-xl md:text-2xl text-slate-300 font-body font-light tracking-wide leading-relaxed">
-                {TAGLINE}
-             </p>
-             <div className="absolute -right-8 bottom-0 text-6xl font-serif text-primary/20">"</div>
+             <div className="inline-block relative mt-2">
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-md skew-x-12 rounded-sm border border-white/20 shadow-glass"></div>
+                <h2 className="relative z-10 px-8 py-2 text-xl md:text-2xl text-slate-100 font-body font-semibold tracking-[0.15em] uppercase leading-relaxed drop-shadow-md">
+                    {TAGLINE}
+                </h2>
+            </div>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-8 mt-8 w-full sm:w-auto animate-fade-in-up opacity-0" style={{ animationDelay: '1.2s', animationFillMode: 'forwards' }}>
+        <div className="flex flex-col sm:flex-row gap-8 mt-12 w-full sm:w-auto animate-fade-in-up opacity-0" style={{ animationDelay: '1.2s', animationFillMode: 'forwards' }}>
           <a 
             href="#books" 
             onClick={(e) => scrollToSection(e, 'books')}
@@ -73,7 +76,7 @@ const Hero: React.FC = () => {
         </div>
       </div>
       
-      <a href="#books" onClick={(e) => scrollToSection(e, 'books')} className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 text-slate-600 hover:text-primary transition-colors duration-500 cursor-pointer group">
+      <a href="#books" onClick={(e) => scrollToSection(e, 'books')} className="absolute bottom-24 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 text-slate-600 hover:text-primary transition-colors duration-500 cursor-pointer group">
         <span className="text-[10px] uppercase tracking-[0.3em] font-body opacity-50 group-hover:opacity-100 transition-opacity">Begin</span>
         <ChevronDown size={20} className="animate-bounce opacity-50" />
       </a>

@@ -8,9 +8,22 @@ const Navigation: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const sentinel = document.getElementById('nav-scroll-sentinel');
+    if (!sentinel) return;
+
+    // Use IntersectionObserver to detect when the sentinel is out of view
+    // This is far more performant than a 'scroll' event listener
+    const observer = new IntersectionObserver(
+        ([entry]) => {
+            // When the sentinel is no longer intersecting, it means we have scrolled down
+            setScrolled(!entry.isIntersecting);
+        },
+        { threshold: 1.0 } // Trigger as soon as the element is fully out of view
+    );
+
+    observer.observe(sentinel);
+
+    return () => observer.disconnect();
   }, []);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
