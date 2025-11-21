@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Lock, Unlock, BrainCircuit, ChevronRight, Shield } from 'lucide-react';
 import { callGeminiUnspokenThoughts } from '../services/geminiService';
@@ -60,16 +61,18 @@ const UnspokenThoughts: React.FC = () => {
         setError("");
         setLoadingMessage("Deciphering Silence...");
         
-        try {
-            const result = await callGeminiUnspokenThoughts(selectedSceneData.title, selectedSceneData.trigger);
-            
-            if (result.includes("guarded") || result.includes("silence remains") || !result) {
-                 setError("His thoughts are too guarded right now. The silence remains unbroken.");
-            } else {
-                setUnlockedThoughts(prev => ({...prev, [selectedSceneId]: result}));
-            }
-        } catch (e) {
-            setError("His thoughts are too guarded right now. The silence remains unbroken.");
+        const result = await callGeminiUnspokenThoughts(selectedSceneData.title, selectedSceneData.trigger);
+        
+        // Refined error check to handle specific new error messages from the service
+        const isGenericError = result.includes("guarded") || result.includes("silence remains");
+        const isSpecificError = result.includes("filtered") || result.includes("rate limit") || result.includes("failed") || result.includes("configuration");
+
+        if (isGenericError || isSpecificError || !result) {
+             // Display the exact error message from the service if it's a specific one,
+             // otherwise fall back to the component's default error message.
+             setError(isSpecificError ? result : "His thoughts are too guarded right now. The silence remains unbroken.");
+        } else {
+            setUnlockedThoughts(prev => ({...prev, [selectedSceneId]: result}));
         }
         
         setIsLoading(false);

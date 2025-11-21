@@ -1,4 +1,7 @@
 
+
+
+
 import React, { useState, useEffect, lazy } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, initializeAuth } from './services/firebase';
@@ -12,6 +15,8 @@ import Newsletter from './components/Newsletter';
 import Footer from './components/Footer';
 
 // Lazily load below-the-fold components
+const CharacterProfiles = lazy(() => import('./components/CharacterProfiles'));
+const VisualTimeline = lazy(() => import('./components/VisualTimeline'));
 const AestheticGallery = lazy(() => import('./components/AestheticGallery'));
 const Cliffhanger = lazy(() => import('./components/Cliffhanger'));
 const TropeFinder = lazy(() => import('./components/TropeFinder'));
@@ -57,6 +62,8 @@ const App: React.FC = () => {
         <BookSection />
         <div className="relative bg-black shadow-[0_-50px_100px_rgba(0,0,0,1)]">
           {/* The "Hook" Phase */}
+          <LazyLoad><CharacterProfiles /></LazyLoad>
+          <LazyLoad><VisualTimeline /></LazyLoad>
           <LazyLoad><UnspokenThoughts /></LazyLoad>
           <LazyLoad><Cliffhanger /> </LazyLoad>
           <LazyLoad><PredictionGame /></LazyLoad>

@@ -24,12 +24,15 @@ const ai = getAiClient();
 const MODEL_NAME = 'gemini-2.5-flash';
 
 /**
- * Safely executes a Gemini API generation call with error handling and fallback messaging.
+ * Safely executes a Gemini API generation call with enhanced, user-friendly error handling.
+ * This function centralizes error detection for common issues like content filtering,
+ * API key problems, and rate limiting, providing clear calls to action for the user.
+ * 
  * @param prompt The user-facing prompt for the AI.
  * @param systemInstruction The backend instructions guiding the AI's personality and format.
  * @param contextName A friendly name for logging purposes.
- * @param userErrorMessage A fallback message to show the user if the API call fails.
- * @returns A string containing the AI's response or the fallback error message.
+ * @param userErrorMessage A fallback message for generic, unhandled errors.
+ * @returns A string containing the AI's response or a specific, helpful error message.
  */
 const safeGenerate = async (
   prompt: string, 
@@ -37,9 +40,10 @@ const safeGenerate = async (
   contextName: string,
   userErrorMessage: string
 ): Promise<string> => {
+  // 1. Handle missing API key - This is a developer/setup issue.
   if (!ai) {
     console.error(`[${contextName}] Failed: Gemini API Client not initialized (Missing API Key).`);
-    return userErrorMessage;
+    return "Connection to the creative AI has failed. This may be a configuration issue. Please try again later.";
   }
 
   try {
@@ -51,19 +55,28 @@ const safeGenerate = async (
       },
     });
     
-    if (!response.text) {
-        console.warn(`[${contextName}] Response was empty. It may have been blocked by safety settings.`);
-        return userErrorMessage;
+    // 2. Handle responses blocked due to safety settings.
+    const candidate = response.candidates?.[0];
+    if (!candidate || candidate.finishReason === 'SAFETY' || !response.text) {
+        console.warn(`[${contextName}] Response was empty or blocked.`, { finishReason: candidate?.finishReason, safetyRatings: candidate?.safetyRatings });
+        return "The response was filtered for safety reasons. Your input may contain sensitive topics. Please try rephrasing your request.";
     }
 
     return response.text;
   } catch (error: any) {
+    // 3. Handle specific API errors gracefully.
     console.error(`[${contextName}] Gemini API Call Failed:`, {
         message: error.message,
         status: error.status,
         name: error.name,
         details: error
     });
+    
+    if (error.message?.includes('rate limit')) {
+        return "Our creative AI is experiencing high demand right now. Please wait a moment and try your request again.";
+    }
+    
+    // 4. Fallback to the original component-specific message for other errors.
     return userErrorMessage;
   }
 };

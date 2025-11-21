@@ -42,12 +42,9 @@ const Hero: React.FC = () => {
             <h1 className="font-display font-bold text-6xl md:text-8xl lg:text-9xl text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 leading-none drop-shadow-2xl tracking-wide [text-shadow:0_4px_20px_rgba(255,255,255,0.3)]">
             The Jasmine Knot
             </h1>
-             <div className="inline-block relative mt-2">
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-md skew-x-12 rounded-sm border border-white/20 shadow-glass"></div>
-                <h2 className="relative z-10 px-8 py-2 text-xl md:text-2xl text-slate-100 font-body font-semibold tracking-[0.15em] uppercase leading-relaxed drop-shadow-md">
-                    {TAGLINE}
-                </h2>
-            </div>
+            <h2 className="font-display text-xl md:text-2xl text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 drop-shadow-lg [text-shadow:0_2px_10px_rgba(255,255,255,0.2)] mt-4 tracking-wider font-light">
+                {TAGLINE}
+            </h2>
         </div>
         
         <div className="flex flex-col sm:flex-row gap-8 mt-12 w-full sm:w-auto animate-fade-in-up opacity-0" style={{ animationDelay: '1.2s', animationFillMode: 'forwards' }}>

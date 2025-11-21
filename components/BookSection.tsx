@@ -104,6 +104,8 @@ const BookSection: React.FC = () => {
                         alt={book.coverImages[0].alt} 
                         loading="lazy" 
                         decoding="async"
+                        width="1000"
+                        height="1500"
                         className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105" 
                    />
                    {/* Overlay Gradient */}

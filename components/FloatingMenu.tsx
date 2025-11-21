@@ -1,55 +1,69 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useMotionValue, useSpring } from 'framer-motion';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence, useScroll, useSpring, useMotionValue } from 'framer-motion';
 import { 
     Menu, X, BookOpen, Sparkles, BrainCircuit, Heart, Flame, 
-    Key, MessageSquare, MapPin, PenTool, Activity, Lock, 
-    Search, PlayCircle, Eye, Music, CloudRain, Wand2
+    Key, MessageSquare, MapPin, PenTool, Activity, 
+    Search, PlayCircle, Eye, Music, CloudRain, Wand2, Lock
 } from 'lucide-react';
 
 // --- Constants & Configuration ---
-
-const HEAVY_SETTLE = [0.25, 0.46, 0.45, 0.94]; // The Cinematic Curve
+const HEAVY_SETTLE = [0.25, 0.46, 0.45, 0.94];
 
 const NARRATIVE_LINKS = [
     { label: "The Novel", href: "#books", icon: BookOpen },
-    { label: "Experience", href: "#experience", icon: PlayCircle },
+    { label: "The Experience", href: "#experience", icon: PlayCircle },
     { label: "The Author", href: "#author", icon: PenTool },
     { label: "Subscribe", href: "#newsletter", icon: MessageSquare },
 ];
 
-const AI_TOOLS = [
-    { label: "Unspoken Thoughts", href: "#unspoken", icon: BrainCircuit, badge: "AI" },
-    { label: "Cliffhanger Engine", href: "#cliffhanger", icon: Flame, badge: "Beta" },
-    { label: "Prediction Game", href: "#prediction", icon: Key, badge: "Game" },
-    { label: "Tension Heatmap", href: "#heatmap", icon: Activity, badge: "Data" },
-    { label: "Trope Matchmaker", href: "#tropematcher", icon: Search, badge: "Search" },
-    { label: "Co-Write Scene", href: "#finishscene", icon: PenTool, badge: "GenAI" },
-    { label: "POV Shift", href: "#povshift", icon: Eye, badge: "Rewrite" },
-    { label: "Sensory Immersion", href: "#sensory", icon: CloudRain, badge: "Vibe" },
-    { label: "Mood Playlist", href: "#playlist", icon: Music, badge: "Audio" },
-    { label: "Date Planner", href: "#dateplanner", icon: MapPin, badge: "Travel" },
-    { label: "Text Decoder", href: "#decoder", icon: Lock, badge: "Analyze" },
-    { label: "Character Connect", href: "#connect", icon: MessageSquare, badge: "Chat" },
-    { label: "Destiny Match", href: "#destiny", icon: Sparkles, badge: "Star" },
-    { label: "Love Letter Muse", href: "#muse", icon: Heart, badge: "Poet" },
+const AI_TOOL_CATEGORIES = [
+    {
+        title: "Narrative Insights",
+        tools: [
+            { label: "Unspoken Thoughts", href: "#unspoken", icon: BrainCircuit },
+            { label: "Tension Heatmap", href: "#heatmap", icon: Activity },
+            { label: "Trope Matchmaker", href: "#tropematcher", icon: Search },
+            { label: "Text Decoder", href: "#decoder", icon: Lock },
+        ]
+    },
+    {
+        title: "Interactive Fiction",
+        tools: [
+            { label: "Co-Write Scene", href: "#finishscene", icon: PenTool },
+            { label: "Cliffhanger Engine", href: "#cliffhanger", icon: Flame },
+            { label: "Prediction Game", href: "#prediction", icon: Key },
+            { label: "POV Shift", href: "#povshift", icon: Eye },
+        ]
+    },
+    {
+        title: "Atmospheric & Fun",
+        tools: [
+            { label: "Sensory Immersion", href: "#sensory", icon: CloudRain },
+            { label: "Mood Playlist", href: "#playlist", icon: Music },
+            { label: "Destiny Match", href: "#destiny", icon: Sparkles },
+            { label: "Character Connect", href: "#connect", icon: MessageSquare },
+            { label: "Date Planner", href: "#dateplanner", icon: MapPin },
+            { label: "Love Letter Muse", href: "#muse", icon: Heart },
+        ]
+    }
 ];
+
+const ALL_LINKS = [...NARRATIVE_LINKS, ...AI_TOOL_CATEGORIES.flatMap(cat => cat.tools)];
 
 const FloatingMenu: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
     const [buttonPos, setButtonPos] = useState({ x: 0, y: 0 });
     const [isMobile, setIsMobile] = useState(false);
+    const [activeSection, setActiveSection] = useState("#hero");
     
     const buttonRef = useRef<HTMLButtonElement>(null);
     const { scrollY } = useScroll();
     const lastScrollY = useRef(0);
 
-    // -- Physics: Magnetic Pull --
     const x = useMotionValue(0);
     const y = useMotionValue(0);
-    
-    // Spring config for the "Heavy" feel
     const springConfig = { damping: 25, stiffness: 400, mass: 1 }; 
     const springX = useSpring(x, springConfig);
     const springY = useSpring(y, springConfig);
@@ -64,14 +78,11 @@ const FloatingMenu: React.FC = () => {
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (isOpen || !buttonRef.current || isMobile) return;
-
             const rect = buttonRef.current.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
             const dist = Math.sqrt(Math.pow(e.clientX - centerX, 2) + Math.pow(e.clientY - centerY, 2));
-
-            if (dist < 120) { // Magnetic Field Radius
-                // Elasticity factor (0.2 = moves 20% of distance)
+            if (dist < 120) {
                 x.set((e.clientX - centerX) * 0.2);
                 y.set((e.clientY - centerY) * 0.2);
             } else {
@@ -79,170 +90,173 @@ const FloatingMenu: React.FC = () => {
                 y.set(0);
             }
         };
-
         window.addEventListener("mousemove", handleMouseMove);
         return () => window.removeEventListener("mousemove", handleMouseMove);
     }, [isOpen, x, y, isMobile]);
 
-    // -- Logic: Scroll Awareness (Hysteresis) --
     useEffect(() => {
         const updateScroll = () => {
             const current = scrollY.get();
             const delta = current - lastScrollY.current;
-            
-            if (current < 50) {
-                setIsVisible(true); // Always show at top
-            } else if (delta > 20) {
-                setIsVisible(false); // Hide on scroll down
-            } else if (delta < -10) {
-                setIsVisible(true); // Show on scroll up
-            }
-            
+            if (current < 50) setIsVisible(true);
+            else if (delta > 20) setIsVisible(false);
+            else if (delta < -10) setIsVisible(true);
             lastScrollY.current = current;
         };
-
         const unsubscribe = scrollY.on("change", updateScroll);
         return () => unsubscribe();
     }, [scrollY]);
 
-    // -- Logic: Capture Button Position for Iris Wipe --
-    const handleClick = () => {
+    // --- Active Link Highlighting ---
+    useEffect(() => {
+        const sections = ALL_LINKS.map(link => document.getElementById(link.href.substring(1))).filter(Boolean);
+        if (sections.length === 0) return;
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                     if (entry.intersectionRatio > 0.5) {
+                        setActiveSection(`#${entry.target.id}`);
+                     }
+                }
+            });
+        }, { rootMargin: "-50% 0px -50% 0px", threshold: [0, 0.5, 1] });
+
+        sections.forEach(section => { if(section) observer.observe(section) });
+        return () => sections.forEach(section => { if(section) observer.unobserve(section) });
+    }, []);
+
+    const handleMenuToggle = useCallback(() => {
         if (buttonRef.current) {
             const rect = buttonRef.current.getBoundingClientRect();
-            setButtonPos({ 
-                x: rect.left + rect.width / 2, 
-                y: rect.top + rect.height / 2 
-            });
+            setButtonPos({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
         }
-        setIsOpen(!isOpen);
-    };
+        // FIX: Use functional update to prevent stale state issues with useCallback.
+        // This was the root cause of the menu not closing.
+        setIsOpen(prev => !prev);
+    }, []);
 
-    // Lock body scroll when open
-    useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
+    const handleLinkClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+        e.preventDefault();
+        setIsOpen(false);
+        const targetId = href.substring(1);
+        const element = document.getElementById(targetId);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+    }, []);
+
+    useEffect(() => {
+        document.body.style.overflow = isOpen ? 'hidden' : 'unset';
     }, [isOpen]);
 
     return (
         <>
-            {/* --- The Void Overlay --- */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ 
-                            clipPath: `circle(0px at ${buttonPos.x}px ${buttonPos.y}px)` 
-                        }}
-                        animate={{ 
-                            clipPath: `circle(150% at ${buttonPos.x}px ${buttonPos.y}px)` 
-                        }}
-                        exit={{ 
-                            clipPath: `circle(0px at ${buttonPos.x}px ${buttonPos.y}px)`,
-                            transition: { duration: 0.6, ease: [0.55, 0.085, 0.68, 0.53] } // Sharper exit
-                        }}
-                        transition={{ 
-                            duration: 0.8, 
-                            ease: HEAVY_SETTLE 
-                        }}
-                        className="fixed inset-0 z-[9998] bg-[#0B1026]/95 backdrop-blur-xl flex flex-col lg:flex-row overflow-hidden will-change-[clip-path]"
+                        initial={{ clipPath: `circle(0px at ${buttonPos.x}px ${buttonPos.y}px)` }}
+                        animate={{ clipPath: `circle(150% at ${buttonPos.x}px ${buttonPos.y}px)` }}
+                        exit={{ clipPath: `circle(0px at ${buttonPos.x}px ${buttonPos.y}px)`, transition: { duration: 0.6, ease: [0.55, 0.085, 0.68, 0.53] } }}
+                        transition={{ duration: 0.8, ease: HEAVY_SETTLE }}
+                        className="fixed inset-0 z-[9998] bg-[#0B1026]/95 backdrop-blur-xl flex flex-col lg:flex-row overflow-hidden will-change-[clip-path] spotlight-overlay"
                     >
-                        {/* Noise Texture for Film Grain */}
                         <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/noise.png')]"></div>
-
-                        {/* Left: The Journal (Narrative) */}
                         <div className="w-full lg:w-5/12 h-full flex flex-col justify-center px-8 lg:px-24 relative z-10 border-b lg:border-b-0 lg:border-r border-white/5 bg-black/20 lg:bg-transparent">
                             <div className="space-y-8 lg:space-y-12">
                                 <span className="text-primary/50 text-[10px] font-bold uppercase tracking-[0.4em] block mb-4">The Journal</span>
-                                {NARRATIVE_LINKS.map((link, i) => (
-                                    <motion.a
-                                        key={link.label}
-                                        href={link.href}
-                                        onClick={() => setIsOpen(false)}
-                                        initial={{ y: 40, opacity: 0 }}
-                                        animate={{ y: 0, opacity: 1 }}
-                                        transition={{ delay: 0.1 + (i * 0.1), duration: 0.8, ease: HEAVY_SETTLE }}
-                                        className="block group"
-                                    >
-                                        <span className="font-display text-4xl md:text-6xl lg:text-7xl tracking-wide transition-all duration-500 relative block"
-                                              style={{ 
-                                                  WebkitTextStroke: '1px rgba(255,255,255,0.3)', 
-                                                  color: 'transparent' 
-                                              }}
+                                {NARRATIVE_LINKS.map((link, i) => {
+                                    const isActive = activeSection === link.href;
+                                    return (
+                                        <motion.a
+                                            key={link.label}
+                                            href={link.href}
+                                            onClick={(e) => handleLinkClick(e, link.href)}
+                                            initial={{ y: 40, opacity: 0 }}
+                                            animate={{ y: 0, opacity: 1 }}
+                                            transition={{ delay: 0.1 + (i * 0.1), duration: 0.8, ease: HEAVY_SETTLE }}
+                                            className="block group"
                                         >
-                                            {link.label}
-                                            <span className="absolute inset-0 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-500 [text-shadow:0_0_30px_rgba(244,194,194,0.4)]" aria-hidden="true">
+                                            <span className="font-display text-4xl sm:text-5xl lg:text-7xl tracking-wide transition-all duration-500 relative block" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.3)', color: 'transparent' }}>
                                                 {link.label}
+                                                <span className={`absolute inset-0 text-white transition-opacity duration-500 [text-shadow:0_0_30px_rgba(244,194,194,0.4)] ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} aria-hidden="true">
+                                                    {link.label}
+                                                </span>
                                             </span>
-                                        </span>
-                                    </motion.a>
-                                ))}
+                                        </motion.a>
+                                    );
+                                })}
                             </div>
                         </div>
-
-                        {/* Right: The Nexus (Intelligence) */}
                         <div className="w-full lg:w-7/12 h-full bg-black/20 overflow-y-auto custom-scrollbar p-6 lg:p-16 relative z-10">
                              <div className="max-w-4xl mx-auto pt-8 lg:pt-0">
-                                <span className="text-primary/50 text-[10px] font-bold uppercase tracking-[0.4em] block mb-8 lg:mb-12 sticky top-0 bg-[#0B1026]/0 backdrop-blur-sm py-4 z-20">The Nexus</span>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20">
-                                    {AI_TOOLS.map((tool, i) => (
-                                        <motion.a
-                                            key={tool.label}
-                                            href={tool.href}
-                                            onClick={() => setIsOpen(false)}
-                                            initial={{ y: 20, opacity: 0 }}
-                                            animate={{ y: 0, opacity: 1 }}
-                                            transition={{ delay: 0.3 + (i * 0.05), duration: 0.6, ease: HEAVY_SETTLE }}
-                                            className="group relative p-5 rounded-sm border border-primary/20 bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(37,150,190,0.15)] flex items-center gap-4 overflow-hidden"
-                                        >
-                                            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                            <div className="p-3 rounded-full bg-black/40 border border-white/10 text-primary group-hover:text-white group-hover:scale-110 transition-all duration-300 relative z-10">
-                                                <tool.icon size={18} />
-                                            </div>
-                                            <div className="flex-1 relative z-10">
-                                                <div className="flex justify-between items-center">
-                                                    <h4 className="font-body font-bold text-sm text-slate-200 group-hover:text-white tracking-wide">{tool.label}</h4>
-                                                    <span className="text-[9px] text-primary/80 border border-primary/30 px-2 py-0.5 rounded-full uppercase tracking-widest group-hover:bg-primary/20 transition-colors">{tool.badge}</span>
-                                                </div>
-                                            </div>
-                                        </motion.a>
-                                    ))}
-                                </div>
+                                {AI_TOOL_CATEGORIES.map((category, catIndex) => (
+                                <motion.div key={category.title} className="mb-12"
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.3 + (catIndex * 0.1), duration: 0.6, ease: HEAVY_SETTLE }}
+                                >
+                                    <h3 className="text-primary/50 text-xs font-bold uppercase tracking-[0.3em] block mb-6 sticky top-0 bg-[#0B1026]/80 backdrop-blur-sm py-4 z-20 border-b border-primary/10">{category.title}</h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                                        {category.tools.map((tool, i) => {
+                                            const isActive = activeSection === tool.href;
+                                            return (
+                                                <motion.a
+                                                    key={tool.label}
+                                                    href={tool.href}
+                                                    onClick={(e) => handleLinkClick(e, tool.href)}
+                                                    initial={{ y: 20, opacity: 0 }}
+                                                    animate={{ y: 0, opacity: 1 }}
+                                                    transition={{ delay: 0.4 + (i * 0.03), duration: 0.6, ease: HEAVY_SETTLE }}
+                                                    whileHover={{ y: -3, scale: 1.02 }}
+                                                    className={`group relative p-4 rounded-md border bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-300 hover:shadow-[0_0_20px_rgba(37,150,190,0.15)] flex items-center gap-4 overflow-hidden ${isActive ? 'bg-primary/10 border-primary/50' : 'border-primary/20 hover:border-primary/50'}`}
+                                                >
+                                                    <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                                    <div className={`p-2 rounded-md bg-black/40 border transition-all duration-300 relative z-10 ${isActive ? 'text-white border-white/20' : 'text-primary border-white/10 group-hover:text-white group-hover:scale-110'}`}>
+                                                        <tool.icon size={18} />
+                                                    </div>
+                                                    <div className="flex-1 relative z-10">
+                                                        <h4 className={`font-body font-bold text-sm tracking-wide ${isActive ? 'text-white' : 'text-slate-200 group-hover:text-white'}`}>{tool.label}</h4>
+                                                    </div>
+                                                </motion.a>
+                                            );
+                                        })}
+                                    </div>
+                                </motion.div>
+                                ))}
                              </div>
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            {/* --- The Orb (Trigger) --- */}
             <motion.button
                 ref={buttonRef}
-                onClick={handleClick}
+                onClick={handleMenuToggle}
                 style={{ x: springX, y: springY }}
                 initial={{ scale: 0 }}
-                animate={{ 
-                    scale: isVisible ? 1 : 0.8, 
-                    opacity: isVisible ? 1 : 0.5 
+                animate={{
+                    scale: isVisible ? 1 : 0.8,
+                    opacity: isVisible ? 1 : 0.5,
+                    boxShadow: isVisible
+                        ? [
+                            "0 0 10px rgba(37,150,190,0.4), 0 0 20px rgba(37,150,190,0.2)",
+                            "0 0 20px rgba(37,150,190,0.6), 0 0 40px rgba(37,150,190,0.3)",
+                            "0 0 10px rgba(37,150,190,0.4), 0 0 20px rgba(37,150,190,0.2)"
+                          ]
+                        : "0 0 10px rgba(37,150,190,0.4), 0 0 20px rgba(37,150,190,0.2)"
+                }}
+                transition={{
+                    scale: { type: "spring", stiffness: 300, damping: 20 },
+                    opacity: { duration: 0.3 },
+                    boxShadow: { duration: 4, repeat: Infinity, ease: "easeInOut" }
                 }}
                 whileHover={{ scale: 1.1 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className={`fixed z-[9999] flex items-center justify-center
-                           bottom-6 right-6 w-14 h-14
-                           md:bottom-12 md:right-12 md:w-16 md:h-16
-                           rounded-full backdrop-blur-md border border-white/10
-                           text-white bg-[#0F0F0F]/80
-                           shadow-[0_0_10px_rgba(37,150,190,0.4),0_0_20px_rgba(37,150,190,0.2),0_0_40px_rgba(37,150,190,0.1)]
-                           hover:shadow-[0_0_20px_rgba(37,150,190,0.6),0_0_40px_rgba(37,150,190,0.3),0_0_60px_rgba(37,150,190,0.2)]
-                           transition-shadow duration-500 group outline-none`}
+                className="fixed z-[9999] flex items-center justify-center bottom-6 right-6 w-14 h-14 md:bottom-12 md:right-12 md:w-16 md:h-16 rounded-full backdrop-blur-md border border-white/10 text-white bg-[#0F0F0F]/80 transition-shadow duration-500 group outline-none"
                 aria-label={isOpen ? "Close Menu" : "Open Menu"}
                 aria-expanded={isOpen}
             >
-                <motion.div
-                    animate={{ rotate: isOpen ? 90 : 0 }}
-                    transition={{ duration: 0.4, ease: "easeInOut" }}
-                    className="relative z-10"
-                >
+                <motion.div animate={{ rotate: isOpen ? 90 : 0 }} transition={{ duration: 0.4, ease: "easeInOut" }} className="relative z-10">
                     {isOpen ? <X size={24} className="text-blush" /> : <Menu size={24} strokeWidth={1.5} />}
                 </motion.div>
             </motion.button>
