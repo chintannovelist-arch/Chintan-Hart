@@ -11,7 +11,7 @@ const AestheticGallery: React.FC = () => (
             
             <div className="w-full max-w-5xl mx-auto mt-8 relative group overflow-hidden rounded-2xl bg-surface flex items-center justify-center p-12 md:p-24 border border-white/5 shadow-2xl transition-all">
                 {/* Background Overlay */}
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1608462888013-11a1cb632b62?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-overlay transition-transform duration-[10s] group-hover:scale-110"></div>
+                <div className="absolute inset-0 bg-[url('assets/gallery-background.jpg')] bg-cover bg-center opacity-20 mix-blend-overlay transition-transform duration-[10s] group-hover:scale-110"></div>
                 
                 <div className="relative z-10 text-center max-w-2xl">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-black/50 border border-white/10 rounded-full shadow-lg mb-8 text-primary group-hover:scale-110 transition-transform duration-500">

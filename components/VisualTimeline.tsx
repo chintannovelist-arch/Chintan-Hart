@@ -1,4 +1,6 @@
 
+
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { BookText } from 'lucide-react';
@@ -61,7 +63,7 @@ const itemVariants = {
 };
 
 const VisualTimeline: React.FC = () => {
-    const imageUrl = "https://storage.googleapis.com/aistudio-hosting/history/1719904221113/user/0c3848b9f1d0cae712ca735d4ac9f91a.png";
+    const imageUrl = "assets/visual-timeline.png";
 
     return (
         <section id="timeline" className="py-32 bg-onyx border-y border-white/5 overflow-hidden">

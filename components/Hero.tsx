@@ -1,5 +1,6 @@
 
 
+
 import React from 'react';
 import { BookOpen, ChevronRight, ChevronDown, Sparkles } from 'lucide-react';
 import { TAGLINE } from '../constants';
@@ -27,7 +28,7 @@ const Hero: React.FC<HeroProps> = ({ onStartPresentation }) => {
 
       {/* Background Layer with Ken Burns Effect */}
       <div className="absolute inset-0 opacity-40 z-0">
-        <div className="w-full h-full bg-[url('https://images.unsplash.com/photo-1615875228545-9b3400a0e1ae?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center animate-ken-burns"></div>
+        <div className="w-full h-full bg-[url('assets/hero-background.jpg')] bg-cover bg-center animate-ken-burns"></div>
         {/* Heavy Vignette for Focus */}
         <div className="absolute inset-0 bg-vignette"></div>
       </div>

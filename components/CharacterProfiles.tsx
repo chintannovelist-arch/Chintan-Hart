@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Zap, Flower2 } from 'lucide-react';
