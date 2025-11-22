@@ -1,36 +1,38 @@
+
+
+
 import { GoogleGenAI } from "@google/genai";
 import { NOVEL_SCENES } from '../constants';
 
 // This service centralizes all interactions with the Gemini API.
+// It uses a single, robust `safeGenerate` helper function to ensure that all
+// API calls have consistent error handling, API key validation, and fallback
+// messaging. This pattern makes adding new AI features scalable and maintainable.
 
-// Helper to safely initialize the client with Key Rotation
+// Helper to safely initialize the client
 const getAiClient = () => {
-  // DIRECT ACCESS: We access the keys directly so Vite can replace them with the real values.
-  // If we use a variable like 'env', Vite cannot see inside it.
-  const k1 = process.env.GEMINI_KEY_1;
-  const k2 = process.env.GEMINI_KEY_2;
-  const k3 = process.env.GEMINI_KEY_3;
-  
-  // Filter out any missing keys
-  const availableKeys = [k1, k2, k3].filter(key => key && key !== 'undefined');
-
-  if (availableKeys.length === 0) {
-      console.warn("[Gemini Service] No API Keys found. AI features will be disabled.");
+  // Safely check for process.env to avoid crashing in browser environments
+  const apiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : undefined;
+  if (!apiKey) {
+      console.warn("[Gemini Service] API Key is missing. AI features will be disabled.");
       return null;
   }
-
-  // Pick a Random Key (Load Balancing)
-  const randomKey = availableKeys[Math.floor(Math.random() * availableKeys.length)];
-  
-  return new GoogleGenAI({ apiKey: randomKey });
+  return new GoogleGenAI({ apiKey });
 };
 
-// Initialize the client
 const ai = getAiClient();
 const MODEL_NAME = 'gemini-2.5-flash';
 
 /**
- * Safely executes a Gemini API generation call.
+ * Safely executes a Gemini API generation call with enhanced, user-friendly error handling.
+ * This function centralizes error detection for common issues like content filtering,
+ * API key problems, and rate limiting, providing clear calls to action for the user.
+ * 
+ * @param prompt The user-facing prompt for the AI.
+ * @param systemInstruction The backend instructions guiding the AI's personality and format.
+ * @param contextName A friendly name for logging purposes.
+ * @param userErrorMessage A fallback message for generic, unhandled errors.
+ * @returns A string containing the AI's response or a specific, helpful error message.
  */
 const safeGenerate = async (
   prompt: string, 
@@ -38,9 +40,9 @@ const safeGenerate = async (
   contextName: string,
   userErrorMessage: string
 ): Promise<string> => {
-  // 1. Handle missing API key
+  // 1. Handle missing API key - This is a developer/setup issue.
   if (!ai) {
-    console.error(`[${contextName}] Failed: Gemini API Client not initialized (Missing API Keys).`);
+    console.error(`[${contextName}] Failed: Gemini API Client not initialized (Missing API Key).`);
     return "Connection to the creative AI has failed. This may be a configuration issue. Please try again later.";
   }
 
@@ -70,10 +72,11 @@ const safeGenerate = async (
         details: error
     });
     
-    if (error.message?.includes('rate limit') || error.status === 429) {
+    if (error.message?.includes('rate limit')) {
         return "Our creative AI is experiencing high demand right now. Please wait a moment and try your request again.";
     }
     
+    // 4. Fallback to the original component-specific message for other errors.
     return userErrorMessage;
   }
 };
@@ -138,6 +141,8 @@ export const callGeminiDatePlanner = async (country: string, city: string, vibe:
 };
 
 export const callGeminiTropeMatch = async (userFavorite: string) => {
+    // This is "Context Grounding". By providing actual snippets from the book,
+    // the AI can make more accurate and relevant connections instead of guessing.
     const bookContext = Object.entries(NOVEL_SCENES).map(([key, val]) => `${key}: ${val.substring(0, 150)}...`).join('\n');
 
     const system = `You are a literary matchmaker for 'The Jasmine Knot'.
@@ -181,6 +186,7 @@ export const callGeminiCliffhanger = async (scenario: string) => {
     );
 };
 
+// FIX: Add missing callGeminiTranslator function for the RomanceTranslator component.
 export const callGeminiTranslator = async (boringText: string) => {
     const system = `You are a romantic novelist in the style of Chintan Hart, author of 'The Jasmine Knot'.
     Your task is to transform a mundane, boring sentence into a lush, sensory, and romantic description.
@@ -269,6 +275,8 @@ export const callGeminiSensory = async (sense: string) => {
 };
 
 export const callGeminiUnspokenThoughts = async (chapterTitle: string, sceneContext: string) => {
+    // This is "Context Grounding". By providing the actual text from the novel,
+    // the AI can generate a more accurate and in-character internal monologue.
     const lookupKey = chapterTitle.includes(':') ? chapterTitle.split(':')[0] : chapterTitle;
     const novelText = NOVEL_SCENES[lookupKey] || "Context unavailable from text.";
     
