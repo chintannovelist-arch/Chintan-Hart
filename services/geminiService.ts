@@ -1,6 +1,4 @@
-
-
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Modality } from "@google/genai";
 import { NOVEL_SCENES } from '../constants';
 
 // This service centralizes all interactions with the Gemini API.
@@ -33,16 +31,17 @@ const getAiClients = () => {
 
 const clients = getAiClients();
 const MODEL_NAME = 'gemini-2.5-flash';
+const TTS_MODEL_NAME = 'gemini-2.5-flash-preview-tts';
+
+// --- Helpers ---
+
+const getClient = () => {
+    if (clients.length === 0) return null;
+    return clients[Math.floor(Math.random() * clients.length)];
+};
 
 /**
- * Safely executes a Gemini API generation call with enhanced, user-friendly error handling
- * and automatic API key rotation for rate limits.
- * 
- * @param prompt The user-facing prompt for the AI.
- * @param systemInstruction The backend instructions guiding the AI's personality and format.
- * @param contextName A friendly name for logging purposes.
- * @param userErrorMessage A fallback message for generic, unhandled errors.
- * @returns A string containing the AI's response or a specific, helpful error message.
+ * Safely executes a Gemini API generation call.
  */
 const safeGenerate = async (
   prompt: string, 
@@ -50,73 +49,57 @@ const safeGenerate = async (
   contextName: string,
   userErrorMessage: string
 ): Promise<string> => {
-  // 1. Handle missing API clients
-  if (clients.length === 0) {
-    console.error(`[${contextName}] Failed: Gemini API Client not initialized (Missing API Key).`);
-    return "Connection to the creative AI has failed. This may be a configuration issue. Please try again later.";
+  const ai = getClient();
+  if (!ai) return "Connection to the creative AI has failed. Configuration issue.";
+
+  try {
+      const response = await ai.models.generateContent({
+        model: MODEL_NAME,
+        contents: prompt,
+        config: { systemInstruction },
+      });
+      
+      const candidate = response.candidates?.[0];
+      if (!candidate || candidate.finishReason === 'SAFETY' || !response.text) {
+          return "The response was filtered for safety reasons. Please try rephrasing.";
+      }
+      return response.text;
+  } catch (error: any) {
+      console.error(`[${contextName}] Failed:`, error);
+      return userErrorMessage;
   }
+};
 
-  // 2. Load Balancing: Start with a random client to distribute load
-  let clientIndex = Math.floor(Math.random() * clients.length);
-
-  // 3. Retry Logic: Iterate through available keys if a quota error occurs
-  for (let attempt = 0; attempt < clients.length; attempt++) {
-    const ai = clients[clientIndex];
-    
-    try {
-        const response = await ai.models.generateContent({
-          model: MODEL_NAME,
-          contents: prompt,
-          config: {
-            systemInstruction: systemInstruction,
-          },
-        });
-        
-        // Handle blocked responses
-        const candidate = response.candidates?.[0];
-        if (!candidate || candidate.finishReason === 'SAFETY' || !response.text) {
-            console.warn(`[${contextName}] Response was empty or blocked.`, { finishReason: candidate?.finishReason, safetyRatings: candidate?.safetyRatings });
-            return "The response was filtered for safety reasons. Your input may contain sensitive topics. Please try rephrasing your request.";
-        }
-    
-        return response.text;
-
-    } catch (error: any) {
-        // Detect Quota/Rate Limit errors (429)
-        const isQuotaError = error.message?.includes('429') || 
-                             error.message?.includes('rate limit') || 
-                             error.message?.includes('quota') || 
-                             error.message?.includes('exhausted') ||
-                             error.status === 429;
-
-        if (isQuotaError) {
-            console.warn(`[${contextName}] Key at index ${clientIndex} exhausted (Attempt ${attempt + 1}/${clients.length}). Switching keys...`);
-            
-            // Rotate to next key
-            clientIndex = (clientIndex + 1) % clients.length;
-            
-            // If all keys have been tried and failed
-            if (attempt === clients.length - 1) {
-                console.error(`[${contextName}] All API keys exhausted rate limits.`);
-                return "Our creative AI is experiencing high demand right now. Please wait a moment and try your request again.";
-            }
-            // Continue loop to try next key
-            continue;
-        }
-
-        // 4. Handle other specific API errors gracefully (do not retry)
-        console.error(`[${contextName}] Gemini API Call Failed:`, {
-            message: error.message,
-            status: error.status,
-            name: error.name,
-            details: error
-        });
-        
-        return userErrorMessage;
+/**
+ * GENERATOR FUNCTION: Streams text chunk by chunk for a "Typewriter" effect.
+ */
+export const safeGenerateStream = async function* (
+    prompt: string,
+    systemInstruction: string,
+    contextName: string
+): AsyncGenerator<string, void, unknown> {
+    const ai = getClient();
+    if (!ai) {
+        yield "AI Connection Failed.";
+        return;
     }
-  }
-  
-  return userErrorMessage;
+
+    try {
+        const responseStream = await ai.models.generateContentStream({
+            model: MODEL_NAME,
+            contents: prompt,
+            config: { systemInstruction },
+        });
+
+        for await (const chunk of responseStream) {
+            if (chunk.text) {
+                yield chunk.text;
+            }
+        }
+    } catch (error) {
+        console.error(`[${contextName}] Stream Failed:`, error);
+        yield " ...[Connection Lost]";
+    }
 };
 
 // --- API Service Functions ---
@@ -141,29 +124,40 @@ export const callGeminiPlaylist = async (mood: string) => {
     );
 };
 
-export const callGeminiFinishScene = async (context: string, action: string, role: string) => {
+// STREAMING VERSION
+export const callGeminiFinishSceneStream = async function* (context: string, action: string, role: string) {
     const system = `You are the co-author of 'The Jasmine Knot'. Continue the story scene based on the user's action. Role: ${role}. Style: Sensory, slow-burn. Length: 150 words.`;
     const prompt = `Context: ${context}\nAction: ${action}\nContinue.`;
     
-    return safeGenerate(
-        prompt, 
-        system, 
-        "Finish The Scene",
-        "The ink has run dry. The muse is resting, please try writing again later."
-    );
+    const stream = safeGenerateStream(prompt, system, "Finish The Scene");
+    for await (const chunk of stream) {
+        yield chunk;
+    }
 };
 
-export const callGeminiChat = async (character: string, message: string) => {
+// OLD NON-STREAMING (Deprecated but kept for safety if needed, though we won't use it)
+export const callGeminiFinishScene = async (context: string, action: string, role: string) => {
+    const system = `You are the co-author of 'The Jasmine Knot'. Continue the story scene based on the user's action. Role: ${role}. Style: Sensory, slow-burn. Length: 150 words.`;
+    const prompt = `Context: ${context}\nAction: ${action}\nContinue.`;
+    return safeGenerate(prompt, system, "Finish Scene", "Error generating scene.");
+};
+
+// STREAMING VERSION
+export const callGeminiChatStream = async function* (character: string, message: string) {
     const system = character === "Vijay" 
         ? "You are Vijay (The Husband) from 'The Jasmine Knot'. Intense, protective, data analyst. Deeply in love but restrained. Short replies."
         : "You are Meena (The Wife) from 'The Jasmine Knot'. Professor, spirited, loves poetry and jasmine. Flustered but brave. Short replies.";
     
-    return safeGenerate(
-        message, 
-        system, 
-        `Character Chat (${character})`,
-        "I cannot find the words right now. (Connection Error)"
-    );
+    const stream = safeGenerateStream(message, system, `Character Chat (${character})`);
+    for await (const chunk of stream) {
+        yield chunk;
+    }
+};
+
+export const callGeminiChat = async (character: string, message: string) => {
+    // Legacy fallback
+    const system = character === "Vijay" ? "You are Vijay." : "You are Meena.";
+    return safeGenerate(message, system, "Chat", "Error.");
 };
 
 export const callGeminiDatePlanner = async (country: string, city: string, vibe: string, time: string) => {
@@ -179,8 +173,6 @@ export const callGeminiDatePlanner = async (country: string, city: string, vibe:
 };
 
 export const callGeminiTropeMatch = async (userFavorite: string) => {
-    // This is "Context Grounding". By providing actual snippets from the book,
-    // the AI can make more accurate and relevant connections instead of guessing.
     const bookContext = Object.entries(NOVEL_SCENES).map(([key, val]) => `${key}: ${val.substring(0, 150)}...`).join('\n');
 
     const system = `You are a literary matchmaker for 'The Jasmine Knot'.
@@ -296,8 +288,6 @@ export const callGeminiLetter = async (recipient: string, vibe: string) => {
 };
 
 export const callGeminiUnspokenThoughts = async (chapterTitle: string, sceneContext: string) => {
-    // This is "Context Grounding". By providing the actual text from the novel,
-    // the AI can generate a more accurate and in-character internal monologue.
     const lookupKey = chapterTitle.includes(':') ? chapterTitle.split(':')[0] : chapterTitle;
     const novelText = NOVEL_SCENES[lookupKey] || "Context unavailable from text.";
     
@@ -370,4 +360,38 @@ export const callGeminiSensory = async (sense: string) => {
         "Sensory Immersion",
         "The sensation is too faint to capture right now."
     );
+};
+
+// --- AUDIO (Text-To-Speech) ---
+
+/**
+ * Generates spoken audio for a given text using the Gemini 2.5 Flash TTS model.
+ * Returns the base64 encoded audio string.
+ */
+export const callGeminiTTS = async (text: string): Promise<string | null> => {
+    const ai = getClient();
+    if (!ai) return null;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: TTS_MODEL_NAME,
+            contents: { parts: [{ text }] },
+            config: {
+                responseModalities: [Modality.AUDIO],
+                speechConfig: {
+                    voiceConfig: {
+                        prebuiltVoiceConfig: { voiceName: 'Kore' }, // 'Kore' is good for narration
+                    },
+                },
+            },
+        });
+
+        // Extract base64 audio
+        const audioData = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+        return audioData || null;
+
+    } catch (error) {
+        console.error("[Gemini TTS] Failed:", error);
+        return null;
+    }
 };

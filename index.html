@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
@@ -177,14 +178,28 @@
             background: #2596be;
             border-radius: 2px;
         }
-        
-        /* Spotlight Effect Logic */
-        .spotlight-overlay {
+
+        /* Spotlight Card Logic */
+        .spotlight-card {
+            position: relative;
+            overflow: hidden;
+        }
+        .spotlight-card::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            z-index: 0;
             background: radial-gradient(
                 600px circle at var(--mouse-x) var(--mouse-y),
-                rgba(37, 150, 190, 0.06),
+                rgba(37, 150, 190, 0.15),
                 transparent 40%
             );
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .spotlight-card:hover::before {
+            opacity: 1;
         }
 
         /* Text selection for high contrast */
@@ -197,6 +212,18 @@
         /* Smooth Scroll Behavior Override */
         html {
             scroll-behavior: smooth;
+        }
+        
+        /* MODAL OVERRIDES for re-used sections */
+        .feature-modal-content section {
+            padding-top: 2rem !important;
+            padding-bottom: 2rem !important;
+            min-height: auto !important;
+            background-color: transparent !important;
+            border: none !important;
+        }
+        .feature-modal-content section > div {
+           max-width: 100% !important;
         }
 
         /* Global Animations */
@@ -237,7 +264,6 @@
         }
 
         // Define Global placeholders for Firebase to prevent ReferenceErrors during static hosting
-        // if environment injection hasn't happened.
         if (typeof window.__firebase_config === 'undefined') {
             window.__firebase_config = undefined;
         }

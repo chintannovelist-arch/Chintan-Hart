@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Edit3, User, Loader, PenTool, Sparkles, Feather, RefreshCw, Check, Zap, AlertCircle } from 'lucide-react';
 import { SCENARIOS } from '../constants';
-import { callGeminiFinishScene } from '../services/geminiService';
+import { callGeminiFinishSceneStream } from '../services/geminiService';
 
 // --- Sub-components for Performance Optimization ---
 
@@ -25,30 +25,24 @@ const WritingCanvas = React.memo(({ selectedChar, activeScenario }: { selectedCh
         setContinuation("");
         setError("");
         
-        const result = await callGeminiFinishScene(activeScenario.context, userAction, selectedChar);
-        
-        if (result.includes("run dry") || result.includes("filtered")) {
-            setError(result);
-        } else {
-            setContinuation(result);
+        try {
+            const stream = callGeminiFinishSceneStream(activeScenario.context, userAction, selectedChar);
+            
+            for await (const chunk of stream) {
+                setContinuation(prev => prev + chunk);
+            }
+        } catch (e) {
+            setError("The ink has run dry. Please try again.");
+        } finally {
+            setIsLoading(false);
         }
-        
-        setIsLoading(false);
     };
 
     return (
         <div className="lg:col-span-8">
-             <div className="bg-black/60 rounded-sm shadow-2xl border border-white/10 min-h-[600px] flex flex-col relative overflow-hidden">
+             <div className="bg-black/60 rounded-sm shadow-2xl border border-white/10 min-h-[600px] flex flex-col relative overflow-hidden spotlight-card">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-blush to-transparent"></div>
                 
-                {isLoading && (
-                    <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center animate-fade-in">
-                        <div className="w-16 h-16 border-4 border-white/10 border-t-primary rounded-full animate-spin mb-6"></div>
-                        <p className="text-primary font-display text-xl tracking-widest animate-pulse">The Muse is Writing...</p>
-                        <p className="text-slate-500 text-xs uppercase tracking-[0.2em] mt-2">Crafting sensory details</p>
-                    </div>
-                )}
-
                 <div className="bg-white/5 p-10 border-b border-white/5 relative">
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary/30"></div>
                     <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.25em] mb-4 opacity-70">Scene Setup</h4>
@@ -76,7 +70,11 @@ const WritingCanvas = React.memo(({ selectedChar, activeScenario }: { selectedCh
                                 disabled={isLoading || !userAction} 
                                 className="h-12 px-8 bg-primary text-white rounded-sm flex items-center justify-center hover:bg-primary-dark disabled:opacity-50 disabled:bg-slate-800 transition-all hover:-translate-y-1 text-xs font-bold uppercase tracking-wider shadow-lg hover:shadow-glow ease-snappy"
                             >
-                                 <span className="flex items-center gap-2">Generate <Zap size={14} className="fill-white"/></span>
+                                 {isLoading ? (
+                                    <span className="flex items-center gap-2"><Loader size={14} className="animate-spin"/> Writing...</span>
+                                 ) : (
+                                    <span className="flex items-center gap-2">Generate <Zap size={14} className="fill-white"/></span>
+                                 )}
                             </button>
                         </div>
                     </div>
@@ -98,10 +96,14 @@ const WritingCanvas = React.memo(({ selectedChar, activeScenario }: { selectedCh
                                 <div className="font-serif text-lg leading-loose text-slate-300 whitespace-pre-wrap border-l-2 border-primary/30 pl-8 py-2 relative">
                                     <span className="absolute -left-1.5 top-0 text-4xl text-primary/20 font-serif">“</span>
                                     {continuation}
+                                    {/* Cursor blinking effect to show active writing */}
+                                    {isLoading && <span className="inline-block w-1.5 h-5 bg-primary/70 ml-1 animate-pulse align-middle"></span>}
                                 </div>
-                                <div className="mt-10 flex justify-end">
-                                    <button onClick={() => setUserAction("")} className="text-xs text-slate-500 hover:text-white flex items-center gap-2 transition-colors uppercase tracking-widest"><RefreshCw size={12}/> Write Another</button>
-                                </div>
+                                {!isLoading && (
+                                    <div className="mt-10 flex justify-end animate-fade-in">
+                                        <button onClick={() => {setUserAction(""); setContinuation("");}} className="text-xs text-slate-500 hover:text-white flex items-center gap-2 transition-colors uppercase tracking-widest"><RefreshCw size={12}/> Write Another</button>
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <div className="h-full flex flex-col items-center justify-center text-slate-700 gap-4 py-8 opacity-60">
@@ -120,7 +122,7 @@ WritingCanvas.displayName = 'WritingCanvas';
 const SceneSelector = React.memo(({ selectedChar, onCharacterChange, activeScenario, onScenarioChange }: any) => {
     return (
         <div className="lg:col-span-4 space-y-8">
-            <div className="bg-black/40 p-6 rounded-sm border border-white/5">
+            <div className="bg-black/40 p-6 rounded-sm border border-white/5 spotlight-card">
                 <label className="block text-xs font-bold text-primary uppercase tracking-[0.2em] mb-4">Perspective</label>
                 <div className="flex gap-4" role="group" aria-label="Select Character Perspective">
                     {["Meena", "Vijay"].map(char => (
@@ -136,7 +138,7 @@ const SceneSelector = React.memo(({ selectedChar, onCharacterChange, activeScena
                 </div>
             </div>
 
-            <div className="bg-black/40 p-6 rounded-sm border border-white/5">
+            <div className="bg-black/40 p-6 rounded-sm border border-white/5 spotlight-card">
                 <label className="block text-xs font-bold text-primary uppercase tracking-[0.2em] mb-4">Scenario</label>
                 <div className="space-y-1 max-h-[300px] overflow-y-auto custom-scrollbar pr-2" role="listbox" aria-label="Select Scenario">
                     {SCENARIOS[selectedChar].map((scenario: any) => (

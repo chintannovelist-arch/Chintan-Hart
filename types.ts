@@ -31,6 +31,8 @@ export interface SneakPeek {
 export interface ChatMessage {
     role: 'user' | 'char';
     text: string;
+    status?: 'sent' | 'delivered' | 'read';
+    timestamp?: number;
 }
 
 export interface Subscriber {

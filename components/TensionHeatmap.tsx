@@ -1,6 +1,5 @@
 
-
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef } from 'react';
 import { Activity, Flame, Lock, Unlock, Zap } from 'lucide-react';
 import { TENSION_DATA } from '../constants';
 
@@ -13,8 +12,6 @@ const MAX_Y_VALUE = 100;
 
 /**
  * A memoized component for rendering individual data points on the graph.
- * This prevents the entire complex SVG chart from re-rendering when the user
- * simply hovers over a single point, significantly improving performance.
  */
 const MemoizedGraphPoint = React.memo(({ d, i, isActive, getX, getY, onPointHover }: any) => {
     const cx = getX(i);
@@ -70,6 +67,7 @@ MemoizedGraphPoint.displayName = 'MemoizedGraphPoint';
 const TensionHeatmap: React.FC = () => {
     const [activePoint, setActivePoint] = useState<typeof TENSION_DATA[0] | null>(null);
     const [tooltipPos, setTooltipPos] = useState<{x: number, y: number} | null>(null);
+    const svgRef = useRef<SVGSVGElement>(null);
 
     // useCallback ensures the function reference is stable
     const handlePointHover = useCallback((point: typeof TENSION_DATA[0], x: number, y: number) => {
@@ -77,19 +75,41 @@ const TensionHeatmap: React.FC = () => {
         setTooltipPos({ x, y });
     }, []);
 
-    // useMemo prevents expensive SVG path calculations
     const { getX, getY, tensionLinePath, tensionAreaPath } = useMemo(() => {
-        // Helper function to map a data point's index to an X-coordinate.
         const getX = (index: number) => PADDING + (index / (TENSION_DATA.length - 1)) * (SVG_WIDTH - 2 * PADDING);
-        
-        // Helper function to map a tension value to a Y-coordinate (inverted for SVG).
         const getY = (val: number) => (SVG_HEIGHT - BOTTOM_PADDING) - (val / MAX_Y_VALUE) * (SVG_HEIGHT - BOTTOM_PADDING - PADDING);
-
         const svgPoints = TENSION_DATA.map((d, i) => `${getX(i)},${getY(d.tension)}`).join(" ");
         const svgAreaPoints = `${getX(0)},${SVG_HEIGHT - BOTTOM_PADDING} ${svgPoints} ${getX(TENSION_DATA.length - 1)},${SVG_HEIGHT - BOTTOM_PADDING}`;
-        
         return { getX, getY, tensionLinePath: svgPoints, tensionAreaPath: svgAreaPoints };
     }, []);
+
+    // Handle touch/move on the SVG to find nearest point
+    const handleTouchMove = useCallback((e: React.TouchEvent | React.MouseEvent) => {
+        if (!svgRef.current) return;
+        
+        const rect = svgRef.current.getBoundingClientRect();
+        let clientX;
+        
+        if ('touches' in e) {
+            clientX = e.touches[0].clientX;
+        } else {
+            clientX = (e as React.MouseEvent).clientX;
+        }
+
+        // Calculate X relative to SVG coordinate system
+        const relativeX = (clientX - rect.left) * (SVG_WIDTH / rect.width);
+        
+        // Find nearest index
+        const totalPoints = TENSION_DATA.length;
+        const widthPerPoint = (SVG_WIDTH - 2 * PADDING) / (totalPoints - 1);
+        
+        let nearestIndex = Math.round((relativeX - PADDING) / widthPerPoint);
+        nearestIndex = Math.max(0, Math.min(nearestIndex, totalPoints - 1));
+        
+        const point = TENSION_DATA[nearestIndex];
+        handlePointHover(point, getX(nearestIndex), getY(point.tension));
+    }, [getX, getY, handlePointHover]);
+
 
     // Dynamic Tooltip Positioning Logic
     const tooltipStyles = useMemo(() => {
@@ -139,7 +159,7 @@ const TensionHeatmap: React.FC = () => {
                 </div>
 
                 {/* Slow Burn Meter UI */}
-                <div className="mb-12 max-w-2xl mx-auto bg-onyx p-6 rounded-sm border border-white/5 shadow-lg relative overflow-hidden">
+                <div className="mb-12 max-w-2xl mx-auto bg-onyx p-6 rounded-sm border border-white/5 shadow-lg relative overflow-hidden spotlight-card">
                      <div className="absolute top-0 right-0 p-2 opacity-10">
                          <Flame size={40} className="text-white" />
                      </div>
@@ -159,10 +179,17 @@ const TensionHeatmap: React.FC = () => {
                 </div>
 
                 {/* The Graph */}
-                <div className="relative bg-onyx border border-white/10 rounded-sm p-4 md:p-8 shadow-2xl group z-0">
+                <div className="relative bg-onyx border border-white/10 rounded-sm p-4 md:p-8 shadow-2xl group z-0 spotlight-card">
                     <div className="w-full overflow-x-auto custom-scrollbar pb-4 relative">
                         <div className="min-w-[800px] relative">
-                            <svg width="100%" height={SVG_HEIGHT} viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} className="overflow-visible">
+                            <svg 
+                                ref={svgRef}
+                                width="100%" 
+                                height={SVG_HEIGHT} 
+                                viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} 
+                                className="overflow-visible touch-none"
+                                onTouchMove={handleTouchMove}
+                            >
                                 <defs>
                                     <linearGradient id="tensionGradient" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="0%" stopColor="#F4C2C2" stopOpacity="0.3"/>
@@ -265,7 +292,7 @@ const TensionHeatmap: React.FC = () => {
                         ) : (
                             <div className="relative z-10 flex flex-col items-center opacity-50 gap-3">
                                 <Activity size={40} className="text-slate-600" strokeWidth={1.5} />
-                                <p className="text-slate-500 text-xs font-bold uppercase tracking-[0.3em]">Hover over points to reveal scenes</p>
+                                <p className="text-slate-500 text-xs font-bold uppercase tracking-[0.3em]">Hover or touch graph to reveal scenes</p>
                             </div>
                         )}
                     </div>

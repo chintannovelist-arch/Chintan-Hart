@@ -1,10 +1,38 @@
 
-
-
-import React, { useState, useEffect, useCallback } from 'react';
-import { Lock, Unlock, BrainCircuit, ChevronRight, Shield } from 'lucide-react';
-import { callGeminiUnspokenThoughts } from '../services/geminiService';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Lock, Unlock, BrainCircuit, ChevronRight, Shield, Volume2, Loader, StopCircle } from 'lucide-react';
+import { callGeminiUnspokenThoughts, callGeminiTTS } from '../services/geminiService';
 import { UNSPOKEN_SCENES } from '../constants';
+
+// --- Audio Helper Functions ---
+function decode(base64: string) {
+    const binaryString = atob(base64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes;
+}
+
+async function decodeAudioData(
+    data: Uint8Array,
+    ctx: AudioContext,
+    sampleRate: number,
+    numChannels: number,
+): Promise<AudioBuffer> {
+    const dataInt16 = new Int16Array(data.buffer);
+    const frameCount = dataInt16.length / numChannels;
+    const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
+
+    for (let channel = 0; channel < numChannels; channel++) {
+        const channelData = buffer.getChannelData(channel);
+        for (let i = 0; i < frameCount; i++) {
+            channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
+        }
+    }
+    return buffer;
+}
 
 const SceneButton = React.memo(({ scene, isSelected, isUnlocked, onSelect }: any) => (
     <button 
@@ -20,11 +48,14 @@ SceneButton.displayName = 'SceneButton';
 
 const UnspokenThoughts: React.FC = () => {
     const [selectedSceneId, setSelectedSceneId] = useState(UNSPOKEN_SCENES[0].id);
-    
-    // State to store unlocked thoughts, mapping scene ID to the generated text.
-    // e.g., { "ch8": "Her skin feels like...", "ch41": "I need to protect her..." }
     const [unlockedThoughts, setUnlockedThoughts] = useState<Record<string, string>>({});
     
+    // Audio State
+    const [isAudioLoading, setIsAudioLoading] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const audioContextRef = useRef<AudioContext | null>(null);
+    const sourceRef = useRef<AudioBufferSourceNode | null>(null);
+
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const [loadingMessage, setLoadingMessage] = useState("Deciphering Silence...");
@@ -40,7 +71,6 @@ const UnspokenThoughts: React.FC = () => {
         "Translating the unspoken..."
     ];
 
-    // Effect to cycle through different loading messages for better UX.
     useEffect(() => {
         let interval: any;
         if (isLoading) {
@@ -51,8 +81,32 @@ const UnspokenThoughts: React.FC = () => {
             }, 2000);
         }
         return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isLoading]);
+
+    // Clean up audio on unmount or scene change
+    useEffect(() => {
+        return () => {
+            if (sourceRef.current) {
+                sourceRef.current.stop();
+            }
+            if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+                audioContextRef.current.close();
+            }
+        };
+    }, []);
+
+    // Stop audio when switching scenes
+    useEffect(() => {
+        stopAudio();
+    }, [selectedSceneId]);
+
+    const stopAudio = () => {
+        if (sourceRef.current) {
+            try { sourceRef.current.stop(); } catch(e) {}
+            sourceRef.current = null;
+        }
+        setIsPlaying(false);
+    };
 
     const handleReveal = async () => {
         if (isCurrentUnlocked) return;
@@ -63,19 +117,65 @@ const UnspokenThoughts: React.FC = () => {
         
         const result = await callGeminiUnspokenThoughts(selectedSceneData.title, selectedSceneData.trigger);
         
-        // Refined error check to handle specific new error messages from the service
         const isGenericError = result.includes("guarded") || result.includes("silence remains");
         const isSpecificError = result.includes("filtered") || result.includes("rate limit") || result.includes("failed") || result.includes("configuration");
 
         if (isGenericError || isSpecificError || !result) {
-             // Display the exact error message from the service if it's a specific one,
-             // otherwise fall back to the component's default error message.
              setError(isSpecificError ? result : "His thoughts are too guarded right now. The silence remains unbroken.");
         } else {
             setUnlockedThoughts(prev => ({...prev, [selectedSceneId]: result}));
         }
         
         setIsLoading(false);
+    };
+
+    const handleListen = async () => {
+        if (isPlaying) {
+            stopAudio();
+            return;
+        }
+
+        const textToSpeak = unlockedThoughts[selectedSceneId];
+        if (!textToSpeak) return;
+
+        setIsAudioLoading(true);
+
+        try {
+            const base64Audio = await callGeminiTTS(textToSpeak);
+            if (!base64Audio) {
+                throw new Error("Failed to generate audio");
+            }
+
+            if (!audioContextRef.current) {
+                audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({sampleRate: 24000});
+            } else if (audioContextRef.current.state === 'suspended') {
+                await audioContextRef.current.resume();
+            }
+
+            const ctx = audioContextRef.current;
+            const audioBuffer = await decodeAudioData(
+                decode(base64Audio),
+                ctx,
+                24000,
+                1
+            );
+
+            const source = ctx.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(ctx.destination);
+            
+            source.onended = () => setIsPlaying(false);
+            sourceRef.current = source;
+            
+            source.start();
+            setIsPlaying(true);
+
+        } catch (e) {
+            console.error("Audio playback error:", e);
+            setError("Could not play audio.");
+        } finally {
+            setIsAudioLoading(false);
+        }
     };
 
     const handleSceneSelect = useCallback((id: string) => {
@@ -96,7 +196,7 @@ const UnspokenThoughts: React.FC = () => {
                     </p>
                 </div>
 
-                <div className="grid lg:grid-cols-12 gap-8 bg-onyx border border-white/10 rounded-sm shadow-2xl overflow-hidden min-h-[600px]">
+                <div className="grid lg:grid-cols-12 gap-8 bg-onyx border border-white/10 rounded-sm shadow-2xl overflow-hidden min-h-[600px] spotlight-card">
                     
                     {/* Sidebar Selector */}
                     <div className="lg:col-span-4 bg-black/40 border-r border-white/5 p-6 flex flex-col gap-2">
@@ -190,8 +290,31 @@ const UnspokenThoughts: React.FC = () => {
                                         <Unlock size={14} className="text-blush" />
                                         <span className="text-[10px] uppercase tracking-[0.3em] text-blush font-bold">Internal Monologue</span>
                                     </div>
-                                    <div className="font-serif text-xl md:text-2xl leading-loose text-white text-center italic drop-shadow-lg">
+                                    <div className="font-serif text-xl md:text-2xl leading-loose text-white text-center italic drop-shadow-lg mb-8">
                                         "{unlockedThoughts[selectedSceneId]}"
+                                    </div>
+                                    
+                                    {/* Audio Controls */}
+                                    <div className="flex justify-center">
+                                        <button 
+                                            onClick={handleListen}
+                                            disabled={isAudioLoading}
+                                            className={`
+                                                flex items-center gap-2 px-6 py-2 rounded-full border transition-all duration-300
+                                                ${isPlaying 
+                                                    ? 'bg-primary/20 border-primary text-primary animate-pulse' 
+                                                    : 'bg-white/5 border-white/20 text-slate-400 hover:text-white hover:border-white/50'
+                                                }
+                                            `}
+                                        >
+                                            {isAudioLoading ? (
+                                                <Loader size={16} className="animate-spin" />
+                                            ) : isPlaying ? (
+                                                <><StopCircle size={16} /> Stop Listening</>
+                                            ) : (
+                                                <><Volume2 size={16} /> Listen to Thoughts</>
+                                            )}
+                                        </button>
                                     </div>
                                 </div>
                             )}

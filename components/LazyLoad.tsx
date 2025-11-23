@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect, Suspense } from 'react';
 import { motion } from 'framer-motion';
 
@@ -26,8 +27,8 @@ const LazyLoad: React.FC<LazyLoadProps> = ({ children, delay = 0 }) => {
         }
       },
       { 
-          rootMargin: "100px", // Trigger slightly before element is in view
-          threshold: 0.1
+          rootMargin: "200px", // Trigger slightly before element is in view to start loading chunk
+          threshold: 0
       } 
     );
 
@@ -42,11 +43,11 @@ const LazyLoad: React.FC<LazyLoadProps> = ({ children, delay = 0 }) => {
     <div ref={ref} className="min-h-[100px] w-full relative">
       {isVisible ? (
         <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 60, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             transition={{ 
-                duration: 0.8, 
-                ease: [0.22, 1, 0.36, 1], // Snappy cinematic ease
+                duration: 0.9, 
+                ease: [0.22, 1, 0.36, 1], // Snappy cinematic ease matching ScrollReveal
                 delay 
             }}
         >
