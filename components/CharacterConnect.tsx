@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { MessageCircle, Send, MoreHorizontal, Circle } from 'lucide-react';
 import { ChatMessage } from '../types';
@@ -95,7 +94,7 @@ const CharacterConnect: React.FC = () => {
                             <button 
                                 key={char}
                                 onClick={() => { setSelectedChar(char); setChatHistory([]); }} 
-                                className={`p-4 rounded-sm flex items-center gap-4 transition-all group border border-transparent focus:outline-none focus:ring-1 focus:ring-primary ${selectedChar === char ? "bg-white/5 border-white/10" : "hover:bg-white/5 hover:border-white/5 hover:translate-x-1"}`}
+                                className={`p-4 rounded-sm flex items-center gap-4 transition-all duration-300 group border border-transparent focus:outline-none focus:ring-1 focus:ring-primary ${selectedChar === char ? "bg-white/5 border-white/10 shadow-[0_0_15px_rgba(37,150,190,0.15)]" : "hover:bg-white/5 hover:border-white/5 hover:translate-x-1 hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] hover:scale-[1.05]"}`}
                                 role="tab"
                                 aria-selected={selectedChar === char}
                                 aria-controls={`chat-panel-${char}`}

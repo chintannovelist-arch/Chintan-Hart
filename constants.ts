@@ -1,3 +1,5 @@
+
+
 import { Book, Scenario, SneakPeek } from './types';
 
 export const AUTHOR_NAME = "Chintan Hart";
@@ -124,35 +126,193 @@ export const UNSPOKEN_SCENES = [
     { id: "ch54", title: "Chapter 54: The Blueprints", context: "Planning their house. Hands touch over the paper.", trigger: "She says 'My room'." }
 ];
 
+// Refined "S-Curve" Data for better Slow Burn visualization
+// Tension starts low and rises non-linearly.
+// Pact Integrity starts high and crumbles inversely.
 export const TENSION_DATA = [
-    { chapter: 1, title: "The Agreement", snippet: "A handshake. A contract. A wall of pillows.", tension: 10, pactIntegrity: 100 },
-    { chapter: 15, title: "The Saree", snippet: "He helps her with the pleats. His knuckles graze her waist.", tension: 30, pactIntegrity: 90 },
-    { chapter: 35, title: "The Powercut", snippet: "Total darkness. A collision in the hallway.", tension: 55, pactIntegrity: 70 },
-    { chapter: 50, title: "The Fever", snippet: "She cares for him. He is vulnerable.", tension: 75, pactIntegrity: 50 },
-    { chapter: 65, title: "The Rain", snippet: "Soaked clothes. He pulls her out of the storm.", tension: 90, pactIntegrity: 20 },
+    { chapter: 1, title: "The Agreement", snippet: "A handshake. A contract. A wall of pillows.", tension: 2, pactIntegrity: 98 },
+    { chapter: 4, title: "The Pillow Wall", snippet: "Separate sides. The cotton barrier is absolute.", tension: 5, pactIntegrity: 95 },
+    { chapter: 8, title: "The Lizard Rescue", snippet: "He chases it out. She grips his arm in fear.", tension: 8, pactIntegrity: 92 },
+    { chapter: 12, title: "Lunch Touch", snippet: "Knees brush under the table. No one pulls away.", tension: 12, pactIntegrity: 88 },
+    { chapter: 16, title: "The Saree Pleats", snippet: "His knuckles graze her bare waist.", tension: 15, pactIntegrity: 85 },
+    { chapter: 20, title: "Morning Reflection", snippet: "Caught staring in the mirror. Eyes lock.", tension: 20, pactIntegrity: 80 },
+    { chapter: 24, title: "The Jealousy", snippet: "A cousin flirts. Vijay's jaw tightens.", tension: 25, pactIntegrity: 75 },
+    { chapter: 28, title: "The Salesman", snippet: "He steps between her and the stranger.", tension: 30, pactIntegrity: 70 },
+    { chapter: 32, title: "Phone Call", snippet: "He ignores work for her. The shift begins.", tension: 35, pactIntegrity: 65 },
+    { chapter: 36, title: "Powercut Collision", snippet: "Total darkness. Pressed against the wall.", tension: 42, pactIntegrity: 58 },
+    { chapter: 40, title: "Car Ride Nap", snippet: "She sleeps on his shoulder. He drives one-handed.", tension: 48, pactIntegrity: 52 },
+    { chapter: 44, title: "Temple Crowd", snippet: "He cages her with his body to shield her.", tension: 55, pactIntegrity: 45 },
+    { chapter: 48, title: "The Umbrella", snippet: "One small umbrella. Hips flush together.", tension: 62, pactIntegrity: 38 },
+    { chapter: 52, title: "The Fever", snippet: "She wipes his brow. He leans into her touch.", tension: 70, pactIntegrity: 30 },
+    { chapter: 56, title: "The Slow Dance", snippet: "A waltz in the living room. Silence is loud.", tension: 78, pactIntegrity: 22 },
+    { chapter: 60, title: "The Fight", snippet: "Passion explodes as anger. The distance breaks.", tension: 85, pactIntegrity: 15 },
+    { chapter: 64, title: "Photo Album", snippet: "Tracing her face in the picture. 'Beautiful.'", tension: 88, pactIntegrity: 12 },
+    { chapter: 68, title: "The Rain Rescue", snippet: "Soaked clothes. He pulls her from the storm.", tension: 92, pactIntegrity: 8 },
+    { chapter: 72, title: "Balcony Night", snippet: "Stargazing. Whispers near the ear.", tension: 95, pactIntegrity: 5 },
+    { chapter: 76, title: "Jasmine Gift", snippet: "Flowers for her hair. His hands shake.", tension: 98, pactIntegrity: 2 },
     { chapter: 80, title: "The Knot", snippet: "The wall comes down. The pact is broken.", tension: 100, pactIntegrity: 0 }
 ];
 
 export const PREDICTION_QUESTIONS = [
     { 
         chapter: "Chapter 10", 
-        context: "Meena drops a glass in the kitchen. It shatters.", 
-        options: [{id: "A", text: "He tells her to be careful."}, {id: "B", text: "He rushes to check her feet."}, {id: "C", text: "He calls the maid."}],
+        context: "Meena drops a glass in the kitchen. It shatters loudly.", 
+        options: [{id: "A", text: "He tells her to be careful."}, {id: "B", text: "He rushes to check her bare feet."}, {id: "C", text: "He calls the maid to clean it."}],
         correctOption: "B",
         answerExcerpt: "Before the shards had even settled, Vijay was there. He gripped her arms, lifting her bodily onto the counter. 'Don't move,' he ordered, his eyes scanning her bare feet for blood."
     },
     { 
         chapter: "Chapter 25", 
-        context: "Meena is wearing a dress that is slightly too short for a family gathering.", 
-        options: [{id: "A", text: "He asks her to change."}, {id: "B", text: "He stays close to her all night."}, {id: "C", text: "He makes a joke about it."}],
+        context: "Meena wears a dress that is slightly shorter than usual for a family gathering. Her aunt stares.", 
+        options: [{id: "A", text: "He asks her to change."}, {id: "B", text: "He stays close to her all night."}, {id: "C", text: "He makes a joke to defuse tension."}],
         correctOption: "B",
         answerExcerpt: "He didn't say a word about the hemline. He simply became her shadow. Whenever a gaze lingered too long, Vijay was there, a wall of broad shoulders and dark glares blocking the view."
     },
     { 
         chapter: "Chapter 60", 
-        context: "They have their first big fight. Meena walks out to the balcony in the rain.", 
-        options: [{id: "A", text: "He locks the door."}, {id: "B", text: "He waits for her to cool down."}, {id: "C", text: "He follows her instantly."}],
+        context: "They have their first big fight. Meena walks out to the balcony in the pouring rain.", 
+        options: [{id: "A", text: "He locks the balcony door."}, {id: "B", text: "He waits inside for her to cool down."}, {id: "C", text: "He follows her instantly."}],
         correctOption: "C",
         answerExcerpt: "He didn't care about the rain or the neighbors. He followed her out, spinning her around. 'You don't get to walk away,' he shouted over the thunder. 'Not from this. Not from me.'"
+    },
+    {
+        chapter: "Chapter 2",
+        context: "It's their first morning. Meena is nervous about coffee.",
+        options: [{id: "A", text: "He asks her to make it."}, {id: "B", text: "He makes it exactly how she likes it."}, {id: "C", text: "He leaves for work without speaking."}],
+        correctOption: "B",
+        answerExcerpt: "She walked into the kitchen to find a steaming cup waiting. 'Sugar, no milk,' he said without turning around. He had remembered."
+    },
+    {
+        chapter: "Chapter 5",
+        context: "Meena spills ink on Vijay's important work papers.",
+        options: [{id: "A", text: "He yells in frustration."}, {id: "B", text: "He checks her hands for stains first."}, {id: "C", text: "He silently cleans the desk."}],
+        correctOption: "B",
+        answerExcerpt: "Meena froze, expecting anger. Instead, Vijay grabbed a tissue and wiped her fingers. 'Ink is hard to scrub off,' he murmured, ignoring the ruined contract."
+    },
+    {
+        chapter: "Chapter 14",
+        context: "The power goes out while they are eating dinner.",
+        options: [{id: "A", text: "He fumbles for a flashlight."}, {id: "B", text: "He moves his chair closer in the dark."}, {id: "C", text: "He complains about the electricity board."}],
+        correctOption: "B",
+        answerExcerpt: "In the pitch black, she heard the scrape of wood on tile. His voice came from inches away. 'Don't be scared,' he whispered. 'I'm right here.'"
+    },
+    {
+        chapter: "Chapter 18",
+        context: "A cousin mentions Meena's old college crush at a party.",
+        options: [{id: "A", text: "He asks details about him."}, {id: "B", text: "He grips his glass until his knuckles turn white."}, {id: "C", text: "He laughs it off."}],
+        correctOption: "B",
+        answerExcerpt: "Vijay's expression didn't change, but Meena heard the sharp 'clink' of his ring hitting the glass. His hold on the tumbler was lethal."
+    },
+    {
+        chapter: "Chapter 22",
+        context: "Vijay has a nightmare and wakes up shouting.",
+        options: [{id: "A", text: "He turns away in shame."}, {id: "B", text: "He goes to the living room."}, {id: "C", text: "He lets Meena hold him."}],
+        correctOption: "C",
+        answerExcerpt: "For the first time, he didn't pull away. He collapsed against her chest, his breathing ragged, letting her fingers comb through his sweat-dampened hair."
+    },
+    {
+        chapter: "Chapter 30",
+        context: "A salesman touches Meena's shoulder to demonstrate a saree drape.",
+        options: [{id: "A", text: "He pays and leaves."}, {id: "B", text: "He steps between them immediately."}, {id: "C", text: "He asks Meena if she likes the color."}],
+        correctOption: "B",
+        answerExcerpt: "Vijay moved faster than thought. He stepped between the man and his wife, taking the silk fabric into his own hands. 'I'll handle the pleats,' he said, his voice ice cold."
+    },
+    {
+        chapter: "Chapter 33",
+        context: "Vijay gets a work call at 2 AM while they are talking.",
+        options: [{id: "A", text: "He takes it on the balcony."}, {id: "B", text: "He rejects it and pulls her closer."}, {id: "C", text: "He answers apologetically."}],
+        correctOption: "B",
+        answerExcerpt: "The phone lit up the dark room. Vijay reached out, silenced it, and tossed it onto the floor. 'Continue,' he said, his focus entirely on her lips."
+    },
+    {
+        chapter: "Chapter 38",
+        context: "Meena burns the sambar for lunch.",
+        options: [{id: "A", text: "He orders pizza."}, {id: "B", text: "He eats it without complaint."}, {id: "C", text: "He teaches her how to cook."}],
+        correctOption: "B",
+        answerExcerpt: "It was acrid and smoky. Vijay took a second helping. 'It's distinct,' he said, catching her eye. 'I like distinct.'"
+    },
+    {
+        chapter: "Chapter 45",
+        context: "A stranger bumps into Meena roughly at the temple.",
+        options: [{id: "A", text: "He yells at the stranger."}, {id: "B", text: "He pulls her into his chest to shield her."}, {id: "C", text: "He asks if she is okay."}],
+        correctOption: "B",
+        answerExcerpt: "Before she could stumble, she was buried in his shirt. His arms formed a cage around her, hard and unyielding against the crushing crowd."
+    },
+    {
+        chapter: "Chapter 48",
+        context: "They are walking in the rain with only one small umbrella.",
+        options: [{id: "A", text: "He gives it to her."}, {id: "B", text: "He pulls her by the waist to keep her dry."}, {id: "C", text: "He hails an auto."}],
+        correctOption: "B",
+        answerExcerpt: "He didn't offer the umbrella. Instead, he hooked an arm around her waist and yanked her flush against his side. 'Stay close,' he muttered. 'Or you'll get wet.'"
+    },
+    {
+        chapter: "Chapter 52",
+        context: "She struggles with the clasp of her necklace.",
+        options: [{id: "A", text: "He watches her struggle."}, {id: "B", text: "He brushes her hands away and does it himself."}, {id: "C", text: "He tells her to hurry up."}],
+        correctOption: "B",
+        answerExcerpt: "His fingers brushed hers aside. 'Stop fidgeting,' he breathed against her neck, his warm hands deft and sure against the delicate gold chain."
+    },
+    {
+        chapter: "Chapter 55",
+        context: "Meena is sick with a high fever.",
+        options: [{id: "A", text: "He calls his mother."}, {id: "B", text: "He stays home to apply cool cloths."}, {id: "C", text: "He sleeps in the guest room."}],
+        correctOption: "B",
+        answerExcerpt: "The CEO of Hart Analytics took a sick day. He spent it dipping a cloth in ice water and pressing it to her forehead, his face lined with worry."
+    },
+    {
+        chapter: "Chapter 58",
+        context: "A female colleague flirts with Vijay at a party.",
+        options: [{id: "A", text: "He introduces Meena immediately."}, {id: "B", text: "He ignores the colleague."}, {id: "C", text: "He smiles politely."}],
+        correctOption: "A",
+        answerExcerpt: "He didn't even smile. He reached out, grabbed Meena's hand, and interlaced their fingers. 'Have you met my wife?' he interrupted, his tone final."
+    },
+    {
+        chapter: "Chapter 62",
+        context: "They look at their awkward wedding photos from months ago.",
+        options: [{id: "A", text: "He laughs at them."}, {id: "B", text: "He traces her face in the photo."}, {id: "C", text: "He closes the album."}],
+        correctOption: "B",
+        answerExcerpt: "His finger lingered on her image in the bridal silk. 'You looked terrified,' he noted softly. 'I wish I had known you then.'"
+    },
+    {
+        chapter: "Chapter 67",
+        context: "Stargazing on the roof. Meena shivers in the cold.",
+        options: [{id: "A", text: "He says let's go inside."}, {id: "B", text: "He puts his jacket on her shoulders."}, {id: "C", text: "He rubs her arms."}],
+        correctOption: "B",
+        answerExcerpt: "He stripped off his suit jacket and draped it over her. It was heavy, warm, and smelled entirely of him. He didn't ask for it back."
+    },
+    {
+        chapter: "Chapter 72",
+        context: "Meena twists her ankle on the stairs.",
+        options: [{id: "A", text: "He helps her walk."}, {id: "B", text: "He carries her bridal style."}, {id: "C", text: "He calls a doctor immediately."}],
+        correctOption: "B",
+        answerExcerpt: "He didn't let her take a single step. He scooped her up, ignoring her protests, carrying her up three flights of stairs as if she weighed nothing."
+    },
+    {
+        chapter: "Chapter 75",
+        context: "He buys her a random gift on a Tuesday.",
+        options: [{id: "A", text: "A diamond necklace."}, {id: "B", text: "Fresh jasmine flowers."}, {id: "C", text: "A new book."}],
+        correctOption: "B",
+        answerExcerpt: "It wasn't gold. It was a string of fresh, dew-covered jasmine wrapped in newspaper. 'For your hair,' he said gruffly."
+    },
+    {
+        chapter: "Chapter 78",
+        context: "They are inches apart in the kitchen. The tension is breaking.",
+        options: [{id: "A", text: "He backs away."}, {id: "B", text: "He leans in, waiting for a sign."}, {id: "C", text: "He kisses her immediately."}],
+        correctOption: "B",
+        answerExcerpt: "He didn't take. He offered. He leaned in until their breaths mingled, waiting, giving her the power to close the final inch."
+    },
+    {
+        chapter: "Chapter 8",
+        context: "A lizard on the wall scares Meena.",
+        options: [{id: "A", text: "He laughs at her fear."}, {id: "B", text: "He chases it out gently."}, {id: "C", text: "He kills it."}],
+        correctOption: "B",
+        answerExcerpt: "He didn't mock her. He quietly guided the creature out with a broom. 'It's gone,' he assured her, checking the corners to make her feel safe."
+    },
+    {
+        chapter: "Epilogue",
+        context: "They are discussing having children.",
+        options: [{id: "A", text: "He wants a boy."}, {id: "B", text: "He is terrified but wants a girl like her."}, {id: "C", text: "He says not yet."}],
+        correctOption: "B",
+        answerExcerpt: "'A daughter,' he whispered against her hair. 'I want a daughter. But only if she has your fire.'"
     }
 ];

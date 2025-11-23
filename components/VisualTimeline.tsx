@@ -1,7 +1,6 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { BookText } from 'lucide-react';
+import { BookText, ImageOff } from 'lucide-react';
 
 const timelineData = [
   {
@@ -62,6 +61,15 @@ const itemVariants = {
 
 const VisualTimeline: React.FC = () => {
     const imageUrl = "assets/visual-timeline.png";
+    const [imgError, setImgError] = useState(false);
+
+    const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        e.preventDefault();
+        const element = document.getElementById('books');
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
 
     return (
         <section id="timeline" className="py-32 bg-onyx border-y border-white/5 overflow-hidden">
@@ -87,15 +95,27 @@ const VisualTimeline: React.FC = () => {
                     transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
                 >
                     <div className="overflow-x-auto custom-scrollbar">
-                         <img 
-                            src={imageUrl} 
-                            alt="A visual timeline of Vijay and Meena's relationship across four panels."
-                            className="w-full min-w-[1200px] h-auto object-cover"
-                            loading="lazy"
-                            decoding="async"
-                            width="1200"
-                            height="600"
-                         />
+                         {!imgError ? (
+                             <img 
+                                src={imageUrl} 
+                                alt="A visual timeline of Vijay and Meena's relationship across four panels."
+                                className="w-full min-w-[1200px] h-auto object-cover"
+                                loading="lazy"
+                                decoding="async"
+                                width="1200"
+                                height="600"
+                                onError={() => setImgError(true)}
+                             />
+                         ) : (
+                             // Visual Fallback for Timeline
+                             <div className="w-full min-w-[800px] h-[300px] bg-white/5 flex flex-col items-center justify-center text-slate-500 gap-4">
+                                <ImageOff size={40} className="opacity-50"/>
+                                <div className="text-center">
+                                    <p className="font-display text-lg">Timeline Graphic Not Found</p>
+                                    <p className="text-xs font-mono mt-1 opacity-70">Ensure 'assets/visual-timeline.png' exists.</p>
+                                </div>
+                             </div>
+                         )}
                     </div>
                 </motion.div>
                 
@@ -122,7 +142,11 @@ const VisualTimeline: React.FC = () => {
                                 </p>
                             </div>
                             <div className="mt-auto pt-6 border-t border-white/10 text-center">
-                                <a href="#books" className={`text-xs font-bold uppercase tracking-widest ${item.textColor} hover:text-white transition-colors duration-300 flex items-center justify-center gap-2`}>
+                                <a 
+                                    href="#books" 
+                                    onClick={handleScroll}
+                                    className={`text-xs font-bold uppercase tracking-widest ${item.textColor} hover:text-white transition-colors duration-300 flex items-center justify-center gap-2`}
+                                >
                                     <BookText size={14}/> Read Chapters {item.chapters}
                                 </a>
                             </div>

@@ -1,30 +1,42 @@
 
+
 import { GoogleGenAI } from "@google/genai";
 import { NOVEL_SCENES } from '../constants';
 
 // This service centralizes all interactions with the Gemini API.
-// It uses a single, robust `safeGenerate` helper function to ensure that all
-// API calls have consistent error handling, API key validation, and fallback
-// messaging. This pattern makes adding new AI features scalable and maintainable.
+// It supports multiple API keys (API_KEY, API_KEY_2, API_KEY_3) to distribute
+// load and handle rate limits seamlessly.
 
-// Helper to safely initialize the client
-const getAiClient = () => {
+// Helper to safely initialize the client pool
+const getAiClients = () => {
   // Safely check for process.env to avoid crashing in browser environments
-  const apiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : undefined;
-  if (!apiKey) {
-      console.warn("[Gemini Service] API Key is missing. AI features will be disabled.");
-      return null;
+  if (typeof process === 'undefined' || !process.env) {
+      console.warn("[Gemini Service] Environment variables not accessible.");
+      return [];
   }
-  return new GoogleGenAI({ apiKey });
+
+  // Explicitly access keys to ensure bundlers capture them
+  // This allows the app to use up to 3 keys for higher throughput
+  const keys = [
+      process.env.API_KEY,
+      process.env.API_KEY_2,
+      process.env.API_KEY_3
+  ].filter(key => key && typeof key === 'string' && key.length > 0) as string[];
+
+  if (keys.length === 0) {
+      console.warn("[Gemini Service] API Key is missing. AI features will be disabled.");
+      return [];
+  }
+  
+  return keys.map(key => new GoogleGenAI({ apiKey: key }));
 };
 
-const ai = getAiClient();
+const clients = getAiClients();
 const MODEL_NAME = 'gemini-2.5-flash';
 
 /**
- * Safely executes a Gemini API generation call with enhanced, user-friendly error handling.
- * This function centralizes error detection for common issues like content filtering,
- * API key problems, and rate limiting, providing clear calls to action for the user.
+ * Safely executes a Gemini API generation call with enhanced, user-friendly error handling
+ * and automatic API key rotation for rate limits.
  * 
  * @param prompt The user-facing prompt for the AI.
  * @param systemInstruction The backend instructions guiding the AI's personality and format.
@@ -38,45 +50,73 @@ const safeGenerate = async (
   contextName: string,
   userErrorMessage: string
 ): Promise<string> => {
-  // 1. Handle missing API key - This is a developer/setup issue.
-  if (!ai) {
+  // 1. Handle missing API clients
+  if (clients.length === 0) {
     console.error(`[${contextName}] Failed: Gemini API Client not initialized (Missing API Key).`);
     return "Connection to the creative AI has failed. This may be a configuration issue. Please try again later.";
   }
 
-  try {
-    const response = await ai.models.generateContent({
-      model: MODEL_NAME,
-      contents: prompt,
-      config: {
-        systemInstruction: systemInstruction,
-      },
-    });
-    
-    // 2. Handle responses blocked due to safety settings.
-    const candidate = response.candidates?.[0];
-    if (!candidate || candidate.finishReason === 'SAFETY' || !response.text) {
-        console.warn(`[${contextName}] Response was empty or blocked.`, { finishReason: candidate?.finishReason, safetyRatings: candidate?.safetyRatings });
-        return "The response was filtered for safety reasons. Your input may contain sensitive topics. Please try rephrasing your request.";
-    }
+  // 2. Load Balancing: Start with a random client to distribute load
+  let clientIndex = Math.floor(Math.random() * clients.length);
 
-    return response.text;
-  } catch (error: any) {
-    // 3. Handle specific API errors gracefully.
-    console.error(`[${contextName}] Gemini API Call Failed:`, {
-        message: error.message,
-        status: error.status,
-        name: error.name,
-        details: error
-    });
+  // 3. Retry Logic: Iterate through available keys if a quota error occurs
+  for (let attempt = 0; attempt < clients.length; attempt++) {
+    const ai = clients[clientIndex];
     
-    if (error.message?.includes('rate limit')) {
-        return "Our creative AI is experiencing high demand right now. Please wait a moment and try your request again.";
+    try {
+        const response = await ai.models.generateContent({
+          model: MODEL_NAME,
+          contents: prompt,
+          config: {
+            systemInstruction: systemInstruction,
+          },
+        });
+        
+        // Handle blocked responses
+        const candidate = response.candidates?.[0];
+        if (!candidate || candidate.finishReason === 'SAFETY' || !response.text) {
+            console.warn(`[${contextName}] Response was empty or blocked.`, { finishReason: candidate?.finishReason, safetyRatings: candidate?.safetyRatings });
+            return "The response was filtered for safety reasons. Your input may contain sensitive topics. Please try rephrasing your request.";
+        }
+    
+        return response.text;
+
+    } catch (error: any) {
+        // Detect Quota/Rate Limit errors (429)
+        const isQuotaError = error.message?.includes('429') || 
+                             error.message?.includes('rate limit') || 
+                             error.message?.includes('quota') || 
+                             error.message?.includes('exhausted') ||
+                             error.status === 429;
+
+        if (isQuotaError) {
+            console.warn(`[${contextName}] Key at index ${clientIndex} exhausted (Attempt ${attempt + 1}/${clients.length}). Switching keys...`);
+            
+            // Rotate to next key
+            clientIndex = (clientIndex + 1) % clients.length;
+            
+            // If all keys have been tried and failed
+            if (attempt === clients.length - 1) {
+                console.error(`[${contextName}] All API keys exhausted rate limits.`);
+                return "Our creative AI is experiencing high demand right now. Please wait a moment and try your request again.";
+            }
+            // Continue loop to try next key
+            continue;
+        }
+
+        // 4. Handle other specific API errors gracefully (do not retry)
+        console.error(`[${contextName}] Gemini API Call Failed:`, {
+            message: error.message,
+            status: error.status,
+            name: error.name,
+            details: error
+        });
+        
+        return userErrorMessage;
     }
-    
-    // 4. Fallback to the original component-specific message for other errors.
-    return userErrorMessage;
   }
+  
+  return userErrorMessage;
 };
 
 // --- API Service Functions ---
@@ -184,7 +224,6 @@ export const callGeminiCliffhanger = async (scenario: string) => {
     );
 };
 
-// FIX: Add missing callGeminiTranslator function for the RomanceTranslator component.
 export const callGeminiTranslator = async (boringText: string) => {
     const system = `You are a romantic novelist in the style of Chintan Hart, author of 'The Jasmine Knot'.
     Your task is to transform a mundane, boring sentence into a lush, sensory, and romantic description.

@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Edit3, User, Loader, PenTool, Sparkles, Feather, RefreshCw, Check, Zap, AlertCircle } from 'lucide-react';
 import { SCENARIOS } from '../constants';
@@ -182,7 +181,8 @@ const FinishTheScene: React.FC = () => {
 
     return (
         <section id="finishscene" className="py-32 bg-onyx border-y border-white/5 relative">
-            <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] pointer-events-none"></div>
+            {/* Replaced external stardust image with CSS gradient pattern to prevent loading errors */}
+            <div className="absolute inset-0 opacity-5 bg-[radial-gradient(rgba(255,255,255,0.2)_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
 
             <div className="max-w-6xl mx-auto px-6 relative z-10">
                 <div className="text-center mb-20">

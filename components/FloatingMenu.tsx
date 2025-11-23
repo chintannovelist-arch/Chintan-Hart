@@ -1,264 +1,318 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, useScroll, useSpring, useMotionValue } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring, useMotionValue, useTransform } from 'framer-motion';
 import { 
-    Menu, X, BookOpen, Sparkles, BrainCircuit, Heart, Flame, 
-    Key, MessageSquare, MapPin, PenTool, Activity, 
-    Search, PlayCircle, Eye, Music, Wand2, Lock
+    Menu, X, BookOpen, Sparkles, BrainCircuit, PenTool, 
+    Activity, Search, Flame, Key, Music, MessageSquare, Heart, Eye, Lock, MapPin, PlayCircle, Wand2, ChevronRight
 } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
-// --- Constants & Configuration ---
-const HEAVY_SETTLE = [0.25, 0.46, 0.45, 0.94];
+// --- Configuration ---
+// Modified for a "Gentle Snap" effect as requested (Lower stiffness, higher damping)
+const SPRING_CONFIG = { damping: 20, stiffness: 100, mass: 1 }; 
+const IRIS_EASE = [0.76, 0, 0.24, 1]; // Cinematic Ease
 
 const NARRATIVE_LINKS = [
-    { label: "The Novel", href: "#books", icon: BookOpen },
-    { label: "The Experience", href: "#experience", icon: PlayCircle },
-    { label: "The Author", href: "#author", icon: PenTool },
-    { label: "Subscribe", href: "#newsletter", icon: MessageSquare },
+    { label: "The Novel", href: "#books", icon: BookOpen, desc: "Start the journey" },
+    { label: "The Experience", href: "#experience", icon: PlayCircle, desc: "Visuals & Audio" },
+    { label: "The Author", href: "#author", icon: PenTool, desc: "Meet Chintan" },
+    { label: "Subscribe", href: "#newsletter", icon: MessageSquare, desc: "Join the circle" },
 ];
 
-const AI_TOOL_CATEGORIES = [
-    {
-        title: "Narrative Insights",
-        tools: [
-            { label: "Unspoken Thoughts", href: "#unspoken", icon: BrainCircuit },
-            { label: "Tension Heatmap", href: "#heatmap", icon: Activity },
-            { label: "Trope Matchmaker", href: "#tropematcher", icon: Search },
-            { label: "Text Decoder", href: "#decoder", icon: Lock },
-        ]
-    },
-    {
-        title: "Interactive Fiction",
-        tools: [
-            { label: "Co-Write Scene", href: "#finishscene", icon: PenTool },
-            { label: "Cliffhanger Engine", href: "#cliffhanger", icon: Flame },
-            { label: "Prediction Game", href: "#prediction", icon: Key },
-            { label: "POV Shift", href: "#povshift", icon: Eye },
-        ]
-    },
-    {
-        title: "Atmospheric & Fun",
-        tools: [
-            { label: "Mood Playlist", href: "#playlist", icon: Music },
-            { label: "Destiny Match", href: "#destiny", icon: Sparkles },
-            { label: "Character Connect", href: "#connect", icon: MessageSquare },
-            { label: "Date Planner", href: "#dateplanner", icon: MapPin },
-            { label: "Love Letter Muse", href: "#muse", icon: Heart },
-        ]
-    }
+const TOOLS = [
+    { label: "Unspoken Thoughts", href: "#unspoken", icon: BrainCircuit, color: "text-blue-400" },
+    { label: "Tension Heatmap", href: "#heatmap", icon: Activity, color: "text-rose-400" },
+    { label: "Co-Write Scene", href: "#finishscene", icon: PenTool, color: "text-emerald-400" },
+    { label: "Trope Matcher", href: "#tropematcher", icon: Search, color: "text-purple-400" },
+    { label: "Cliffhanger", href: "#cliffhanger", icon: Flame, color: "text-orange-400" },
+    { label: "Prediction Game", href: "#prediction", icon: Key, color: "text-yellow-400" },
+    { label: "Mood Playlist", href: "#playlist", icon: Music, color: "text-cyan-400" },
+    { label: "Destiny Match", href: "#destiny", icon: Sparkles, color: "text-indigo-400" },
+    { label: "Character Chat", href: "#connect", icon: MessageSquare, color: "text-green-400" },
+    { label: "Love Letter", href: "#muse", icon: Heart, color: "text-pink-400" },
+    { label: "Translator", href: "#translator", icon: Wand2, color: "text-fuchsia-400" },
+    { label: "Date Planner", href: "#dateplanner", icon: MapPin, color: "text-teal-400" },
 ];
-
-const ALL_LINKS = [...NARRATIVE_LINKS, ...AI_TOOL_CATEGORIES.flatMap(cat => cat.tools)];
 
 const FloatingMenu: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
-    const [buttonPos, setButtonPos] = useState({ x: 0, y: 0 });
     const [isMobile, setIsMobile] = useState(false);
-    const [activeSection, setActiveSection] = useState("#hero");
     
+    // Mouse tracking for magnetic effect
     const buttonRef = useRef<HTMLButtonElement>(null);
     const { scrollY } = useScroll();
     const lastScrollY = useRef(0);
-
+    
+    // Magnetic Motion Values
     const x = useMotionValue(0);
     const y = useMotionValue(0);
-    const springConfig = { damping: 25, stiffness: 400, mass: 1 }; 
-    const springX = useSpring(x, springConfig);
-    const springY = useSpring(y, springConfig);
+    const springX = useSpring(x, SPRING_CONFIG);
+    const springY = useSpring(y, SPRING_CONFIG);
+    
+    // Icon Rotation
+    const iconRotate = useTransform(springX, [-20, 20], [-10, 10]);
 
-    useEffect(() => {
-        const checkMobile = () => setIsMobile(window.matchMedia("(max-width: 768px)").matches);
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
+    // --- Menu Parallax Logic ---
+    const menuX = useMotionValue(0);
+    const menuY = useMotionValue(0);
+    // Smooth springs for background gradients
+    const bgX = useSpring(menuX, { stiffness: 30, damping: 30 });
+    const bgY = useSpring(menuY, { stiffness: 30, damping: 30 });
+    // Invert movement for secondary layer to create depth
+    const bgXInv = useTransform(bgX, (val) => -val);
+    const bgYInv = useTransform(bgY, (val) => -val);
 
+    const handleMenuMouseMove = (e: React.MouseEvent) => {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        // Calculate offset from center, scaled down for subtlety
+        const offsetX = (e.clientX - width / 2) / 30; 
+        const offsetY = (e.clientY - height / 2) / 30;
+        
+        menuX.set(offsetX);
+        menuY.set(offsetY);
+    };
+
+    // --- Device & Scroll Logic ---
     useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            if (isOpen || !buttonRef.current || isMobile) return;
-            const rect = buttonRef.current.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            const dist = Math.sqrt(Math.pow(e.clientX - centerX, 2) + Math.pow(e.clientY - centerY, 2));
-            if (dist < 120) {
-                x.set((e.clientX - centerX) * 0.2);
-                y.set((e.clientY - centerY) * 0.2);
-            } else {
-                x.set(0);
-                y.set(0);
-            }
+        const handleResize = () => {
+            // Robust check: Width < 1024 OR Touch capability
+            const checkMobile = window.innerWidth < 1024 || window.matchMedia("(pointer: coarse)").matches;
+            setIsMobile(checkMobile);
+            
+            // If mobile, FORCE visible. If desktop, reset.
+            if (checkMobile) setIsVisible(true);
         };
-        window.addEventListener("mousemove", handleMouseMove);
-        return () => window.removeEventListener("mousemove", handleMouseMove);
-    }, [isOpen, x, y, isMobile]);
 
-    useEffect(() => {
-        const updateScroll = () => {
+        // Scroll Logic for Desktop only
+        const handleScroll = () => {
             const current = scrollY.get();
             const delta = current - lastScrollY.current;
-            if (current < 50) setIsVisible(true);
-            else if (delta > 20) setIsVisible(false);
-            else if (delta < -10) setIsVisible(true);
+            const isAtTop = current < 50;
+
+            // On Mobile/Tablet: ALWAYS VISIBLE. No exceptions.
+            if (window.innerWidth < 1024 || window.matchMedia("(pointer: coarse)").matches) {
+                setIsVisible(true);
+            } else {
+                // Desktop: Hide on scroll down, Show on scroll up
+                if (isAtTop) setIsVisible(true);
+                else if (delta > 20 && !isOpen) setIsVisible(false);
+                else if (delta < -10) setIsVisible(true);
+            }
             lastScrollY.current = current;
         };
-        const unsubscribe = scrollY.on("change", updateScroll);
-        return () => unsubscribe();
-    }, [scrollY]);
 
-    // --- Active Link Highlighting ---
-    useEffect(() => {
-        const sections = ALL_LINKS.map(link => document.getElementById(link.href.substring(1))).filter(Boolean);
-        if (sections.length === 0) return;
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        const unsubscribeScroll = scrollY.on("change", handleScroll);
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                     if (entry.intersectionRatio > 0.5) {
-                        setActiveSection(`#${entry.target.id}`);
-                     }
-                }
-            });
-        }, { rootMargin: "-50% 0px -50% 0px", threshold: [0, 0.5, 1] });
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            unsubscribeScroll();
+        };
+    }, [scrollY, isOpen]);
 
-        sections.forEach(section => { if(section) observer.observe(section) });
-        return () => sections.forEach(section => { if(section) observer.unobserve(section) });
-    }, []);
+    // --- Magnetic Effect (Desktop Only) ---
+    const handleMouseMove = (e: React.MouseEvent) => {
+        if (isMobile || isOpen) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const distance = Math.sqrt(Math.pow(e.clientX - centerX, 2) + Math.pow(e.clientY - centerY, 2));
 
-    const handleMenuToggle = useCallback(() => {
-        if (buttonRef.current) {
-            const rect = buttonRef.current.getBoundingClientRect();
-            setButtonPos({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+        if (distance < 100) {
+            x.set((e.clientX - centerX) * 0.3);
+            y.set((e.clientY - centerY) * 0.3);
+        } else {
+            x.set(0);
+            y.set(0);
         }
-        // FIX: Use functional update to prevent stale state issues with useCallback.
-        // This was the root cause of the menu not closing.
-        setIsOpen(prev => !prev);
-    }, []);
+    };
 
-    const handleLinkClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-        e.preventDefault();
+    const handleMouseLeave = () => {
+        x.set(0);
+        y.set(0);
+    };
+
+    // --- Navigation Logic ---
+    const handleNav = (href: string) => {
         setIsOpen(false);
-        const targetId = href.substring(1);
-        const element = document.getElementById(targetId);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const id = href.replace('#', '');
+        const el = document.getElementById(id);
+        if (el) {
+            // Small delay to allow menu to close cinematically first
+            setTimeout(() => {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }, 300);
         }
-    }, []);
+    };
 
+    // Lock body scroll when menu is open
     useEffect(() => {
-        document.body.style.overflow = isOpen ? 'hidden' : 'unset';
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
     }, [isOpen]);
 
     return (
         <>
+            {/* --- THE IMMERSIVE OVERLAY --- */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ clipPath: `circle(0px at ${buttonPos.x}px ${buttonPos.y}px)` }}
-                        animate={{ clipPath: `circle(150% at ${buttonPos.x}px ${buttonPos.y}px)` }}
-                        exit={{ clipPath: `circle(0px at ${buttonPos.x}px ${buttonPos.y}px)`, transition: { duration: 0.6, ease: [0.55, 0.085, 0.68, 0.53] } }}
-                        transition={{ duration: 0.8, ease: HEAVY_SETTLE }}
-                        className="fixed inset-0 z-[9998] bg-[#0B1026]/95 backdrop-blur-xl flex flex-col lg:flex-row overflow-hidden will-change-[clip-path] spotlight-overlay"
+                        initial={{ clipPath: `circle(0% at calc(100% - 3rem) calc(100% - 3rem))` }}
+                        animate={{ clipPath: `circle(150% at calc(100% - 3rem) calc(100% - 3rem))` }}
+                        exit={{ clipPath: `circle(0% at calc(100% - 3rem) calc(100% - 3rem))` }}
+                        transition={{ duration: 0.7, ease: IRIS_EASE }}
+                        className="fixed inset-0 z-[9998] bg-[#050505]/95 backdrop-blur-xl flex flex-col md:flex-row overflow-hidden"
+                        onMouseMove={handleMenuMouseMove}
                     >
-                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/noise.png')]"></div>
-                        <div className="w-full lg:w-5/12 h-full flex flex-col justify-center px-8 lg:px-24 relative z-10 border-b lg:border-b-0 lg:border-r border-white/5 bg-black/20 lg:bg-transparent">
-                            <div className="space-y-8 lg:space-y-12">
-                                <span className="text-primary/50 text-[10px] font-bold uppercase tracking-[0.4em] block mb-4">The Journal</span>
-                                {NARRATIVE_LINKS.map((link, i) => {
-                                    const isActive = activeSection === link.href;
-                                    return (
-                                        <motion.a
-                                            key={link.label}
-                                            href={link.href}
-                                            onClick={(e) => handleLinkClick(e, link.href)}
-                                            initial={{ y: 40, opacity: 0 }}
-                                            animate={{ y: 0, opacity: 1 }}
-                                            transition={{ delay: 0.1 + (i * 0.1), duration: 0.8, ease: HEAVY_SETTLE }}
-                                            className="block group"
-                                        >
-                                            <span className="font-display text-4xl sm:text-5xl lg:text-7xl tracking-wide transition-all duration-500 relative block" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.3)', color: 'transparent' }}>
-                                                {link.label}
-                                                <span className={`absolute inset-0 text-white transition-opacity duration-500 [text-shadow:0_0_30px_rgba(244,194,194,0.4)] ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} aria-hidden="true">
-                                                    {link.label}
-                                                </span>
-                                            </span>
-                                        </motion.a>
-                                    );
-                                })}
+                         {/* Parallax Background Blobs */}
+                        <motion.div 
+                            style={{ x: bgX, y: bgY }}
+                            className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-primary/10 rounded-full blur-[150px] pointer-events-none opacity-60 z-0"
+                        />
+                        <motion.div 
+                            style={{ x: bgXInv, y: bgYInv }}
+                            className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-blush/5 rounded-full blur-[150px] pointer-events-none opacity-60 z-0"
+                        />
+
+                        {/* Background Noise Texture */}
+                        <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(rgba(255,255,255,0.2)_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none z-0" />
+
+                        {/* Top Bar for Mobile (Close & Theme) */}
+                        <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-50 md:hidden">
+                             <span className="font-display text-primary tracking-widest text-xs uppercase">Menu</span>
+                             <ThemeToggle />
+                        </div>
+
+                        {/* --- LEFT PANEL: NARRATIVE (Main Links) --- */}
+                        <div className="w-full md:w-5/12 h-[40vh] md:h-full flex flex-col justify-center px-8 md:px-16 lg:px-24 border-b md:border-b-0 md:border-r border-white/10 relative z-10 pt-20 md:pt-0">
+                            <div className="space-y-6 md:space-y-10">
+                                {NARRATIVE_LINKS.map((link, i) => (
+                                    <motion.button
+                                        key={link.label}
+                                        onClick={() => handleNav(link.href)}
+                                        initial={{ opacity: 0, x: -50 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: 0.2 + (i * 0.1) }}
+                                        className="group flex flex-col text-left focus:outline-none"
+                                    >
+                                        <span className="font-display text-3xl md:text-5xl lg:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-slate-100 to-slate-500 group-hover:from-primary group-hover:to-blush transition-all duration-500">
+                                            {link.label}
+                                        </span>
+                                        <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -translate-x-4 group-hover:translate-x-0">
+                                            <span className="h-px w-8 bg-primary"></span>
+                                            <span className="text-[10px] uppercase tracking-widest text-primary font-bold">{link.desc}</span>
+                                        </div>
+                                    </motion.button>
+                                ))}
+                            </div>
+                            
+                            {/* Desktop Theme Toggle Position */}
+                            <div className="hidden md:block absolute bottom-12 left-16 lg:left-24">
+                                <ThemeToggle />
                             </div>
                         </div>
-                        <div className="w-full lg:w-7/12 h-full bg-black/20 overflow-y-auto custom-scrollbar p-6 lg:p-16 relative z-10">
-                             <div className="max-w-4xl mx-auto pt-8 lg:pt-0">
-                                {AI_TOOL_CATEGORIES.map((category, catIndex) => (
-                                <motion.div key={category.title} className="mb-12"
-                                    initial={{ y: 20, opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.3 + (catIndex * 0.1), duration: 0.6, ease: HEAVY_SETTLE }}
+
+                        {/* --- RIGHT PANEL: TOOLS (Grid) --- */}
+                        <div className="w-full md:w-7/12 h-[60vh] md:h-full bg-white/[0.02] overflow-y-auto custom-scrollbar p-6 md:p-16 lg:p-20 relative z-10">
+                            <div className="max-w-4xl mx-auto h-full flex flex-col">
+                                <motion.h3 
+                                    initial={{ opacity: 0 }} 
+                                    animate={{ opacity: 1 }} 
+                                    transition={{ delay: 0.5 }}
+                                    className="text-xs font-bold uppercase tracking-[0.3em] text-slate-500 mb-8 sticky top-0 bg-[#0c0c0c]/90 backdrop-blur-md py-4 z-20 w-full"
                                 >
-                                    <h3 className="text-primary/50 text-xs font-bold uppercase tracking-[0.3em] block mb-6 sticky top-0 bg-[#0B1026]/80 backdrop-blur-sm py-4 z-20 border-b border-primary/10">{category.title}</h3>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                                        {category.tools.map((tool, i) => {
-                                            const isActive = activeSection === tool.href;
-                                            return (
-                                                <motion.a
-                                                    key={tool.label}
-                                                    href={tool.href}
-                                                    onClick={(e) => handleLinkClick(e, tool.href)}
-                                                    initial={{ y: 20, opacity: 0 }}
-                                                    animate={{ y: 0, opacity: 1 }}
-                                                    transition={{ delay: 0.4 + (i * 0.03), duration: 0.6, ease: HEAVY_SETTLE }}
-                                                    whileHover={{ y: -3, scale: 1.02 }}
-                                                    className={`group relative p-4 rounded-md border bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-300 hover:shadow-[0_0_20px_rgba(37,150,190,0.15)] flex items-center gap-4 overflow-hidden ${isActive ? 'bg-primary/10 border-primary/50' : 'border-primary/20 hover:border-primary/50'}`}
-                                                >
-                                                    <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                                    <div className={`p-2 rounded-md bg-black/40 border transition-all duration-300 relative z-10 ${isActive ? 'text-white border-white/20' : 'text-primary border-white/10 group-hover:text-white group-hover:scale-110'}`}>
-                                                        <tool.icon size={18} />
-                                                    </div>
-                                                    <div className="flex-1 relative z-10">
-                                                        <h4 className={`font-body font-bold text-sm tracking-wide ${isActive ? 'text-white' : 'text-slate-200 group-hover:text-white'}`}>{tool.label}</h4>
-                                                    </div>
-                                                </motion.a>
-                                            );
-                                        })}
-                                    </div>
-                                </motion.div>
-                                ))}
-                             </div>
+                                    Interactive Experience
+                                </motion.h3>
+                                
+                                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 pb-20">
+                                    {TOOLS.map((tool, i) => (
+                                        <motion.button
+                                            key={tool.label}
+                                            onClick={() => handleNav(tool.href)}
+                                            initial={{ opacity: 0, scale: 0.9 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: 0.3 + (i * 0.05) }}
+                                            whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.05)" }}
+                                            whileTap={{ scale: 0.98 }}
+                                            className="flex flex-col items-center justify-center p-4 md:p-6 rounded-sm border border-white/5 bg-black/20 hover:border-primary/30 transition-all duration-300 group text-center gap-3 aspect-square sm:aspect-auto sm:h-32"
+                                        >
+                                            <tool.icon size={24} className={`mb-1 transition-transform group-hover:scale-110 duration-300 ${tool.color}`} />
+                                            <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-400 group-hover:text-white transition-colors">
+                                                {tool.label}
+                                            </span>
+                                            <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 text-primary transition-all transform translate-x-[-10px] group-hover:translate-x-0" />
+                                        </motion.button>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            <motion.button
-                ref={buttonRef}
-                onClick={handleMenuToggle}
-                style={{ x: springX, y: springY }}
-                initial={{ scale: 0 }}
+            {/* --- THE FLOATING TRIGGER BUTTON --- */}
+            <motion.div
+                className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[9999]"
+                initial={false}
                 animate={{
-                    scale: isVisible ? 1 : 0.8,
-                    opacity: isVisible ? 1 : 0.5,
-                    boxShadow: isVisible
-                        ? [
-                            "0 0 10px rgba(37,150,190,0.4), 0 0 20px rgba(37,150,190,0.2)",
-                            "0 0 20px rgba(37,150,190,0.6), 0 0 40px rgba(37,150,190,0.3)",
-                            "0 0 10px rgba(37,150,190,0.4), 0 0 20px rgba(37,150,190,0.2)"
-                          ]
-                        : "0 0 10px rgba(37,150,190,0.4), 0 0 20px rgba(37,150,190,0.2)"
+                    scale: isVisible ? 1 : 0,
+                    opacity: isVisible ? 1 : 0,
                 }}
-                transition={{
-                    scale: { type: "spring", stiffness: 300, damping: 20 },
-                    opacity: { duration: 0.3 },
-                    boxShadow: { duration: 4, repeat: Infinity, ease: "easeInOut" }
-                }}
-                whileHover={{ scale: 1.1 }}
-                className="fixed z-[9999] flex items-center justify-center bottom-6 right-6 w-14 h-14 md:bottom-12 md:right-12 md:w-16 md:h-16 rounded-full backdrop-blur-md border border-white/10 text-white bg-[#0F0F0F]/80 transition-shadow duration-500 group outline-none"
-                aria-label={isOpen ? "Close Menu" : "Open Menu"}
-                aria-expanded={isOpen}
+                transition={{ type: "spring", stiffness: 260, damping: 20 }}
             >
-                <motion.div animate={{ rotate: isOpen ? 90 : 0 }} transition={{ duration: 0.4, ease: "easeInOut" }} className="relative z-10">
-                    {isOpen ? <X size={24} className="text-blush" /> : <Menu size={24} strokeWidth={1.5} />}
-                </motion.div>
-            </motion.button>
+                {/* Pulse Ring (Optimistic UI) */}
+                <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping opacity-75 duration-[3s]"></div>
+                
+                <motion.button
+                    ref={buttonRef}
+                    onClick={() => setIsOpen(!isOpen)}
+                    onMouseMove={handleMouseMove}
+                    onMouseLeave={handleMouseLeave}
+                    style={{ x: springX, y: springY }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className={`
+                        relative w-14 h-14 md:w-16 md:h-16 rounded-full 
+                        flex items-center justify-center 
+                        shadow-[0_0_30px_rgba(37,150,190,0.4)]
+                        border border-white/10
+                        transition-colors duration-300
+                        ${isOpen ? 'bg-white text-black' : 'bg-[#0F0F0F] text-white hover:bg-black'}
+                    `}
+                    aria-label="Toggle Menu"
+                >
+                    <motion.div style={{ rotate: iconRotate }} className="relative z-10">
+                        <AnimatePresence mode="wait">
+                            {isOpen ? (
+                                <motion.div
+                                    key="close"
+                                    initial={{ rotate: -90, opacity: 0 }}
+                                    animate={{ rotate: 0, opacity: 1 }}
+                                    exit={{ rotate: 90, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <X size={28} />
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    key="menu"
+                                    initial={{ rotate: 90, opacity: 0 }}
+                                    animate={{ rotate: 0, opacity: 1 }}
+                                    exit={{ rotate: -90, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <Menu size={28} />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.div>
+                </motion.button>
+            </motion.div>
         </>
     );
 };

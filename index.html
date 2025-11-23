@@ -4,23 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Jasmine Knot | Chintan Hart</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TS372QJF56"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-TS372QJF56');
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        primary: '#2596be', // Cinematic Cerulean
+                        primary: 'rgb(37, 150, 190)', // Cinematic Cerulean (Fixed)
                         'primary-dark': '#186a8a',
-                        onyx: '#0F0F0F', // Deep Onyx (Base)
-                        secondary: '#121212', // Darker Onyx for sections
-                        paper: '#050505', // Almost black for texture sections
-                        surface: '#1A1A1A', // Cards and elevated surfaces
-                        muted: '#262626', // Inputs and disabled states
-                        blush: '#F4C2C2', // Pale Blush (Highlight)
-                        black: '#000000', // Infinite Black
-                        white: '#FFFFFF', // Stark White
+                        
+                        // Dynamic Colors via CSS Variables
+                        onyx: 'rgb(var(--c-onyx) / <alpha-value>)', 
+                        secondary: 'rgb(var(--c-secondary) / <alpha-value>)',
+                        paper: 'rgb(var(--c-paper) / <alpha-value>)',
+                        surface: 'rgb(var(--c-surface) / <alpha-value>)',
+                        muted: 'rgb(var(--c-muted) / <alpha-value>)',
+                        
+                        // Inverted Logic: Black becomes White in light mode, White becomes Dark
+                        black: 'rgb(var(--c-black) / <alpha-value>)', 
+                        white: 'rgb(var(--c-white) / <alpha-value>)',
+                        
+                        blush: '#F4C2C2', // Keep constant
+                        
+                        // Override Slate scales for automatic text inversion
+                        slate: {
+                            50: 'rgb(var(--c-slate-50) / <alpha-value>)',
+                            100: 'rgb(var(--c-slate-100) / <alpha-value>)',
+                            200: 'rgb(var(--c-slate-200) / <alpha-value>)',
+                            300: 'rgb(var(--c-slate-300) / <alpha-value>)',
+                            400: 'rgb(var(--c-slate-400) / <alpha-value>)',
+                            500: 'rgb(var(--c-slate-500) / <alpha-value>)',
+                            600: 'rgb(var(--c-slate-600) / <alpha-value>)',
+                            700: 'rgb(var(--c-slate-700) / <alpha-value>)',
+                            800: 'rgb(var(--c-slate-800) / <alpha-value>)',
+                            900: 'rgb(var(--c-slate-900) / <alpha-value>)',
+                        }
                     },
                     fontFamily: {
                         display: ['"Cinzel Decorative"', 'serif'],
@@ -33,19 +62,24 @@
                     },
                     animation: {
                         'fade-in': 'fadeIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                        'fade-in-up': 'fadeInUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                        'fade-in-up': 'fadeInUp 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                        'reveal': 'reveal 1.5s cubic-bezier(0.16, 1, 0.3, 1)',
                         'ken-burns': 'kenBurns 20s ease-in-out infinite alternate',
                         'pulse-slow': 'pulseGlow 4s ease-in-out infinite',
                         'shimmer': 'shimmer 2s linear infinite',
                     },
                     keyframes: {
                         fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
+                            '0%': { opacity: '0', filter: 'blur(5px)' },
+                            '100%': { opacity: '1', filter: 'blur(0)' },
                         },
                         fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(30px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                            '0%': { opacity: '0', transform: 'translateY(40px)', filter: 'blur(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)', filter: 'blur(0)' },
+                        },
+                        reveal: {
+                             '0%': { opacity: '0', transform: 'scale(0.98)', filter: 'blur(8px)' },
+                             '100%': { opacity: '1', transform: 'scale(1)', filter: 'blur(0)' }
                         },
                         kenBurns: {
                             '0%': { transform: 'scale(1)' },
@@ -76,12 +110,60 @@
         :root {
             --mouse-x: 50%;
             --mouse-y: 50%;
+
+            /* DARK MODE (DEFAULT) */
+            --c-black: 0 0 0;
+            --c-white: 255 255 255;
+            
+            --c-onyx: 15 15 15;        /* #0F0F0F */
+            --c-secondary: 18 18 18;   /* #121212 */
+            --c-paper: 5 5 5;          /* #050505 */
+            --c-surface: 26 26 26;     /* #1A1A1A */
+            --c-muted: 38 38 38;       /* #262626 */
+            
+            /* Slate Scale (Standard) */
+            --c-slate-50: 248 250 252;
+            --c-slate-100: 241 245 249;
+            --c-slate-200: 226 232 240;
+            --c-slate-300: 203 213 225;
+            --c-slate-400: 148 163 184;
+            --c-slate-500: 100 116 139;
+            --c-slate-600: 71 85 105;
+            --c-slate-700: 51 65 85;
+            --c-slate-800: 30 41 59;
+            --c-slate-900: 15 23 42;
+        }
+
+        .light-theme {
+            /* LIGHT MODE (INVERTED) */
+            --c-black: 255 255 255;    /* Bg becomes white */
+            --c-white: 15 23 42;       /* Text becomes dark slate */
+            
+            --c-onyx: 248 250 252;     /* Slate-50 */
+            --c-secondary: 241 245 249;/* Slate-100 */
+            --c-paper: 255 255 255;    /* White */
+            --c-surface: 255 255 255;  /* White */
+            --c-muted: 226 232 240;    /* Slate-200 */
+
+            /* Inverted Slate Scale for Text Contrast */
+            /* text-slate-300 (light gray) -> becomes text-slate-700 (dark gray) */
+            --c-slate-50: 15 23 42;    /* was slate-900 */
+            --c-slate-100: 30 41 59;   /* was slate-800 */
+            --c-slate-200: 51 65 85;   /* was slate-700 */
+            --c-slate-300: 71 85 105;  /* was slate-600 */
+            --c-slate-400: 100 116 139;/* was slate-500 */
+            --c-slate-500: 148 163 184;/* was slate-400 */
+            --c-slate-600: 203 213 225;/* was slate-300 */
+            --c-slate-700: 226 232 240;/* was slate-200 */
+            --c-slate-800: 241 245 249;/* was slate-100 */
+            --c-slate-900: 248 250 252;/* was slate-50 */
         }
         
         body {
-            background-color: #000000;
-            color: #FFFFFF;
+            background-color: rgb(var(--c-black));
+            color: rgb(var(--c-white));
             overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
 
         /* Cinematic Scrollbar */
@@ -89,7 +171,7 @@
             width: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: #000000;
+            background: rgb(var(--c-black));
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #2596be;
@@ -132,7 +214,9 @@
     "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
     "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
     "firebase/": "https://aistudiocdn.com/firebase@^12.6.0/",
-    "framer-motion": "https://aistudiocdn.com/framer-motion@^11.0.8"
+    "framer-motion": "https://aistudiocdn.com/framer-motion@^11.0.8",
+    "html2canvas": "https://aistudiocdn.com/html2canvas@^1.4.1",
+    "jspdf": "https://aistudiocdn.com/jspdf@^2.5.1"
   }
 }
 </script>
@@ -145,6 +229,24 @@
             document.documentElement.style.setProperty('--mouse-x', e.clientX + 'px');
             document.documentElement.style.setProperty('--mouse-y', e.clientY + 'px');
         });
+        
+        // Init Theme
+        const storedTheme = localStorage.getItem('theme');
+        if (storedTheme === 'light') {
+            document.documentElement.classList.add('light-theme');
+        }
+
+        // Define Global placeholders for Firebase to prevent ReferenceErrors during static hosting
+        // if environment injection hasn't happened.
+        if (typeof window.__firebase_config === 'undefined') {
+            window.__firebase_config = undefined;
+        }
+        if (typeof window.__app_id === 'undefined') {
+            window.__app_id = 'demo-app';
+        }
+        if (typeof window.__initial_auth_token === 'undefined') {
+            window.__initial_auth_token = undefined;
+        }
     </script>
     <script type="module" src="./index.tsx"></script>
 </body>

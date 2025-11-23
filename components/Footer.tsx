@@ -1,9 +1,12 @@
+
+
 import React, { useState, useEffect } from 'react';
-import { Lock, ArrowUp, X } from 'lucide-react';
+import { Lock, ArrowUp, X, FileDown } from 'lucide-react';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db, appId } from '../services/firebase';
 import { AUTHOR_NAME } from '../constants';
 import { Subscriber } from '../types';
+import Brochure from './Brochure';
 
 const SubscribersList = ({ onClose }: { onClose: () => void }) => {
     const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
@@ -43,24 +46,36 @@ const SubscribersList = ({ onClose }: { onClose: () => void }) => {
 
 const Footer: React.FC = () => {
     const [showAdmin, setShowAdmin] = useState(false);
+    const [showBrochure, setShowBrochure] = useState(false);
+    
     const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
     
+    // Prevent default for placeholder links to avoid jumping
+    const handlePlaceholder = (e: React.MouseEvent) => e.preventDefault();
+
     return (
         <footer className="bg-black py-12 text-white relative">
             <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-                 <div className="text-slate-500 text-sm flex items-center gap-2">
+                 <div className="text-slate-500 text-sm flex flex-col md:flex-row items-center gap-4">
                     <span>&copy; 2025 {AUTHOR_NAME}. All rights reserved.</span>
                     <button onClick={() => setShowAdmin(true)} className="hover:text-white transition-colors opacity-50 hover:opacity-100" aria-label="Admin access"><Lock size={12}/></button>
                 </div>
-                 <div className="flex gap-6 text-sm font-light text-slate-400">
-                    <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
-                    <a href="#" className="hover:text-primary transition-colors">Contact</a>
+                 <div className="flex gap-6 text-sm font-light text-slate-400 items-center">
+                    <button 
+                        onClick={() => setShowBrochure(true)}
+                        className="flex items-center gap-2 text-primary hover:text-white transition-colors uppercase text-[10px] tracking-widest font-bold"
+                    >
+                        <FileDown size={14} /> Download Guide
+                    </button>
+                    <a href="#" onClick={handlePlaceholder} className="hover:text-primary transition-colors">Privacy Policy</a>
+                    <a href="#" onClick={handlePlaceholder} className="hover:text-primary transition-colors">Contact</a>
                 </div>
             </div>
              <button onClick={scrollToTop} className="absolute right-8 top-[-20px] bg-primary p-3 rounded-full shadow-lg hover:bg-primary-dark transition-all hover:-translate-y-1 group" aria-label="Scroll to top">
                  <ArrowUp size={20} color="white" className="group-hover:scale-110 transition-transform" />
              </button>
             {showAdmin && <SubscribersList onClose={() => setShowAdmin(false)} />}
+            {showBrochure && <Brochure onClose={() => setShowBrochure(false)} />}
         </footer>
     );
 };

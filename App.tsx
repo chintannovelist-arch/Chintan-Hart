@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, initializeAuth } from './services/firebase';
@@ -39,8 +38,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // --- START: Scroll-to-Top Fix ---
-    // On every fresh load/refresh, force the browser to the top of the page.
-    // This overrides the browser's default scroll restoration behavior.
+    // Force the browser to the top of the page on refresh, overriding browser scroll restoration.
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
@@ -56,42 +54,49 @@ const App: React.FC = () => {
 
   return (
     <main className="bg-black min-h-screen text-slate-300 font-body selection:bg-primary/40 selection:text-white overflow-x-hidden">
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
             {showPresentation && <FeaturePresentation onClose={() => setShowPresentation(false)} />}
         </AnimatePresence>
         
         <FloatingMenu />
-        <Hero onStartPresentation={() => setShowPresentation(true)} />
-        <BookSection />
-        <div className="relative bg-black shadow-[0_-50px_100px_rgba(0,0,0,1)]">
-          {/* The "Hook" Phase */}
-          <LazyLoad><CharacterProfiles /></LazyLoad>
-          <LazyLoad><VisualTimeline /></LazyLoad>
-          <LazyLoad><UnspokenThoughts /></LazyLoad>
-          <LazyLoad><Cliffhanger /> </LazyLoad>
-          <LazyLoad><PredictionGame /></LazyLoad>
-          
-          {/* The "Immersion" Phase */}
-          <LazyLoad><TensionHeatmap /></LazyLoad>
-          <LazyLoad><AestheticGallery /></LazyLoad>
-          <LazyLoad><MoodPlaylist /></LazyLoad>
-          
-          {/* The "Engagement" Phase */}
-          <LazyLoad><TropeFinder /> </LazyLoad>
-          <LazyLoad><FinishTheScene /></LazyLoad>
-          <LazyLoad><ObjectPerspective /> </LazyLoad>
-          <LazyLoad><LoveLetterMuse /></LazyLoad>
-          <LazyLoad><DatePlanner /></LazyLoad>
-          <LazyLoad><DestinyMatch /></LazyLoad>
-          
-          {/* The "Utility" Phase */}
-          <LazyLoad><TextDecoder /></LazyLoad>
-          <LazyLoad><CharacterConnect /></LazyLoad>
-          
-          <LazyLoad><Author /></LazyLoad>
-          <LazyLoad><Newsletter user={user} /></LazyLoad>
-          <LazyLoad><Footer /></LazyLoad>
-        </div>
+        
+        {/* AnimatePresence for page-like transitions, although this is a single page scroll */}
+        <AnimatePresence>
+            <div key="main-content">
+                <Hero onStartPresentation={() => setShowPresentation(true)} />
+                <BookSection />
+                
+                <div className="relative bg-black shadow-[0_-50px_100px_rgba(0,0,0,1)]">
+                  {/* The "Hook" Phase */}
+                  <LazyLoad><CharacterProfiles /></LazyLoad>
+                  <LazyLoad><VisualTimeline /></LazyLoad>
+                  <LazyLoad><UnspokenThoughts /></LazyLoad>
+                  <LazyLoad><Cliffhanger /> </LazyLoad>
+                  <LazyLoad><PredictionGame /></LazyLoad>
+                  
+                  {/* The "Immersion" Phase */}
+                  <LazyLoad><TensionHeatmap /></LazyLoad>
+                  <LazyLoad><AestheticGallery /></LazyLoad>
+                  <LazyLoad><MoodPlaylist /></LazyLoad>
+                  
+                  {/* The "Engagement" Phase */}
+                  <LazyLoad><TropeFinder /> </LazyLoad>
+                  <LazyLoad><FinishTheScene /></LazyLoad>
+                  <LazyLoad><ObjectPerspective /> </LazyLoad>
+                  <LazyLoad><LoveLetterMuse /></LazyLoad>
+                  <LazyLoad><DatePlanner /></LazyLoad>
+                  <LazyLoad><DestinyMatch /></LazyLoad>
+                  
+                  {/* The "Utility" Phase */}
+                  <LazyLoad><TextDecoder /></LazyLoad>
+                  <LazyLoad><CharacterConnect /></LazyLoad>
+                  
+                  <LazyLoad><Author /></LazyLoad>
+                  <LazyLoad><Newsletter user={user} /></LazyLoad>
+                  <LazyLoad><Footer /></LazyLoad>
+                </div>
+            </div>
+        </AnimatePresence>
     </main>
   );
 };

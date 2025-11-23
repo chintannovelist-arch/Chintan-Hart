@@ -1,15 +1,22 @@
 
 
-import React, { useState } from 'react';
-import { HelpCircle, CheckCircle2, XCircle, Gift } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { HelpCircle, CheckCircle2, XCircle, Gift, Shuffle } from 'lucide-react';
 import { PREDICTION_QUESTIONS } from '../constants';
 
 const PredictionGame: React.FC = () => {
+    const [questions, setQuestions] = useState<typeof PREDICTION_QUESTIONS>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [showResult, setShowResult] = useState(false);
 
-    const currentQuestion = PREDICTION_QUESTIONS[currentQuestionIndex];
+    // Randomize questions on mount so every visit feels fresh
+    useEffect(() => {
+        const shuffled = [...PREDICTION_QUESTIONS].sort(() => 0.5 - Math.random());
+        setQuestions(shuffled);
+    }, []);
+
+    const currentQuestion = questions[currentQuestionIndex];
 
     const handleSelect = (optionId: string) => {
         if (showResult) return;
@@ -20,8 +27,11 @@ const PredictionGame: React.FC = () => {
     const nextQuestion = () => {
         setSelectedOption(null);
         setShowResult(false);
-        setCurrentQuestionIndex((prevIndex) => (prevIndex + 1) % PREDICTION_QUESTIONS.length);
+        setCurrentQuestionIndex((prevIndex) => (prevIndex + 1) % questions.length);
     };
+
+    // Loading state while shuffling
+    if (questions.length === 0) return null;
 
     return (
         <section id="prediction" className="py-32 bg-secondary border-b border-white/5">
@@ -38,8 +48,11 @@ const PredictionGame: React.FC = () => {
 
                 <div className="bg-black/50 border border-white/10 rounded-sm p-8 md:p-12 shadow-2xl relative overflow-hidden min-h-[500px] flex flex-col">
                     {/* Question Header */}
-                    <div className="mb-10">
-                        <span className="text-primary text-[10px] font-bold uppercase tracking-[0.2em] mb-2 block">{currentQuestion.chapter}</span>
+                    <div className="mb-10 animate-fade-in">
+                        <div className="flex justify-between items-start">
+                             <span className="text-primary text-[10px] font-bold uppercase tracking-[0.2em] mb-2 block">{currentQuestion.chapter}</span>
+                             <span className="text-slate-600 text-[10px] font-bold uppercase tracking-[0.2em]">{currentQuestionIndex + 1} / {questions.length}</span>
+                        </div>
                         <h3 className="text-2xl text-white font-serif leading-relaxed">"{currentQuestion.context}"</h3>
                     </div>
 
@@ -87,8 +100,8 @@ const PredictionGame: React.FC = () => {
                                     "{currentQuestion.answerExcerpt}"
                                 </p>
                                 <div className="mt-6 text-right">
-                                    <button onClick={nextQuestion} className="text-xs font-bold uppercase tracking-widest text-white hover:text-primary transition-colors">
-                                        Next Scenario &rarr;
+                                    <button onClick={nextQuestion} className="text-xs font-bold uppercase tracking-widest text-white hover:text-primary transition-colors flex items-center gap-2 ml-auto">
+                                        Next Scenario <Shuffle size={12} />
                                     </button>
                                 </div>
                             </div>
