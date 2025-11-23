@@ -1,9 +1,8 @@
 
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-    X, ArrowRight, ArrowLeft, BookOpen, BrainCircuit, PenTool, CloudRain, Wand2,
+    X, ArrowRight, ArrowLeft, BookOpen, BrainCircuit, PenTool, Wand2,
     Activity, Search, Flame, Key, Music, Sparkles, MessageSquare, Heart, Eye, Lock, MapPin
 } from 'lucide-react';
 
@@ -44,7 +43,6 @@ const slideData = [
     title: 'Immerse Your Senses',
     description: 'Feel the world of the novel. From custom soundtracks to direct conversations with the characters, experience the story like never before.',
     features: [
-      { name: 'Sensory Immersion', Icon: CloudRain },
       { name: 'Mood Playlist', Icon: Music },
       { name: 'Destiny Match', Icon: Sparkles },
       { name: 'Character Connect', Icon: MessageSquare },

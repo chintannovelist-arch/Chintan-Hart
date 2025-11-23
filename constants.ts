@@ -19,7 +19,7 @@ export const BOOKS: Book[] = [
             alt: "The Jasmine Knot - Romantic Tension"
         }
     ],
-    amazonLink: "#",
+    amazonLink: "https://amzn.in/d/b4xx7hF",
     sampleLink: "#",
     status: "Available Now",
     tags: ["Arranged Marriage", "Slow Burn", "Chennai Romance", "Intimacy"]

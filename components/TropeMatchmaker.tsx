@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Heart, Search, BookOpen, ArrowRight, Sparkles, Loader2 } from 'lucide-react';
 import { callGeminiTropeMatch } from '../services/geminiService';
@@ -79,7 +80,12 @@ const TropeMatchmaker: React.FC = () => {
                                     </div>
                                     <div className="flex items-center justify-between border-t border-white/10 pt-6">
                                         <span className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Recommendation</span>
-                                        <a href={BOOKS[0].amazonLink} className="inline-flex items-center gap-3 text-white font-bold uppercase text-[10px] tracking-[0.3em] hover:text-primary transition-colors group/link">
+                                        <a 
+                                            href={BOOKS[0].amazonLink} 
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-3 text-white font-bold uppercase text-[10px] tracking-[0.3em] hover:text-primary transition-colors group/link"
+                                        >
                                             Read Now <ArrowRight size={14} className="group-hover/link:translate-x-2 transition-transform" />
                                         </a>
                                     </div>

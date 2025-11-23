@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useScroll, useSpring, useMotionValue } from 'f
 import { 
     Menu, X, BookOpen, Sparkles, BrainCircuit, Heart, Flame, 
     Key, MessageSquare, MapPin, PenTool, Activity, 
-    Search, PlayCircle, Eye, Music, CloudRain, Wand2, Lock
+    Search, PlayCircle, Eye, Music, Wand2, Lock
 } from 'lucide-react';
 
 // --- Constants & Configuration ---
@@ -39,7 +39,6 @@ const AI_TOOL_CATEGORIES = [
     {
         title: "Atmospheric & Fun",
         tools: [
-            { label: "Sensory Immersion", href: "#sensory", icon: CloudRain },
             { label: "Mood Playlist", href: "#playlist", icon: Music },
             { label: "Destiny Match", href: "#destiny", icon: Sparkles },
             { label: "Character Connect", href: "#connect", icon: MessageSquare },

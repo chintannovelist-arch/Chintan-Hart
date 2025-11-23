@@ -57,14 +57,14 @@ const Newsletter: React.FC<NewsletterProps> = ({ user }) => {
                             value={email} 
                             onChange={e => setEmail(e.target.value)} 
                             placeholder="Enter your email address" 
-                            className="flex-1 p-4 rounded-md text-slate-800 outline-none shadow-xl border-2 border-transparent focus:border-secondary transition-all placeholder:text-slate-400 focus:ring-2 focus:ring-secondary/50" 
+                            className="flex-1 p-4 rounded-md bg-white text-slate-900 outline-none shadow-xl border-2 border-transparent focus:border-white/50 transition-all placeholder:text-slate-400 focus:ring-2 focus:ring-white/50" 
                             required 
                             aria-label="Email address for newsletter"
                         />
                         <button 
                             type="submit" 
                             disabled={status === "loading"} 
-                            className="px-8 py-4 bg-secondary text-primary font-bold rounded-md hover:bg-white transition-colors shadow-xl uppercase tracking-wider text-sm focus:outline-none focus:ring-2 focus:ring-white"
+                            className="px-8 py-4 bg-white text-primary hover:bg-slate-100 font-bold rounded-md transition-colors shadow-xl uppercase tracking-wider text-sm focus:outline-none focus:ring-2 focus:ring-white"
                         >
                             {status === "loading" ? "..." : "Subscribe"}
                         </button>

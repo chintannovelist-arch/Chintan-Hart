@@ -1,6 +1,4 @@
 
-
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { BookText } from 'lucide-react';
@@ -93,6 +91,10 @@ const VisualTimeline: React.FC = () => {
                             src={imageUrl} 
                             alt="A visual timeline of Vijay and Meena's relationship across four panels."
                             className="w-full min-w-[1200px] h-auto object-cover"
+                            loading="lazy"
+                            decoding="async"
+                            width="1200"
+                            height="600"
                          />
                     </div>
                 </motion.div>

@@ -30,7 +30,6 @@ const Author = lazy(() => import('./components/Author'));
 const DatePlanner = lazy(() => import('./components/DatePlanner'));
 const MoodPlaylist = lazy(() => import('./components/MoodPlaylist'));
 const LoveLetterMuse = lazy(() => import('./components/LoveLetterMuse'));
-const SensoryImmersion = lazy(() => import('./components/SensoryImmersion'));
 const DestinyMatch = lazy(() => import('./components/DestinyMatch'));
 
 
@@ -75,7 +74,6 @@ const App: React.FC = () => {
           {/* The "Immersion" Phase */}
           <LazyLoad><TensionHeatmap /></LazyLoad>
           <LazyLoad><AestheticGallery /></LazyLoad>
-          <LazyLoad><SensoryImmersion /></LazyLoad>
           <LazyLoad><MoodPlaylist /></LazyLoad>
           
           {/* The "Engagement" Phase */}

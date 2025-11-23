@@ -1,6 +1,4 @@
 
-
-
 import React from 'react';
 import { BookOpen, ChevronRight, ChevronDown, Sparkles } from 'lucide-react';
 import { TAGLINE } from '../constants';
@@ -28,7 +26,15 @@ const Hero: React.FC<HeroProps> = ({ onStartPresentation }) => {
 
       {/* Background Layer with Ken Burns Effect */}
       <div className="absolute inset-0 opacity-40 z-0">
-        <div className="w-full h-full bg-[url('assets/hero-background.jpg')] bg-cover bg-center animate-ken-burns"></div>
+        {/* Optimized Image for LCP (Largest Contentful Paint) */}
+        <img 
+            src="assets/hero-background.jpg" 
+            alt="The Jasmine Knot Atmospheric Background" 
+            className="w-full h-full object-cover animate-ken-burns"
+            fetchPriority="high"
+            loading="eager"
+            decoding="async"
+        />
         {/* Heavy Vignette for Focus */}
         <div className="absolute inset-0 bg-vignette"></div>
       </div>

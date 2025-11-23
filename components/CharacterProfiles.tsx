@@ -27,11 +27,10 @@ const sparkCardVariants = {
   },
 };
 
-// Fixed and more effective ShimmeringText component
-const ShimmeringText = ({ children }: { children: React.ReactNode }) => (
+// Fixed ShimmeringText component with explicit typing to prevent children prop errors
+const ShimmeringText: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <span className="relative inline-block">
-        {children}
-        {/* FIX: The self-closing span tag was causing a parser issue, leading to a false "children is missing" error on this component. Using an explicit closing tag resolves this. */}
+        <span className="relative z-10">{children}</span>
         <span
             className="absolute -inset-1 block animate-shimmer bg-repeat opacity-0 group-hover:opacity-100 transition-opacity duration-500"
             style={{
@@ -90,7 +89,6 @@ const CharacterProfiles: React.FC = () => (
             <div className="space-y-8 mt-12">
               <div className="relative group cursor-pointer w-fit mx-auto">
                   <blockquote className="font-display text-xl text-slate-300 italic transition-all px-8 text-center group-hover:text-white">
-                      {/* FIX: Correctly nested the text inside the ShimmeringText component to provide the required 'children' prop. */}
                       <ShimmeringText>
                         "A gentleman on the outside. A wildfire underneath."
                       </ShimmeringText>
@@ -131,7 +129,6 @@ const CharacterProfiles: React.FC = () => (
             <div className="space-y-8 mt-12">
                <div className="relative group cursor-pointer w-fit mx-auto">
                   <blockquote className="font-display text-xl text-slate-300 italic transition-all px-8 text-center group-hover:text-white">
-                      {/* FIX: Correctly nested the text inside the ShimmeringText component to provide the required 'children' prop. */}
                       <ShimmeringText>
                         "A whisper in the beginning. A revolution by the end."
                       </ShimmeringText>

@@ -1,6 +1,4 @@
 
-
-
 import { GoogleGenAI } from "@google/genai";
 import { NOVEL_SCENES } from '../constants';
 
@@ -258,22 +256,6 @@ export const callGeminiLetter = async (recipient: string, vibe: string) => {
     );
 };
 
-export const callGeminiSensory = async (sense: string) => {
-    const system = `You are an immersive narrator for 'The Jasmine Knot'.
-    Describe a vivid, sensory experience from the world of the novel focusing ONLY on the requested sense.
-    Do not mention the sense by name explicitly if possible, just describe the sensation.
-    Keep it under 50 words. Enchanting and atmospheric.`;
-
-    const prompt = `Focus on the sense of: ${sense}`;
-
-    return safeGenerate(
-        prompt,
-        system,
-        "Sensory Immersion",
-        "The senses are dulled. Try again later."
-    );
-};
-
 export const callGeminiUnspokenThoughts = async (chapterTitle: string, sceneContext: string) => {
     // This is "Context Grounding". By providing the actual text from the novel,
     // the AI can generate a more accurate and in-character internal monologue.
@@ -330,5 +312,23 @@ export const callGeminiPOVShift = async (sceneKey: string, objectName: string) =
         system,
         "POV Shift",
         "The object remains silent. Try another perspective."
+    );
+};
+
+export const callGeminiSensory = async (sense: string) => {
+    const system = `You are the sensory immersion engine for 'The Jasmine Knot'.
+    Describe a vivid, atmospheric moment from the novel focusing PRIMARILY on the requested sense.
+    Focus on the humidity of Chennai, the tension between the characters (Meena and Vijay), and specific details.
+    
+    Style: Lush, poetic, evocative.
+    Length: 1-2 sentences.`;
+    
+    const prompt = `Describe a moment involving: ${sense}`;
+    
+    return safeGenerate(
+        prompt,
+        system,
+        "Sensory Immersion",
+        "The sensation is too faint to capture right now."
     );
 };

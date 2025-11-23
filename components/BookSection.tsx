@@ -1,7 +1,6 @@
 
-
 import React, { useState } from 'react';
-import { X, BookOpen, ShoppingBag, Share2, Twitter, Facebook, Mail, Star, Heart, Instagram } from 'lucide-react';
+import { X, BookOpen, ShoppingBag, Share2, Twitter, Facebook, Mail, Heart, Instagram, ChevronLeft, ChevronRight } from 'lucide-react';
 import { BOOKS, BOOK_SAMPLE, AUTHOR_NAME } from '../constants';
 
 const SampleModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
@@ -47,7 +46,7 @@ const SampleModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
                         <a 
                             href={BOOKS[0].amazonLink}
                             target="_blank"
-                            rel="noreferrer"
+                            rel="noopener noreferrer"
                             className="inline-flex items-center gap-3 px-10 py-4 bg-primary/20 border border-primary/50 text-white rounded-sm hover:bg-primary hover:border-primary transition-all duration-500 uppercase tracking-widest text-xs font-bold shadow-glow hover:scale-105"
                         >
                            <ShoppingBag size={16} /> Purchase Full Copy
@@ -61,9 +60,12 @@ const SampleModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
 
 const BookSection: React.FC = () => {
     const [isSampleOpen, setIsSampleOpen] = useState(false);
-    const [shareCount, setShareCount] = useState(128);
-    const [likeCount, setLikeCount] = useState(452);
     const [isLiked, setIsLiked] = useState(false);
+    
+    // Carousel State
+    const [currentCoverIndex, setCurrentCoverIndex] = useState(0);
+    const [touchStart, setTouchStart] = useState(0);
+    const [touchEnd, setTouchEnd] = useState(0);
 
     const book = BOOKS[0];
     const shareText = encodeURIComponent(`Check out "${book.title}" by ${AUTHOR_NAME}. ${book.subtitle}.`);
@@ -71,14 +73,47 @@ const BookSection: React.FC = () => {
     const twitterUrl = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
 
     const handleLike = () => {
-        if (!isLiked) {
-            setLikeCount(prev => prev + 1);
-            setIsLiked(true);
-        }
+        setIsLiked(!isLiked);
     };
 
     const handleShare = () => {
-        setShareCount(prev => prev + 1);
+        if (typeof navigator !== 'undefined' && navigator.share) {
+             navigator.share({
+                 title: book.title,
+                 text: `Check out "${book.title}" by ${AUTHOR_NAME}`,
+                 url: window.location.href
+             }).catch(() => {});
+        }
+    };
+
+    // Carousel Logic
+    const nextCover = () => {
+        setCurrentCoverIndex((prev) => (prev + 1) % book.coverImages.length);
+    };
+
+    const prevCover = () => {
+        setCurrentCoverIndex((prev) => (prev - 1 + book.coverImages.length) % book.coverImages.length);
+    };
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        setTouchEnd(e.targetTouches[0].clientX);
+    };
+
+    const handleTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > 50;
+        const isRightSwipe = distance < -50;
+
+        if (isLeftSwipe) nextCover();
+        if (isRightSwipe) prevCover();
+
+        setTouchStart(0);
+        setTouchEnd(0);
     };
     
     return (
@@ -91,33 +126,66 @@ const BookSection: React.FC = () => {
       
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-20 lg:gap-24 items-center">
-          {/* Cinematic Image Display */}
-          <div className="relative w-full max-w-lg mx-auto lg:ml-auto group perspective-1000">
-             <div className="relative transform transition-all duration-700 ease-cinematic group-hover:rotate-y-6 group-hover:scale-[1.02]">
+          {/* Cinematic Image Display with Carousel */}
+          <div className="relative w-full max-w-lg mx-auto lg:ml-auto group perspective-1000 select-none">
+             <div className="relative transform transition-all duration-700 ease-cinematic group-hover:rotate-y-2">
                 {/* Glow effect behind book */}
                 <div className="absolute inset-0 bg-primary/20 blur-3xl -z-10 rounded-full opacity-0 group-hover:opacity-60 transition-opacity duration-700"></div>
                 
-                <div className="relative aspect-[2/3] rounded-sm shadow-2xl overflow-hidden border border-white/10">
-                   <img 
-                        src={book.coverImages[0].src} 
-                        srcSet={book.coverImages[0].srcSet} 
-                        alt={book.coverImages[0].alt} 
-                        loading="lazy" 
-                        decoding="async"
-                        width="1000"
-                        height="1500"
-                        className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105" 
-                   />
-                   {/* Overlay Gradient */}
-                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-80"></div>
-                   
-                   <div className="absolute bottom-0 left-0 w-full p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-cinematic">
-                        <div className="flex gap-1 mb-3">
-                            {[1,2,3,4,5].map(i => <Star key={i} size={12} className="fill-primary text-primary" />)}
-                        </div>
-                        <p className="text-white font-display text-xl tracking-wider mb-2">"A Masterpiece of Tension."</p>
-                        <p className="text-slate-400 text-xs uppercase tracking-widest font-bold">— Romance Weekly</p>
-                   </div>
+                <div 
+                    className="relative aspect-[2/3] rounded-sm shadow-2xl overflow-hidden border border-white/10 bg-black"
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                >
+                   {book.coverImages.map((img, index) => (
+                       <div 
+                            key={index}
+                            className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${index === currentCoverIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+                       >
+                            <img 
+                                src={img.src} 
+                                srcSet={img.srcSet} 
+                                sizes="(max-width: 768px) 100vw, 500px"
+                                alt={img.alt} 
+                                loading="lazy"
+                                decoding="async"
+                                className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105" 
+                            />
+                             {/* Overlay Gradient */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-80"></div>
+                       </div>
+                   ))}
+
+                   {/* Carousel Navigation Controls */}
+                   {book.coverImages.length > 1 && (
+                       <>
+                            <button 
+                                onClick={(e) => { e.preventDefault(); prevCover(); }}
+                                className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2 bg-black/40 backdrop-blur-sm text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-primary border border-white/10 hover:border-primary hover:scale-110 focus:opacity-100"
+                                aria-label="Previous image"
+                            >
+                                <ChevronLeft size={24} />
+                            </button>
+                            <button 
+                                onClick={(e) => { e.preventDefault(); nextCover(); }}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2 bg-black/40 backdrop-blur-sm text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-primary border border-white/10 hover:border-primary hover:scale-110 focus:opacity-100"
+                                aria-label="Next image"
+                            >
+                                <ChevronRight size={24} />
+                            </button>
+                            
+                            {/* Dots Indicator */}
+                            <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-30 flex gap-2 pointer-events-none">
+                                {book.coverImages.map((_, idx) => (
+                                    <div 
+                                        key={idx}
+                                        className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${idx === currentCoverIndex ? 'bg-primary w-4' : 'bg-white/50'}`}
+                                    />
+                                ))}
+                            </div>
+                       </>
+                   )}
                 </div>
              </div>
           </div>
@@ -141,12 +209,17 @@ const BookSection: React.FC = () => {
                 </p>
                 
                 <div className="flex flex-wrap gap-6 pt-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                    <a href={book.amazonLink} className="px-10 py-4 bg-primary hover:bg-primary-dark text-white text-xs font-bold uppercase tracking-[0.25em] rounded-sm shadow-glow transition-all duration-500 ease-snappy hover:-translate-y-1 flex items-center justify-center gap-3 group">
-                        <ShoppingBag size={16} className="group-hover:animate-bounce"/> Buy on Amazon
+                    <a 
+                        href={book.amazonLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="px-12 py-5 bg-gradient-to-r from-primary to-[#186a8a] hover:from-[#186a8a] hover:to-primary text-white text-sm font-bold uppercase tracking-[0.25em] rounded-sm shadow-[0_0_25px_rgba(37,150,190,0.6)] transition-all duration-500 ease-snappy hover:-translate-y-1 hover:scale-105 hover:shadow-[0_0_40px_rgba(37,150,190,0.8)] flex items-center justify-center gap-3 group"
+                    >
+                        <ShoppingBag size={18} className="group-hover:animate-bounce"/> Buy on Amazon
                     </a>
                     <button 
                         onClick={() => setIsSampleOpen(true)}
-                        className="px-10 py-4 border border-white/20 hover:border-white bg-transparent hover:bg-white/5 text-slate-300 hover:text-white text-xs font-bold uppercase tracking-[0.25em] rounded-sm transition-all duration-500 ease-snappy flex items-center justify-center gap-3 hover:shadow-glass"
+                        className="px-10 py-5 border border-white/20 hover:border-white bg-transparent hover:bg-white/5 text-slate-300 hover:text-white text-xs font-bold uppercase tracking-[0.25em] rounded-sm transition-all duration-500 ease-snappy flex items-center justify-center gap-3 hover:shadow-glass"
                     >
                         <BookOpen size={16}/> Read Sample
                     </button>
@@ -156,10 +229,10 @@ const BookSection: React.FC = () => {
                 <div className="pt-8 border-t border-white/5 flex items-center justify-between animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
                     <div className="flex items-center gap-6">
                         <button onClick={handleLike} className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-colors ${isLiked ? 'text-blush' : 'text-slate-500 hover:text-blush'}`}>
-                            <Heart size={16} className={isLiked ? "fill-blush" : ""} /> {likeCount}
+                            <Heart size={16} className={isLiked ? "fill-blush" : ""} /> Like
                         </button>
                          <button onClick={handleShare} className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-primary transition-colors">
-                            <Share2 size={16} /> {shareCount}
+                            <Share2 size={16} /> Share
                         </button>
                     </div>
                     

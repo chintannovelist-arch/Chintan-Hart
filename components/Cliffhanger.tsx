@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Flame, Lock, ArrowRight, Play } from 'lucide-react';
 import { callGeminiCliffhanger } from '../services/geminiService';
@@ -86,6 +87,8 @@ const Cliffhanger: React.FC = () => {
                                     </div>
                                     <a 
                                         href={BOOKS[0].amazonLink} 
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.25em] text-white group-hover/lock:text-blush transition-colors"
                                     >
                                         Resolve on Kindle <ArrowRight size={16} className="group-hover/lock:translate-x-2 transition-transform" />

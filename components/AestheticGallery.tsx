@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Instagram, ChevronRight, PlayCircle } from 'lucide-react';
 
@@ -10,8 +11,16 @@ const AestheticGallery: React.FC = () => (
             </div>
             
             <div className="w-full max-w-5xl mx-auto mt-8 relative group overflow-hidden rounded-2xl bg-surface flex items-center justify-center p-12 md:p-24 border border-white/5 shadow-2xl transition-all">
-                {/* Background Overlay */}
-                <div className="absolute inset-0 bg-[url('assets/gallery-background.jpg')] bg-cover bg-center opacity-20 mix-blend-overlay transition-transform duration-[10s] group-hover:scale-110"></div>
+                {/* Background Overlay using Img tag for lazy loading */}
+                <div className="absolute inset-0 overflow-hidden rounded-2xl">
+                    <img 
+                        src="assets/gallery-background.jpg" 
+                        alt="Aesthetic gallery background" 
+                        className="w-full h-full object-cover opacity-20 mix-blend-overlay transition-transform duration-[10s] group-hover:scale-110"
+                        loading="lazy"
+                        decoding="async"
+                    />
+                </div>
                 
                 <div className="relative z-10 text-center max-w-2xl">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-black/50 border border-white/10 rounded-full shadow-lg mb-8 text-primary group-hover:scale-110 transition-transform duration-500">
