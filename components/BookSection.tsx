@@ -13,7 +13,7 @@ const SampleModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
             aria-modal="true"
         >
             <div 
-                className="bg-[#0A0A0A] w-full max-w-3xl max-h-[90vh] rounded-sm shadow-[0_0_60px_rgba(37,150,190,0.2)] flex flex-col relative animate-fade-in-up border border-white/10" 
+                className="bg-[#0A0A0A] w-full max-w-4xl max-h-[90vh] rounded-sm shadow-[0_0_60px_rgba(37,150,190,0.2)] flex flex-col relative animate-fade-in-up border border-white/10" 
                 onClick={e => e.stopPropagation()}
             >
                 <div className="absolute top-4 right-4 z-10">
@@ -125,8 +125,8 @@ const BookSection: React.FC = () => {
 
       <SampleModal isOpen={isSampleOpen} onClose={() => setIsSampleOpen(false)} />
       
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-20 lg:gap-24 items-center">
+      <div className="max-w-[1600px] mx-auto px-8 relative z-10">
+        <div className="grid lg:grid-cols-2 gap-20 lg:gap-32 items-center">
           {/* Cinematic Image Display with Carousel */}
           <div className="relative w-full max-w-lg mx-auto lg:ml-auto group perspective-1000 select-none">
              <div className="relative transform transition-all duration-700 ease-cinematic group-hover:rotate-y-2">
@@ -212,11 +212,11 @@ const BookSection: React.FC = () => {
                             </span>
                         ))}
                     </div>
-                    <h3 className="font-display text-5xl md:text-7xl text-white leading-none drop-shadow-xl">{book.title}</h3>
-                    <h4 className="text-lg text-blush font-body font-light tracking-[0.25em] uppercase border-l-2 border-primary pl-6 py-1">{book.subtitle}</h4>
+                    <h3 className="font-display text-5xl md:text-7xl lg:text-8xl text-white leading-none drop-shadow-xl">{book.title}</h3>
+                    <h4 className="text-lg md:text-xl text-blush font-body font-light tracking-[0.25em] uppercase border-l-2 border-primary pl-6 py-1">{book.subtitle}</h4>
                 </div>
                 
-                <p className="text-slate-300 leading-loose text-lg font-body font-light opacity-90 max-w-xl animate-fade-in-up border-l border-white/5 pl-6" style={{ animationDelay: '0.1s' }}>
+                <p className="text-slate-300 leading-loose text-lg md:text-xl font-body font-light opacity-90 max-w-2xl animate-fade-in-up border-l border-white/5 pl-6" style={{ animationDelay: '0.1s' }}>
                     {book.description}
                 </p>
                 
@@ -239,7 +239,7 @@ const BookSection: React.FC = () => {
                 </div>
 
                 {/* Minimalist Social */}
-                <div className="pt-8 border-t border-white/5 flex items-center justify-between animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+                <div className="pt-8 border-t border-white/5 flex items-center justify-between animate-fade-in-up max-w-2xl" style={{ animationDelay: '0.3s' }}>
                     <div className="flex items-center gap-8">
                         <button onClick={handleLike} className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider transition-all hover:-translate-y-0.5 ${isLiked ? 'text-blush' : 'text-slate-500 hover:text-blush'}`}>
                             <Heart size={16} className={`transition-all duration-300 ${isLiked ? "fill-blush scale-110" : "scale-100"}`} /> Like

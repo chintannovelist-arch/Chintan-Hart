@@ -54,7 +54,7 @@ const itemVariants = {
         y: 0,
         transition: {
             duration: 0.8,
-            ease: [0.25, 0.46, 0.45, 0.94],
+            ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
         },
     },
 };
@@ -73,7 +73,7 @@ const VisualTimeline: React.FC = () => {
 
     return (
         <section id="timeline" className="py-32 bg-onyx border-y border-white/5 overflow-hidden">
-            <div className="max-w-7xl mx-auto px-6">
+            <div className="max-w-[1600px] mx-auto px-6">
                 <motion.div 
                     className="text-center mb-16"
                     initial={{ opacity: 0, y: 20 }}
@@ -108,7 +108,7 @@ const VisualTimeline: React.FC = () => {
                              />
                          ) : (
                              // Visual Fallback for Timeline
-                             <div className="w-full min-w-[800px] h-[300px] bg-white/5 flex flex-col items-center justify-center text-slate-500 gap-4">
+                             <div className="w-full min-w-[1000px] h-[400px] bg-white/5 flex flex-col items-center justify-center text-slate-500 gap-4">
                                 <ImageOff size={40} className="opacity-50"/>
                                 <div className="text-center">
                                     <p className="font-display text-lg">Timeline Graphic Not Found</p>
@@ -120,7 +120,7 @@ const VisualTimeline: React.FC = () => {
                 </motion.div>
                 
                 <motion.div 
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12"
                     variants={containerVariants}
                     initial="hidden"
                     whileInView="visible"
@@ -130,7 +130,7 @@ const VisualTimeline: React.FC = () => {
                         <motion.div 
                             key={index}
                             variants={itemVariants}
-                            className={`bg-black/40 border ${item.borderColor} rounded-sm p-8 flex flex-col h-full shadow-lg hover:shadow-primary/10 transition-shadow duration-500`}
+                            className={`bg-black/40 border ${item.borderColor} rounded-sm p-10 flex flex-col h-full shadow-lg hover:shadow-primary/10 transition-shadow duration-500`}
                         >
                             <div className="flex-grow">
                                 <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${item.textColor} mb-4 block`}>

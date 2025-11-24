@@ -1,9 +1,10 @@
 
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     X, ArrowRight, ArrowLeft, BookOpen, BrainCircuit, PenTool, Wand2,
-    Activity, Search, Flame, Key, Music, Sparkles, MessageSquare, Heart, Eye, Lock, MapPin
+    Activity, Search, Flame, Key, Music, Sparkles, MessageSquare, Heart, Eye, Lock, MapPin, Camera
 } from 'lucide-react';
 
 const slideData = [
@@ -39,10 +40,11 @@ const slideData = [
     color: 'text-blush'
   },
   {
-    category: 'Atmospheric & Fun',
+    category: 'Visual & Atmospheric',
     title: 'Immerse Your Senses',
-    description: 'Feel the world of the novel. From custom soundtracks to direct conversations with the characters, experience the story like never before.',
+    description: 'Feel the world of the novel. Visualize intimate moments, generate custom soundtracks, and chat directly with the characters.',
     features: [
+      { name: 'Your Desired Moment', Icon: Camera },
       { name: 'Mood Playlist', Icon: Music },
       { name: 'Destiny Match', Icon: Sparkles },
       { name: 'Character Connect', Icon: MessageSquare },
@@ -56,7 +58,6 @@ const slideData = [
     features: [
       { name: 'Love Letter Muse', Icon: Heart },
       { name: 'Jasmine Translator', Icon: Wand2 },
-      // FIX: Added missing MapPin import for this feature.
       { name: 'Date Planner', Icon: MapPin },
     ],
     color: 'text-purple-400'

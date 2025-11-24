@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Modality } from "@google/genai";
 import { NOVEL_SCENES } from '../constants';
 
@@ -32,6 +33,8 @@ const getAiClients = () => {
 const clients = getAiClients();
 const MODEL_NAME = 'gemini-2.5-flash';
 const TTS_MODEL_NAME = 'gemini-2.5-flash-preview-tts';
+// Switched to Flash Image to ensure compatibility with standard API keys (fixes 403 Permission Denied on Pro)
+const IMG_MODEL_NAME = 'gemini-2.5-flash-image';
 
 // --- Helpers ---
 
@@ -173,7 +176,7 @@ export const callGeminiDatePlanner = async (country: string, city: string, vibe:
 };
 
 export const callGeminiTropeMatch = async (userFavorite: string) => {
-    const bookContext = Object.entries(NOVEL_SCENES).map(([key, val]) => `${key}: ${val.substring(0, 150)}...`).join('\n');
+    const bookContext = Object.entries(NOVEL_SCENES).map(([key, val]) => `${key}: ${(val as string).substring(0, 150)}...`).join('\n');
 
     const system = `You are a literary matchmaker for 'The Jasmine Knot'.
     Your goal is to validate the user's taste by connecting their favorite romance trope to a SPECIFIC chapter in this book.
@@ -201,7 +204,7 @@ export const callGeminiTropeMatch = async (userFavorite: string) => {
 };
 
 export const callGeminiCliffhanger = async (scenario: string) => {
-    const system = `You are writing a high-tension scene for 'The Jasmine Knot' between Meena and Vijay.
+    const system = `You are writing a high-tension scene for 'The Jasmine Knot'.
     Write 150 words of intense buildup based on the scenario.
     Focus on: Breath, heartbeats, proximity, silence.
     CRITICAL: Stop the text abruptly right before a kiss or touch happens. 
@@ -362,6 +365,28 @@ export const callGeminiSensory = async (sense: string) => {
     );
 };
 
+export const callGeminiAnatomy = async (partnerName: string, bodyPart: string) => {
+    const subjectName = partnerName === "Meena" ? "Vijay" : "Meena";
+    
+    const system = `You are the sensory engine for the romance novel 'The Jasmine Knot'.
+    Describe the physical and emotional reaction of ${subjectName} when ${partnerName} focuses on or touches their ${bodyPart}.
+    
+    Context:
+    - ${subjectName} is the one being touched/observed.
+    - ${partnerName} is the one interacting.
+    - Focus on the tension, the heat, the specific texture of skin, pulse, or breath.
+    - Style: Intimate, sensory, poetic. Max 40 words.`;
+    
+    const prompt = `Scenario: ${partnerName} interacts with ${subjectName}'s ${bodyPart}. Describe the sensation.`;
+    
+    return safeGenerate(
+        prompt,
+        system,
+        "Anatomy of Desire",
+        "A shiver traces down the spine, unspoken and electric."
+    );
+};
+
 // --- AUDIO (Text-To-Speech) ---
 
 /**
@@ -392,6 +417,98 @@ export const callGeminiTTS = async (text: string): Promise<string | null> => {
 
     } catch (error) {
         console.error("[Gemini TTS] Failed:", error);
+        return null;
+    }
+};
+
+// --- IMAGE GENERATION ---
+
+/**
+ * Generates a high-fidelity, cinematic image based on the novel's characters and touch points.
+ * Now uses the standard shared API key pool.
+ * Updated to handle detailed wardrobe and position props.
+ */
+export const callGeminiImageGenerator = async (
+    promptContext: any,
+    aspectRatio: string = "3:4"
+): Promise<string | null> => {
+    const ai = getClient();
+    if (!ai) return null;
+
+    const {
+        vijayWardrobe,
+        meenaWardrobe,
+        setting,
+        position,
+        poseIntensity,
+        mood,
+        lighting,
+        camera,
+        style,
+        interactionLine,
+        customDetails,
+        characterDescriptions
+    } = promptContext;
+
+    try {
+        const finalPrompt = `
+        Generate a cinematic, photorealistic image of Vijay and Meena from the romance novel 'The Jasmine Knot'.
+        
+        CHARACTER 1 (VIJAY):
+        - Description: ${characterDescriptions.Vijay}
+        - Attire: ${vijayWardrobe.outfit} (${vijayWardrobe.style}, ${vijayWardrobe.region} style).
+        - Fabric: ${vijayWardrobe.fabric}.
+        - Color Palette: ${vijayWardrobe.color}.
+        - Accessories: ${vijayWardrobe.accessories}.
+        
+        CHARACTER 2 (MEENA):
+        - Description: ${characterDescriptions.Meena}
+        - Attire: ${meenaWardrobe.outfit} (${meenaWardrobe.style}, ${meenaWardrobe.region} style).
+        - Fabric: ${meenaWardrobe.fabric}.
+        - Color Palette: ${meenaWardrobe.color}.
+        - Accessories: ${meenaWardrobe.accessories}.
+        
+        SCENE COMPOSITION:
+        - Setting: ${setting}.
+        - Body Position: ${position}.
+        - Pose Intensity: ${poseIntensity}.
+        ${interactionLine}
+        - Lighting: ${lighting}.
+        - Camera Angle: ${camera}.
+        
+        ATMOSPHERE & STYLE:
+        - Mood: ${mood}.
+        - Visual Style: ${style}.
+        - Custom Details: ${customDetails}
+        
+        IMPORTANT GUIDELINES:
+        - Create a photorealistic, high-detail image suitable for romance novel cover art.
+        - The scene must be PG-13, consensual, and romantic. No explicit nudity.
+        - Focus on emotional intimacy, chemistry, and fabric textures.
+        - Ensure lighting matches the requested mood (e.g. golden hour, moonlight).
+        `;
+
+        const response = await ai.models.generateContent({
+            model: IMG_MODEL_NAME,
+            contents: {
+                parts: [{ text: finalPrompt }]
+            },
+            config: {
+                imageConfig: {
+                    aspectRatio: aspectRatio,
+                }
+            }
+        });
+
+        for (const part of response.candidates?.[0]?.content?.parts || []) {
+            if (part.inlineData) {
+                return `data:image/png;base64,${part.inlineData.data}`;
+            }
+        }
+        return null;
+
+    } catch (error: any) {
+        console.error("[Gemini Image Gen] Failed:", JSON.stringify(error));
         return null;
     }
 };

@@ -17,8 +17,9 @@ import AIMenu from './components/AIMenu';
 import FeatureModal from './components/FeatureModal';
 import CharacterProfiles from './components/CharacterProfiles';
 
-// Lazily load Features (now used inside Modal)
+// Lazily load Features
 const VisualTimeline = lazy(() => import('./components/VisualTimeline'));
+const NovelGallery = lazy(() => import('./components/NovelGallery'));
 const AestheticGallery = lazy(() => import('./components/AestheticGallery'));
 const Cliffhanger = lazy(() => import('./components/Cliffhanger'));
 const TropeFinder = lazy(() => import('./components/TropeFinder'));
@@ -35,6 +36,7 @@ const DatePlanner = lazy(() => import('./components/DatePlanner'));
 const MoodPlaylist = lazy(() => import('./components/MoodPlaylist'));
 const LoveLetterMuse = lazy(() => import('./components/LoveLetterMuse'));
 const DestinyMatch = lazy(() => import('./components/DestinyMatch'));
+const YourDesiredMoment = lazy(() => import('./components/YourDesiredMoment'));
 
 const App: React.FC = () => {
   const [user, setUser] = useState<any>(null);
@@ -53,9 +55,10 @@ const App: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
-  // Helper to render the correct component based on ID
+  // Helper to render the correct component based on ID (Modal Features)
   const renderFeature = (id: string) => {
       switch(id) {
+          case 'gallery': return <NovelGallery />;
           case 'unspoken': return <UnspokenThoughts />;
           case 'heatmap': return <TensionHeatmap />;
           case 'finishscene': return <FinishTheScene />;
@@ -77,6 +80,7 @@ const App: React.FC = () => {
   const getFeatureTitle = (id: string) => {
      // Simple mapping for modal title
      const titles: Record<string, string> = {
+         'gallery': 'Visual Gallery',
          'unspoken': 'Unspoken Thoughts',
          'heatmap': 'Tension Heatmap',
          'finishscene': 'Co-Write Scene',
@@ -90,7 +94,7 @@ const App: React.FC = () => {
          'decoder': 'Text Decoder',
          'translator': 'Romance Translator',
          'dateplanner': 'Date Planner',
-         'povshift': 'Object Perspective'
+         'povshift': 'Object Perspective',
      };
      return titles[id] || 'AI Feature';
   };
@@ -119,7 +123,10 @@ const App: React.FC = () => {
         <FloatingMenu />
         
         {/* Main Content Flow */}
-        <Hero onStartPresentation={() => setShowPresentation(true)} />
+        <Hero 
+            onStartPresentation={() => setShowPresentation(true)} 
+            onOpenGallery={() => setActiveFeature('gallery')}
+        />
         
         <ScrollReveal>
             <BookSection />
@@ -128,7 +135,12 @@ const App: React.FC = () => {
         {/* Narrative Context */}
         <LazyLoad><CharacterProfiles /></LazyLoad>
 
-        {/* The New AI Hub */}
+        {/* Main Feature: Your Desired Moment */}
+        <LazyLoad>
+            <YourDesiredMoment />
+        </LazyLoad>
+
+        {/* The New AI Hub (Remaining Features) */}
         <AIMenu onSelect={setActiveFeature} />
 
         {/* Static Content / Footer */}

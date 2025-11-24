@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { Lock, ArrowUp, X, FileDown } from 'lucide-react';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
@@ -55,7 +53,7 @@ const Footer: React.FC = () => {
 
     return (
         <footer className="bg-black py-12 text-white relative">
-            <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="max-w-[1600px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
                  <div className="text-slate-500 text-sm flex flex-col md:flex-row items-center gap-4">
                     <span>&copy; 2025 {AUTHOR_NAME}. All rights reserved.</span>
                     <button onClick={() => setShowAdmin(true)} className="hover:text-white transition-colors opacity-50 hover:opacity-100" aria-label="Admin access"><Lock size={12}/></button>

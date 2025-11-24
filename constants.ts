@@ -1,5 +1,4 @@
 
-
 import { Book, Scenario, SneakPeek } from './types';
 
 export const AUTHOR_NAME = "Chintan Hart";
@@ -57,7 +56,7 @@ export const SNEAK_PEEKS: SneakPeek[] = [
     {
         chapter: "Chapter 54",
         title: "The Slow Dance",
-        excerpt: "'Dance with me,' he repeated... He placed his left hand on her waist... 'Just sway,' he whispered. They began to move... The space between them evaporated."
+        excerpt: "'Dance with me,' he repeated... He placed his left hand on her waist... 'Just sway,' he whispered, his breath hot against her ear. They began to move... The space between them evaporated."
     }
 ];
 
@@ -75,33 +74,23 @@ export const SCENARIOS: Record<string, Scenario[]> = {
         { id: 10, title: "The Powercut Fall", context: "Pitch dark. You crash into Vijay. He catches you, pulling you tight. You are pressed fully against him.", prompt: "What happens in the dark?" }
     ],
     Vijay: [
-        { id: 1, title: "The Jasmine Scent", context: "Meena walks in wearing a red saree, smelling of jasmine. She looks terrified but breathtaking.", prompt: "What is your first move?" },
-        { id: 2, title: "The Morning Tangle", context: "You wake up. Meena's leg is thrown over yours, her hand on your chest. She is fast asleep.", prompt: "Do you wake her or stay still?" },
-        { id: 3, title: "The Car Ride", context: "Meena falls asleep on your shoulder while you drive. Her breath hits your neck.", prompt: "How do you drive?" },
-        { id: 4, title: "The Kitchen Laugh", context: "Meena is laughing freely in the kitchen. She looks happy. You want to kiss her.", prompt: "What do you do?" },
-        { id: 5, title: "The Mirror Reflection", context: "You watch her getting ready in the mirror. You walk up behind her, locking eyes in the glass.", prompt: "What do you say?" },
-        { id: 6, title: "The Rain Run", context: "You run in from the rain. Meena's saree is soaked and clinging. She is shivering.", prompt: "How do you warm her up?" },
-        { id: 7, title: "The Fever Touch", context: "You have a fever. Meena is rubbing Vicks on your chest. Her hands are cool and soft.", prompt: "How do you react?" },
-        { id: 8, title: "The Balcony Hug", context: "Meena hugs you from behind on the balcony. Her arms wrap around your waist.", prompt: "Do you turn around?" },
-        { id: 9, title: "The Slow Dance", context: "You pull her close to dance. Your hand splays on her waist. She looks up at you.", prompt: "What happens next?" },
-        { id: 10, title: "The High Shelf", context: "Meena reaches for a jar, exposing her midriff. You are standing right behind her.", prompt: "Do you help her or step back?" }
+        { id: 11, title: "The Coffee Mug", context: "She hands you coffee, her fingers brushing yours. The contact lingers longer than necessary.", prompt: "Do you pull away or hold on?" },
+        { id: 12, title: "The Rain", context: "You are driving. It's pouring. She is shivering in the passenger seat.", prompt: "What do you do?" }
     ]
 };
 
+// --- NEW EXPORTS ---
+
 export const BOOK_SAMPLE = {
     title: "Chapter 1: The Arrangement",
-    content: `The ceiling fan cut through the humid Chennai air with a rhythmic click-whir, click-whir, a metronome counting down the seconds of their silence.
-    Meena lay on the very edge of the mattress, her back pressed against the cool wall, as if trying to merge with the plaster. The distance between them was measured in inches of cotton sheet, but it felt like an ocean.
-    "Are you asleep?" Vijay's voice was low, rough with exhaustion.
-    "No," she whispered, clutching the pillow tighter.
-    "Good," he said, shifting. The mattress dipped. "Because neither am I."`
+    content: "The fan whirred overhead, a rhythmic slicing of the humid Chennai air that did little to cool the sweat prickling at Meena's hairline. She sat on the edge of the bed, the heavy silk of her wedding saree pooling around her like a crimson tide. The door clicked shut. \n\nVijay stood there. He looked different without the garland, without the crowd, without the noise of the nadaswaram filling the space between them. He looked... real. \n\n'I can sleep on the floor,' he said, his voice rough, uncertain. \n\nMeena looked up, meeting his eyes for the first time since the ceremony. They were dark, unreadable, but not unkind. 'No,' she whispered, surprising herself. 'The bed is big enough.' \n\nHe hesitated, then nodded, moving to the other side. He placed a pillow between them—a white, fluffy barrier. 'Friends first?' he asked, a ghost of a smile touching his lips. \n\n'Friends first,' she agreed, though as she lay down, listening to the steady rhythm of his breathing, she knew that friendship was a dangerous place to start when your heart was already racing."
 };
 
 export const NOVEL_SCENES: Record<string, string> = {
-    "Chapter 4": "The pillow wall stood between them, a ridiculous fortification of white cotton. He lay on his back, staring at the ceiling fan. She was curled on her side, facing away, but he could hear the soft hitch of her breath.",
-    "Chapter 12": "Under the table, amidst the chatter of her cousins, his knee brushed against hers. It wasn't an accident. He didn't pull away. Neither did she. The contact was a burning point of heat in the air-conditioned room.",
-    "Chapter 41": "The bus swayed violently, throwing her back against the metal pole. Before she could stumble, his arm shot out, caging her in. He didn't touch her, but his body was a shield, hard and unyielding against the crushing crowd.",
-    "Chapter 54": "They sat on the living room floor, the blueprints of their future house spread out between them. The paper crinkled as she pointed to a room. 'The library,' she said. His hand covered hers on the page. 'Our library,' he corrected."
+    "Chapter 4": "The pillow wall stood between them, a fortress of white cotton. Vijay lay on his side, watching the rise and fall of her breathing. He wanted to reach out, to brush a stray hair from her forehead, but the pact held him back.",
+    "Chapter 12": "Under the table, their knees brushed. Meena froze, fork halfway to her mouth. Vijay didn't pull away. The contact was electric, a secret conversation in a crowded room.",
+    "Chapter 41": "The bus lurched. Meena grabbed the pole, her hand landing directly on top of his. His skin was warm, rougher than hers. He didn't move his hand; instead, his fingers tightened slightly beneath hers.",
+    "Chapter 54": "They sat on the living room floor, surrounded by papers. The exhaustion of the day had worn down their defenses. Vijay leaned back, stretching, and his arm brushed against her shoulder. The silence stretched, heavy and wanting."
 };
 
 export const ZODIAC_SIGNS = [
@@ -109,210 +98,322 @@ export const ZODIAC_SIGNS = [
     "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
 ];
 
-export const MOODS = ["Monsoon Romance", "Late Night Longing", "Morning Coffee", "Playful Friction", "Quiet Intimacy", "Stormy Passion"];
+export const MOODS = ["Yearning", "Playful", "Angst", "Domestic", "Passion", "Melancholy"];
 
 export const COUNTRIES_DATA: Record<string, string[]> = {
-    "India": ["Chennai", "Mumbai", "Jaipur", "Udaipur", "Kerala"],
-    "France": ["Paris", "Lyon", "Nice", "Bordeaux"],
-    "Italy": ["Rome", "Venice", "Florence", "Amalfi Coast"],
-    "Japan": ["Tokyo", "Kyoto", "Osaka", "Hokkaido"],
-    "UK": ["London", "Edinburgh", "Bath", "Cotswolds"]
+    "India": ["Chennai", "Mumbai", "Jaipur", "Kerala"],
+    "France": ["Paris", "Lyon", "Nice"],
+    "Italy": ["Rome", "Venice", "Florence"],
+    "USA": ["New York", "San Francisco", "Chicago"]
 };
 
 export const UNSPOKEN_SCENES = [
-    { id: "ch4", title: "Chapter 4: The Pillow Wall", context: "They lie in bed, separated by a wall of pillows. It's their first week.", trigger: "She sighs in her sleep." },
-    { id: "ch12", title: "Chapter 12: Lunch Under Table", context: "A family lunch. His leg touches hers under the table.", trigger: "She doesn't pull away." },
-    { id: "ch41", title: "Chapter 41: The Bus Pole", context: "He shields her from the crowd on the bus.", trigger: "The bus brakes suddenly." },
-    { id: "ch54", title: "Chapter 54: The Blueprints", context: "Planning their house. Hands touch over the paper.", trigger: "She says 'My room'." }
+    { id: "scene1", title: "Chapter 4: The Pillow Wall", context: "Vijay builds a wall of pillows on their wedding night.", trigger: "He places the last pillow." },
+    { id: "scene2", title: "Chapter 15: The Saree Pleats", context: "He helps her pleat her saree for a function.", trigger: "His knuckles graze her waist." },
+    { id: "scene3", title: "Chapter 41: The Bus Ride", context: "Crowded bus. He shields her from the crowd.", trigger: "She leans back against his chest." },
+    { id: "scene4", title: "Chapter 60: The Fever", context: "She is sick. He is taking care of her.", trigger: "He places a cool cloth on her forehead." }
 ];
 
-// Refined "S-Curve" Data for better Slow Burn visualization
-// Tension starts low and rises non-linearly.
-// Pact Integrity starts high and crumbles inversely.
 export const TENSION_DATA = [
-    { chapter: 1, title: "The Agreement", snippet: "A handshake. A contract. A wall of pillows.", tension: 2, pactIntegrity: 98 },
-    { chapter: 4, title: "The Pillow Wall", snippet: "Separate sides. The cotton barrier is absolute.", tension: 5, pactIntegrity: 95 },
-    { chapter: 8, title: "The Lizard Rescue", snippet: "He chases it out. She grips his arm in fear.", tension: 8, pactIntegrity: 92 },
-    { chapter: 12, title: "Lunch Touch", snippet: "Knees brush under the table. No one pulls away.", tension: 12, pactIntegrity: 88 },
-    { chapter: 16, title: "The Saree Pleats", snippet: "His knuckles graze her bare waist.", tension: 15, pactIntegrity: 85 },
-    { chapter: 20, title: "Morning Reflection", snippet: "Caught staring in the mirror. Eyes lock.", tension: 20, pactIntegrity: 80 },
-    { chapter: 24, title: "The Jealousy", snippet: "A cousin flirts. Vijay's jaw tightens.", tension: 25, pactIntegrity: 75 },
-    { chapter: 28, title: "The Salesman", snippet: "He steps between her and the stranger.", tension: 30, pactIntegrity: 70 },
-    { chapter: 32, title: "Phone Call", snippet: "He ignores work for her. The shift begins.", tension: 35, pactIntegrity: 65 },
-    { chapter: 36, title: "Powercut Collision", snippet: "Total darkness. Pressed against the wall.", tension: 42, pactIntegrity: 58 },
-    { chapter: 40, title: "Car Ride Nap", snippet: "She sleeps on his shoulder. He drives one-handed.", tension: 48, pactIntegrity: 52 },
-    { chapter: 44, title: "Temple Crowd", snippet: "He cages her with his body to shield her.", tension: 55, pactIntegrity: 45 },
-    { chapter: 48, title: "The Umbrella", snippet: "One small umbrella. Hips flush together.", tension: 62, pactIntegrity: 38 },
-    { chapter: 52, title: "The Fever", snippet: "She wipes his brow. He leans into her touch.", tension: 70, pactIntegrity: 30 },
-    { chapter: 56, title: "The Slow Dance", snippet: "A waltz in the living room. Silence is loud.", tension: 78, pactIntegrity: 22 },
-    { chapter: 60, title: "The Fight", snippet: "Passion explodes as anger. The distance breaks.", tension: 85, pactIntegrity: 15 },
-    { chapter: 64, title: "Photo Album", snippet: "Tracing her face in the picture. 'Beautiful.'", tension: 88, pactIntegrity: 12 },
-    { chapter: 68, title: "The Rain Rescue", snippet: "Soaked clothes. He pulls her from the storm.", tension: 92, pactIntegrity: 8 },
-    { chapter: 72, title: "Balcony Night", snippet: "Stargazing. Whispers near the ear.", tension: 95, pactIntegrity: 5 },
-    { chapter: 76, title: "Jasmine Gift", snippet: "Flowers for her hair. His hands shake.", tension: 98, pactIntegrity: 2 },
-    { chapter: 80, title: "The Knot", snippet: "The wall comes down. The pact is broken.", tension: 100, pactIntegrity: 0 }
+    { chapter: 1, title: "The Arrangement", tension: 10, pactIntegrity: 100, snippet: "Strangers in a room." },
+    { chapter: 10, title: "Domestic Friction", tension: 30, pactIntegrity: 90, snippet: "Living together creates sparks." },
+    { chapter: 25, title: "The Accidental Touch", tension: 50, pactIntegrity: 75, snippet: "A brush of hands changes everything." },
+    { chapter: 40, title: "The Monsoon", tension: 75, pactIntegrity: 50, snippet: "Trapped by the rain." },
+    { chapter: 60, title: "The Jealousy", tension: 85, pactIntegrity: 30, snippet: "Seeing her with someone else." },
+    { chapter: 75, title: "The Breaking Point", tension: 95, pactIntegrity: 10, snippet: "The wall crumbles." },
+    { chapter: 80, title: "The Knot", tension: 100, pactIntegrity: 0, snippet: "Bound by desire." }
 ];
 
 export const PREDICTION_QUESTIONS = [
     { 
-        chapter: "Chapter 10", 
-        context: "Meena drops a glass in the kitchen. It shatters loudly.", 
-        options: [{id: "A", text: "He tells her to be careful."}, {id: "B", text: "He rushes to check her bare feet."}, {id: "C", text: "He calls the maid to clean it."}],
+        id: "q1", 
+        chapter: "Chapter 12", 
+        context: "Meena burns the dinner. The kitchen is filled with smoke. Vijay walks in.", 
+        options: [
+            { id: "A", text: "He gets angry and orders takeout." },
+            { id: "B", text: "He laughs and helps her clean up." },
+            { id: "C", text: "He silently opens the windows and ignores her." }
+        ],
         correctOption: "B",
-        answerExcerpt: "Before the shards had even settled, Vijay was there. He gripped her arms, lifting her bodily onto the counter. 'Don't move,' he ordered, his eyes scanning her bare feet for blood."
+        answerExcerpt: "Vijay started laughing, a deep rumble that shook his chest. He grabbed a towel and started fanning the smoke alarm. 'Well,' he grinned, 'I guess we're ordering pizza.'" 
     },
     { 
-        chapter: "Chapter 25", 
-        context: "Meena wears a dress that is slightly shorter than usual for a family gathering. Her aunt stares.", 
-        options: [{id: "A", text: "He asks her to change."}, {id: "B", text: "He stays close to her all night."}, {id: "C", text: "He makes a joke to defuse tension."}],
+        id: "q2", 
+        chapter: "Chapter 35", 
+        context: "They are at a wedding. A relative asks when they are having kids.", 
+        options: [
+            { id: "A", text: "Meena blushes and looks away." },
+            { id: "B", text: "Vijay squeezes her hand and deflects." },
+            { id: "C", text: "They both get into an argument." }
+        ],
         correctOption: "B",
-        answerExcerpt: "He didn't say a word about the hemline. He simply became her shadow. Whenever a gaze lingered too long, Vijay was there, a wall of broad shoulders and dark glares blocking the view."
-    },
-    { 
-        chapter: "Chapter 60", 
-        context: "They have their first big fight. Meena walks out to the balcony in the pouring rain.", 
-        options: [{id: "A", text: "He locks the balcony door."}, {id: "B", text: "He waits inside for her to cool down."}, {id: "C", text: "He follows her instantly."}],
-        correctOption: "C",
-        answerExcerpt: "He didn't care about the rain or the neighbors. He followed her out, spinning her around. 'You don't get to walk away,' he shouted over the thunder. 'Not from this. Not from me.'"
-    },
-    {
-        chapter: "Chapter 2",
-        context: "It's their first morning. Meena is nervous about coffee.",
-        options: [{id: "A", text: "He asks her to make it."}, {id: "B", text: "He makes it exactly how she likes it."}, {id: "C", text: "He leaves for work without speaking."}],
-        correctOption: "B",
-        answerExcerpt: "She walked into the kitchen to find a steaming cup waiting. 'Sugar, no milk,' he said without turning around. He had remembered."
-    },
-    {
-        chapter: "Chapter 5",
-        context: "Meena spills ink on Vijay's important work papers.",
-        options: [{id: "A", text: "He yells in frustration."}, {id: "B", text: "He checks her hands for stains first."}, {id: "C", text: "He silently cleans the desk."}],
-        correctOption: "B",
-        answerExcerpt: "Meena froze, expecting anger. Instead, Vijay grabbed a tissue and wiped her fingers. 'Ink is hard to scrub off,' he murmured, ignoring the ruined contract."
-    },
-    {
-        chapter: "Chapter 14",
-        context: "The power goes out while they are eating dinner.",
-        options: [{id: "A", text: "He fumbles for a flashlight."}, {id: "B", text: "He moves his chair closer in the dark."}, {id: "C", text: "He complains about the electricity board."}],
-        correctOption: "B",
-        answerExcerpt: "In the pitch black, she heard the scrape of wood on tile. His voice came from inches away. 'Don't be scared,' he whispered. 'I'm right here.'"
-    },
-    {
-        chapter: "Chapter 18",
-        context: "A cousin mentions Meena's old college crush at a party.",
-        options: [{id: "A", text: "He asks details about him."}, {id: "B", text: "He grips his glass until his knuckles turn white."}, {id: "C", text: "He laughs it off."}],
-        correctOption: "B",
-        answerExcerpt: "Vijay's expression didn't change, but Meena heard the sharp 'clink' of his ring hitting the glass. His hold on the tumbler was lethal."
-    },
-    {
-        chapter: "Chapter 22",
-        context: "Vijay has a nightmare and wakes up shouting.",
-        options: [{id: "A", text: "He turns away in shame."}, {id: "B", text: "He goes to the living room."}, {id: "C", text: "He lets Meena hold him."}],
-        correctOption: "C",
-        answerExcerpt: "For the first time, he didn't pull away. He collapsed against her chest, his breathing ragged, letting her fingers comb through his sweat-dampened hair."
-    },
-    {
-        chapter: "Chapter 30",
-        context: "A salesman touches Meena's shoulder to demonstrate a saree drape.",
-        options: [{id: "A", text: "He pays and leaves."}, {id: "B", text: "He steps between them immediately."}, {id: "C", text: "He asks Meena if she likes the color."}],
-        correctOption: "B",
-        answerExcerpt: "Vijay moved faster than thought. He stepped between the man and his wife, taking the silk fabric into his own hands. 'I'll handle the pleats,' he said, his voice ice cold."
-    },
-    {
-        chapter: "Chapter 33",
-        context: "Vijay gets a work call at 2 AM while they are talking.",
-        options: [{id: "A", text: "He takes it on the balcony."}, {id: "B", text: "He rejects it and pulls her closer."}, {id: "C", text: "He answers apologetically."}],
-        correctOption: "B",
-        answerExcerpt: "The phone lit up the dark room. Vijay reached out, silenced it, and tossed it onto the floor. 'Continue,' he said, his focus entirely on her lips."
-    },
-    {
-        chapter: "Chapter 38",
-        context: "Meena burns the sambar for lunch.",
-        options: [{id: "A", text: "He orders pizza."}, {id: "B", text: "He eats it without complaint."}, {id: "C", text: "He teaches her how to cook."}],
-        correctOption: "B",
-        answerExcerpt: "It was acrid and smoky. Vijay took a second helping. 'It's distinct,' he said, catching her eye. 'I like distinct.'"
-    },
-    {
-        chapter: "Chapter 45",
-        context: "A stranger bumps into Meena roughly at the temple.",
-        options: [{id: "A", text: "He yells at the stranger."}, {id: "B", text: "He pulls her into his chest to shield her."}, {id: "C", text: "He asks if she is okay."}],
-        correctOption: "B",
-        answerExcerpt: "Before she could stumble, she was buried in his shirt. His arms formed a cage around her, hard and unyielding against the crushing crowd."
-    },
-    {
-        chapter: "Chapter 48",
-        context: "They are walking in the rain with only one small umbrella.",
-        options: [{id: "A", text: "He gives it to her."}, {id: "B", text: "He pulls her by the waist to keep her dry."}, {id: "C", text: "He hails an auto."}],
-        correctOption: "B",
-        answerExcerpt: "He didn't offer the umbrella. Instead, he hooked an arm around her waist and yanked her flush against his side. 'Stay close,' he muttered. 'Or you'll get wet.'"
-    },
-    {
-        chapter: "Chapter 52",
-        context: "She struggles with the clasp of her necklace.",
-        options: [{id: "A", text: "He watches her struggle."}, {id: "B", text: "He brushes her hands away and does it himself."}, {id: "C", text: "He tells her to hurry up."}],
-        correctOption: "B",
-        answerExcerpt: "His fingers brushed hers aside. 'Stop fidgeting,' he breathed against her neck, his warm hands deft and sure against the delicate gold chain."
-    },
-    {
-        chapter: "Chapter 55",
-        context: "Meena is sick with a high fever.",
-        options: [{id: "A", text: "He calls his mother."}, {id: "B", text: "He stays home to apply cool cloths."}, {id: "C", text: "He sleeps in the guest room."}],
-        correctOption: "B",
-        answerExcerpt: "The CEO of Hart Analytics took a sick day. He spent it dipping a cloth in ice water and pressing it to her forehead, his face lined with worry."
-    },
-    {
-        chapter: "Chapter 58",
-        context: "A female colleague flirts with Vijay at a party.",
-        options: [{id: "A", text: "He introduces Meena immediately."}, {id: "B", text: "He ignores the colleague."}, {id: "C", text: "He smiles politely."}],
-        correctOption: "A",
-        answerExcerpt: "He didn't even smile. He reached out, grabbed Meena's hand, and interlaced their fingers. 'Have you met my wife?' he interrupted, his tone final."
-    },
-    {
-        chapter: "Chapter 62",
-        context: "They look at their awkward wedding photos from months ago.",
-        options: [{id: "A", text: "He laughs at them."}, {id: "B", text: "He traces her face in the photo."}, {id: "C", text: "He closes the album."}],
-        correctOption: "B",
-        answerExcerpt: "His finger lingered on her image in the bridal silk. 'You looked terrified,' he noted softly. 'I wish I had known you then.'"
-    },
-    {
-        chapter: "Chapter 67",
-        context: "Stargazing on the roof. Meena shivers in the cold.",
-        options: [{id: "A", text: "He says let's go inside."}, {id: "B", text: "He puts his jacket on her shoulders."}, {id: "C", text: "He rubs her arms."}],
-        correctOption: "B",
-        answerExcerpt: "He stripped off his suit jacket and draped it over her. It was heavy, warm, and smelled entirely of him. He didn't ask for it back."
-    },
-    {
-        chapter: "Chapter 72",
-        context: "Meena twists her ankle on the stairs.",
-        options: [{id: "A", text: "He helps her walk."}, {id: "B", text: "He carries her bridal style."}, {id: "C", text: "He calls a doctor immediately."}],
-        correctOption: "B",
-        answerExcerpt: "He didn't let her take a single step. He scooped her up, ignoring her protests, carrying her up three flights of stairs as if she weighed nothing."
-    },
-    {
-        chapter: "Chapter 75",
-        context: "He buys her a random gift on a Tuesday.",
-        options: [{id: "A", text: "A diamond necklace."}, {id: "B", text: "Fresh jasmine flowers."}, {id: "C", text: "A new book."}],
-        correctOption: "B",
-        answerExcerpt: "It wasn't gold. It was a string of fresh, dew-covered jasmine wrapped in newspaper. 'For your hair,' he said gruffly."
-    },
-    {
-        chapter: "Chapter 78",
-        context: "They are inches apart in the kitchen. The tension is breaking.",
-        options: [{id: "A", text: "He backs away."}, {id: "B", text: "He leans in, waiting for a sign."}, {id: "C", text: "He kisses her immediately."}],
-        correctOption: "B",
-        answerExcerpt: "He didn't take. He offered. He leaned in until their breaths mingled, waiting, giving her the power to close the final inch."
-    },
-    {
-        chapter: "Chapter 8",
-        context: "A lizard on the wall scares Meena.",
-        options: [{id: "A", text: "He laughs at her fear."}, {id: "B", text: "He chases it out gently."}, {id: "C", text: "He kills it."}],
-        correctOption: "B",
-        answerExcerpt: "He didn't mock her. He quietly guided the creature out with a broom. 'It's gone,' he assured her, checking the corners to make her feel safe."
-    },
-    {
-        chapter: "Epilogue",
-        context: "They are discussing having children.",
-        options: [{id: "A", text: "He wants a boy."}, {id: "B", text: "He is terrified but wants a girl like her."}, {id: "C", text: "He says not yet."}],
-        correctOption: "B",
-        answerExcerpt: "'A daughter,' he whispered against her hair. 'I want a daughter. But only if she has your fire.'"
+        answerExcerpt: "Vijay didn't miss a beat. His hand found the small of her back, a warm, reassuring weight. 'We're enjoying being newlyweds,' he said smoothly, steering her away."
     }
+];
+
+export const TOUCH_POINT_CATEGORIES = {
+    "Hands": "Hands & Wrists",
+    "Face": "Face & Neck",
+    "Torso": "Torso & Waist",
+    "Legs": "Legs & Feet"
+};
+
+export const TOUCH_POINTS_DATA: Record<string, { id: string, label: string, category: string, description: string }[]> = {
+    Vijay: [
+        { id: "v_hand_hold", label: "Hand Hold", category: "Hands", description: "Firm grip, interlocking fingers." },
+        { id: "v_neck_graze", label: "Neck Graze", category: "Face", description: "Fingers brushing the nape." },
+        { id: "v_waist_hold", label: "Waist Hold", category: "Torso", description: "Hand pressing into the small of the back." },
+        { id: "v_chest_palm", label: "Chest Palm", category: "Torso", description: "Hand resting on the heartbeat." },
+        { id: "v_thigh_rest", label: "Thigh Rest", category: "Legs", description: "Hand resting on knee while driving." },
+        { id: "v_jaw_cup", label: "Jaw Cup", category: "Face", description: "Thumb stroking the jawline." },
+        { id: "v_back_hug", label: "Back Hug", category: "Torso", description: "Arms wrapped from behind." },
+        { id: "v_hair_run", label: "Hair Run", category: "Face", description: "Fingers tangling in hair." },
+        { id: "v_wrist_grip", label: "Wrist Grip", category: "Hands", description: "Gentle restraint during tension." },
+        { id: "v_shoulder_squeeze", label: "Shoulder Squeeze", category: "Torso", description: "Reassuring pressure." },
+        { id: "v_forehead_lean", label: "Forehead Lean", category: "Face", description: "Shared breath, eyes closed." },
+        { id: "v_ear_whisper", label: "Ear Whisper", category: "Face", description: "Lips grazing the earlobe." },
+        { id: "v_palm_kiss", label: "Palm Kiss", category: "Hands", description: "Lips pressed to the center of palm." },
+        { id: "v_knee_brush", label: "Knee Brush", category: "Legs", description: "Accidental contact under table." },
+        { id: "v_collar_trace", label: "Collar Trace", category: "Face", description: "Tracing the collarbone line." },
+        { id: "v_lap_sit", label: "Lap Sit", category: "Legs", description: "Intimate seating arrangement." },
+        { id: "v_arm_link", label: "Arm Link", category: "Hands", description: "Walking arm in arm." },
+        { id: "v_chin_lift", label: "Chin Lift", category: "Face", description: "Guiding gaze upwards." },
+        { id: "v_rain_shield", label: "Rain Shield", category: "Torso", description: "Protecting with body from rain." },
+        { id: "v_scar_trace", label: "Scar Trace", category: "Hands", description: "Tracing an old wound." }
+    ],
+    Meena: [
+        { id: "m_cheek_caress", label: "Cheek Caress", category: "Face", description: "Palm cupping the cheek." },
+        { id: "m_shoulder_lean", label: "Shoulder Lean", category: "Torso", description: "Head resting on the shoulder." },
+        { id: "m_fingertip_trace", label: "Fingertip Trace", category: "Hands", description: "Tracing lines on the palm." },
+        { id: "m_hair_tuck", label: "Hair Tuck", category: "Face", description: "Tucking strand behind ear." },
+        { id: "m_waist_pull", label: "Waist Pull", category: "Torso", description: "Pulling closer by the saree waist." },
+        { id: "m_nape_kiss", label: "Nape Kiss", category: "Face", description: "Lips on the back of the neck." },
+        { id: "m_hand_kiss", label: "Hand Kiss", category: "Hands", description: "Gallant kiss on knuckles." },
+        { id: "m_leg_drape", label: "Leg Drape", category: "Legs", description: "Legs tangled on the couch." },
+        { id: "m_temple_kiss", label: "Temple Kiss", category: "Face", description: "Protective kiss on temple." },
+        { id: "m_back_trace", label: "Back Trace", category: "Torso", description: "Tracing the spine through fabric." },
+        { id: "m_foot_rub", label: "Foot Rub", category: "Legs", description: "Easing tiredness after work." },
+        { id: "m_wrist_pulse", label: "Wrist Pulse", category: "Hands", description: "Thumb on the racing pulse." },
+        { id: "m_hip_hold", label: "Hip Hold", category: "Torso", description: "Hand resting on the curve of hip." },
+        { id: "m_rain_dance", label: "Rain Dance", category: "Legs", description: "Spinning in the rain." },
+        { id: "m_tear_wipe", label: "Tear Wipe", category: "Face", description: "Thumbing away a tear." },
+        { id: "m_nose_boop", label: "Nose Boop", category: "Face", description: "Playful tap on nose." },
+        { id: "m_neck_nuzzle", label: "Neck Nuzzle", category: "Face", description: "Face buried in neck crook." },
+        { id: "m_saree_pleat", label: "Saree Pleat", category: "Torso", description: "Helping fix the pleats." },
+        { id: "m_bangle_fix", label: "Bangle Fix", category: "Hands", description: "Adjusting bracelets." },
+        { id: "m_sleep_watch", label: "Sleep Watch", category: "Face", description: "Watching her sleep." }
+    ]
+};
+
+export const CHARACTER_DESCRIPTIONS = {
+    Vijay: "South Indian male, early 30s, tall, broad-shouldered, sharp jawline, stubble, intense dark eyes, wearing formal shirt or kurta.",
+    Meena: "South Indian female, late 20s, expressive eyes, long dark hair, wearing a saree or salwar kameez, graceful.",
+};
+
+export const SCENE_SETTINGS = [
+    "Bedroom (Night)", "Bedroom (Morning)", "Rainy Balcony", "Temple Corridor", 
+    "Crowded Bus", "Living Room Sofa", "Kitchen Counter", "Office Cubicle",
+    "Rooftop Terrace", "Beach at Sunset", "Auto Rickshaw (Rain)", "Wedding Hall",
+    "Street Food Stall", "Library Aisle", "Hospital Waiting Room", "Garden Bench"
+];
+
+// Visual Metadata for Settings (Icons/Descriptions)
+export const SCENE_META: Record<string, { icon: string, desc: string }> = {
+    "Bedroom (Night)": { icon: "🛏️", desc: "Intimate, shadowy, private" },
+    "Bedroom (Morning)": { icon: "☀️", desc: "Soft light, messy sheets" },
+    "Rainy Balcony": { icon: "🌧️", desc: "Monsoon mood, wet railing" },
+    "Temple Corridor": { icon: "🛕", desc: "Stone pillars, oil lamps" },
+    "Crowded Bus": { icon: "🚌", desc: "Close proximity, humidity" },
+    "Living Room Sofa": { icon: "🛋️", desc: "Domestic, relaxed" },
+    "Kitchen Counter": { icon: "🍳", desc: "Midnight snack, tension" },
+    "Office Cubicle": { icon: "💼", desc: "Forbidden, sterile light" },
+    "Rooftop Terrace": { icon: "🌃", desc: "City lights, breeze" },
+    "Beach at Sunset": { icon: "🌅", desc: "Golden waves, sand" },
+    "Auto Rickshaw (Rain)": { icon: "🛺", desc: "Cozy, plastic shield" },
+    "Wedding Hall": { icon: "🎊", desc: "Grand, jasmine garlands" },
+    "Street Food Stall": { icon: "🍲", desc: "Steam, chaos, flavor" },
+    "Library Aisle": { icon: "📚", desc: "Quiet, dust motes" },
+    "Hospital Waiting Room": { icon: "🏥", desc: "Anxiety, sterile" },
+    "Garden Bench": { icon: "🌳", desc: "Nature, secluded" }
+};
+
+export const SCENE_MOODS = [
+    "Romantic", "Tense", "Playful", "Melancholic", "Steamy", "Cozy",
+    "Forbidden", "Nostalgic", "Hopeful", "Heartbroken", "Electric", "Peaceful"
+];
+
+export const MOOD_META: Record<string, string> = {
+    "Romantic": "#F4C2C2", // Blush
+    "Tense": "#ef4444", // Red
+    "Playful": "#fbbf24", // Amber
+    "Melancholic": "#64748b", // Slate
+    "Steamy": "#be185d", // Pink
+    "Cozy": "#d97706", // Orange
+    "Forbidden": "#581c87", // Purple
+    "Nostalgic": "#78350f", // Sepia
+    "Hopeful": "#10b981", // Emerald
+    "Heartbroken": "#1e293b", // Dark Blue
+    "Electric": "#3b82f6", // Blue
+    "Peaceful": "#a7f3d0" // Mint
+};
+
+export const IMAGE_STYLES = [
+    "Cinematic (Film Look)", "Oil Painting (Classic)", "Watercolor (Dreamy)", 
+    "Photorealistic (Sharp)", "Noir (B&W)", "Vintage (Polaroid)", "Ethereal (Soft Glow)",
+    "Digital Art (Modern)", "Concept Art (Detailed)", "Charcoal Sketch (Rough)"
+];
+
+export const ASPECT_RATIOS = ["1:1", "3:4", "4:3", "16:9", "9:16"];
+export const POSE_INTENSITIES = ["Subtle", "Moderate", "Intense", "Erotic (Implied)"];
+
+export const LIGHTING_OPTIONS = [
+    "Golden Hour", "Moonlight", "Candlelight", "Neon", 
+    "Overcast (Soft)", "Studio (High Key)", "Rembrandt (Dramatic)", "Silhouette",
+    "Firelight", "Streetlamps"
+];
+
+// Visual Gradients for Lighting
+export const LIGHTING_META: Record<string, string> = {
+    "Golden Hour": "linear-gradient(135deg, #f59e0b, #d97706)",
+    "Moonlight": "linear-gradient(135deg, #1e3a8a, #0f172a)",
+    "Candlelight": "radial-gradient(circle, #fcd34d 0%, #78350f 100%)",
+    "Neon": "linear-gradient(90deg, #ec4899, #8b5cf6)",
+    "Overcast (Soft)": "linear-gradient(180deg, #e2e8f0, #94a3b8)",
+    "Studio (High Key)": "linear-gradient(135deg, #ffffff, #e2e8f0)",
+    "Rembrandt (Dramatic)": "linear-gradient(45deg, #000000 50%, #d97706 100%)",
+    "Silhouette": "linear-gradient(180deg, #fb923c, #000000)",
+    "Firelight": "linear-gradient(to top, #7f1d1d, #f97316)",
+    "Streetlamps": "radial-gradient(circle at 50% 0, #fbbf24, #000000)"
+};
+
+export const CAMERA_ANGLES = ["Close Up", "Medium Shot", "Wide Shot", "Over the Shoulder", "Low Angle", "High Angle (Bird's Eye)"];
+
+export const POSITIONS_DB: Record<string, string[]> = {
+    "Standing": ["Face to Face", "Back to Chest", "Leaning against wall", "Forehead against Door", "Cornered"],
+    "Sitting": ["Side by Side", "On Lap (Facing)", "On Lap (Away)", "Across Table", "Legs Tangled"],
+    "Lying": ["Spooning", "Face to Face (Pillow)", "Head on Chest", "Entangled Limbs", "Back to Back"],
+    "Dynamic": ["Walking Away", "Chasing", "Dancing (Dip)", "Spinning", "Falling Catch"],
+    "Sensual Awakening": ["Forehead Touch", "Almost Kissing", "Hair Tuck", "Neck Graze", "Hand Clasp"]
+};
+
+export const WARDROBE_LOCATIONS = ["India", "Western"];
+export const WARDROBE_STYLES = ["Traditional (Grand)", "Casual", "Formal", "Nightwear", "Workwear"];
+export const WARDROBE_FITS = ["Tailored / Fitted", "Loose / Flowing", "Structured", "Draped"];
+export const WARDROBE_FABRICS = ["Silk", "Cotton", "Linen", "Velvet", "Chiffon", "Denim", "Wool"];
+export const WARDROBE_COLORS = ["Red", "Blue", "Gold", "Black", "White", "Green", "Purple", "Pastel Pink"];
+export const WARDROBE_ACCESSORIES = {
+    Vijay: ["Watch", "Cufflinks", "Gold Chain", "Spectacles", "None"],
+    Meena: ["Jhumkas", "Bangles", "Necklace", "Anklets", "Nose Ring", "None"]
+};
+
+// Texture Hints for Fabrics (CSS Backgrounds)
+export const FABRIC_META: Record<string, string> = {
+    "Silk": "linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%)",
+    "Cotton": "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzjwq1ev/k8C8RnQhYAAAQA9Kw9zRg8h8QAAAABJRU5ErkJggg==')", // Simple noise
+    "Linen": "repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.1) 3px)",
+    "Velvet": "radial-gradient(circle, rgba(255,255,255,0.1), transparent)",
+    "Chiffon": "linear-gradient(to right, rgba(255,255,255,0.1), transparent)",
+    "Denim": "repeating-linear-gradient(0deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px)",
+    "Wool": "radial-gradient(circle, rgba(255,255,255,0.2) 1px, transparent 1px)"
+};
+
+export const WARDROBE_DB: Record<string, any> = {
+    "India": {
+        "Traditional (Grand)": {
+            Vijay: ["Sherwani", "Kurta Pyjama (Silk)", "Dhoti & Angavastram"],
+            Meena: ["Kanjeevaram Saree", "Lehenga Choli", "Anarkali Suit"]
+        },
+        "Casual": {
+            Vijay: ["Cotton Kurta", "Short Kurta & Jeans", "Linen Shirt"],
+            Meena: ["Cotton Saree", "Salwar Kameez (Simple)", "Kurti & Leggings"]
+        },
+        "Formal": {
+             Vijay: ["Nehru Jacket Set", "Bandhgala"],
+             Meena: ["Silk Saree (Office)", "Formal Salwar"]
+        },
+        "Nightwear": {
+            Vijay: ["Lungis", "Loose Pyjamas"],
+            Meena: ["Nightie", "Loose Cotton Set"]
+        },
+        "Workwear": {
+             Vijay: ["Formal Shirt & Trousers"],
+             Meena: ["Cotton Saree", "Churidar"]
+        }
+    },
+    "Western": {
+        "Formal": {
+            Vijay: ["Three-Piece Suit", "Tuxedo", "Blazer & Chinos"],
+            Meena: ["Evening Gown", "Cocktail Dress", "Power Suit"]
+        },
+        "Casual": {
+            Vijay: ["T-shirt & Jeans", "Polo Shirt", "Hoodie"],
+            Meena: ["Jeans & Top", "Sundress", "Maxi Dress"]
+        },
+        "Nightwear": {
+            Vijay: ["Boxers & Tee", "Sweatpants"],
+            Meena: ["Silk Robe", "Pajama Set"]
+        },
+        "Workwear": {
+            Vijay: ["Button Down Shirt"],
+            Meena: ["Blouse & Skirt", "Trousers"]
+        }
+    }
+};
+
+export const WARDROBE_DESCRIPTIONS: Record<string, string> = {
+    "Sherwani": "Long coat-like garment, regal & formal",
+    "Kurta Pyjama (Silk)": "Flowing tunic, soft sheen",
+    "Dhoti & Angavastram": "Traditional draped lower garment",
+    "Kanjeevaram Saree": "Heavy silk with gold borders",
+    "Lehenga Choli": "Voluminous skirt and cropped blouse",
+    "Anarkali Suit": "Frock-style long top",
+    "Nehru Jacket Set": "Sleeveless jacket over kurta",
+    "Bandhgala": "Closed-neck formal suit",
+    "Lungis": "Casual wrapped lower garment",
+    "Three-Piece Suit": "Vest, jacket, trousers - sharp",
+    "Evening Gown": "Floor-length elegance"
+};
+
+// --- TIMES & WEATHER ---
+export const TIMES_OF_DAY = [
+    "Dawn (Blue Hour)", "Morning (Soft)", "High Noon (Harsh)", 
+    "Golden Hour (Sunset)", "Twilight (Purple)", "Midnight (Dark)"
+];
+
+export const WEATHER_CONDITIONS = [
+    "Clear Sky", "Monsoon Rain (Heavy)", "Light Drizzle", 
+    "Foggy / Misty", "Windy", "Stormy", "Humid / Hazy"
+];
+
+export const GALLERY_IMAGES = [
+    { id: 1, src: "assets/gallery-1.jpg", caption: "She was his safe place. He was her fortress." },
+    { id: 2, src: "assets/gallery-2.jpg", caption: "Above the table, they were strangers. Below, he owned her." },
+    { id: 3, src: "assets/gallery-3.jpg", caption: "A king on his knees for his queen." },
+    { id: 4, src: "assets/gallery-4.jpg", caption: "It was just a zipper. So why did it feel like he was touching her soul?" },
+    { id: 5, src: "assets/gallery-5.jpg", caption: "Tangled by the wind. Bound by something stronger." },
+    { id: 6, src: "assets/gallery-6.jpg", caption: "He became her pillow, her shield, her home." },
+    { id: 7, src: "assets/gallery-7.jpg", caption: "He stopped the argument with one touch." },
+    { id: 8, src: "assets/gallery-8.jpg", caption: "The best ingredient was always him." },
+    { id: 9, src: "assets/gallery-9.jpg", caption: "One song, two heartbeats. The world faded away." },
+    { id: 10, src: "assets/gallery-10.jpg", caption: "He wasn't just checking her form. He was memorizing her curves." },
+    { id: 11, src: "assets/gallery-11.jpg", caption: "He didn't just dry her hair. He untangled her soul." },
+    { id: 12, src: "assets/gallery-12.jpg", caption: "Pinned between the wall and his gaze." },
+    { id: 13, src: "assets/gallery-13.jpg", caption: "A polite smile for the camera. A possessive grip for her." },
+    { id: 14, src: "assets/gallery-14.jpg", caption: "No more waiting. Tonight, the walls come down." },
+    { id: 15, src: "assets/gallery-15.jpg", caption: "Trusting him with her eyes... and her heart." },
+    { id: 16, src: "assets/gallery-16.jpg", caption: "The spices weren't the only thing burning in the kitchen." },
+    { id: 17, src: "assets/gallery-17.jpg", caption: "He marked her as his. She accepted it as her destiny." },
+    { id: 18, src: "assets/gallery-18.jpg", caption: "His breath on her skin was the only breeze she needed." },
+    { id: 19, src: "assets/gallery-19.jpg", caption: "The First Touch: When Silence Speaks Louder Than Rituals." },
+    { id: 20, src: "assets/gallery-20.jpg", caption: "The storm outside was nothing compared to the one between them." },
+    { id: 21, src: "assets/gallery-21.jpg", caption: "He fixed the pleats. He unraveled her restraint." },
+    { id: 22, src: "assets/gallery-22.jpg", caption: "She touched him without thinking. He felt it in his soul." },
+    { id: 23, src: "assets/gallery-23.jpg", caption: "She wore his shirt better than he ever did." },
+    { id: 24, src: "assets/gallery-24.jpg", caption: "Asleep, they told the truth their waking hearts were afraid to say." },
+    { id: 25, src: "assets/gallery-25.jpg", caption: "If I kiss you now, I'm not going to stop." },
+    { id: 26, src: "assets/gallery-26.jpg", caption: "In high definition, the only thing he saw was her." },
+    { id: 27, src: "assets/gallery-27.jpg", caption: "In the chaos of the crowd, he built a wall of silence around her." },
+    { id: 28, src: "assets/gallery-28.jpg", caption: "She thought she was just fixing his tie. He knew she was tightening the leash." },
+    { id: 29, src: "assets/gallery-29.jpg", caption: "She tried to look away. She failed." },
+    { id: 30, src: "assets/gallery-30.jpg", caption: "He didn't use a napkin. He used his thumb. And then..." }
 ];

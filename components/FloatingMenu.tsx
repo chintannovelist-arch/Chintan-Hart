@@ -8,7 +8,7 @@ import ThemeToggle from './ThemeToggle';
 
 // --- Configuration ---
 const SPRING_CONFIG = { damping: 20, stiffness: 100, mass: 1 }; 
-const IRIS_EASE = [0.76, 0, 0.24, 1]; // Cinematic Ease
+const IRIS_EASE: [number, number, number, number] = [0.76, 0, 0.24, 1]; // Cinematic Ease
 
 const MENU_LINKS = [
     { label: "The Novel", href: "#books", icon: BookOpen, desc: "Start the journey" },

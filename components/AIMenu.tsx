@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -145,7 +144,7 @@ const AIMenu: React.FC<AIMenuProps> = ({ onSelect }) => {
             {/* Background Effects */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
             
-            <div className="max-w-7xl mx-auto px-6 relative z-10">
+            <div className="max-w-[1600px] mx-auto px-6 relative z-10">
                 <div className="text-center mb-16">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 border border-white/10 rounded-full text-slate-300 text-xs tracking-widest uppercase mb-6 font-bold shadow-sm">
                         <Zap size={12} className="text-primary" /> <span>Interactive Features</span>
@@ -162,34 +161,34 @@ const AIMenu: React.FC<AIMenuProps> = ({ onSelect }) => {
                     initial="hidden"
                     whileInView="show"
                     viewport={{ once: true, amount: 0.1 }}
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8"
                 >
                     {FEATURES.map((feature) => (
                         <motion.button
                             key={feature.id}
                             variants={item}
                             onClick={() => onSelect(feature.id)}
-                            className="group relative bg-[#121212] hover:bg-[#1a1a1a] p-6 rounded-lg border border-white/5 hover:border-white/20 transition-all duration-300 text-left flex flex-col shadow-lg hover:shadow-[0_0_30px_rgba(37,150,190,0.15)] hover:-translate-y-1 overflow-hidden"
+                            className="group relative bg-[#121212] hover:bg-[#1a1a1a] p-8 rounded-lg border border-white/5 hover:border-white/20 transition-all duration-300 text-left flex flex-col shadow-lg hover:shadow-[0_0_30px_rgba(37,150,190,0.15)] hover:-translate-y-1 overflow-hidden h-full"
                         >
                             <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             
-                            <div className="flex justify-between items-start mb-4">
-                                <div className={`p-3 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors ${feature.color}`}>
-                                    <feature.icon size={24} />
+                            <div className="flex justify-between items-start mb-6">
+                                <div className={`p-4 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors ${feature.color}`}>
+                                    <feature.icon size={28} />
                                 </div>
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-slate-600 group-hover:text-slate-400">
                                     {feature.category}
                                 </span>
                             </div>
 
-                            <h3 className="font-display text-xl text-white mb-2 group-hover:text-primary transition-colors">
+                            <h3 className="font-display text-2xl text-white mb-3 group-hover:text-primary transition-colors">
                                 {feature.label}
                             </h3>
-                            <p className="text-sm text-slate-500 group-hover:text-slate-400 font-body leading-relaxed">
+                            <p className="text-sm text-slate-500 group-hover:text-slate-400 font-body leading-relaxed flex-grow">
                                 {feature.desc}
                             </p>
 
-                            <div className="mt-6 flex items-center text-xs font-bold uppercase tracking-widest text-slate-600 group-hover:text-white transition-colors opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 duration-300">
+                            <div className="mt-8 flex items-center text-xs font-bold uppercase tracking-widest text-slate-600 group-hover:text-white transition-colors opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 duration-300">
                                 Launch <ChevronRight size={14} className="ml-1" />
                             </div>
                         </motion.button>

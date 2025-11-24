@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Feather, Key, Edit3, BookHeart, X, Menu, Search, Lock } from 'lucide-react';
+import { Feather, Key, Edit3, BookHeart, X, Menu, Search, Lock, Image as ImageIcon } from 'lucide-react';
 import { AUTHOR_NAME } from '../constants';
 import ThemeToggle from './ThemeToggle';
 
@@ -60,6 +60,7 @@ const Navigation: React.FC = () => {
         
         <div className="hidden lg:flex items-center gap-8">
           <NavLink href="#books">Novels</NavLink>
+          <NavLink href="#gallery" icon={ImageIcon}>Gallery</NavLink>
           <NavLink href="#cliffhanger" icon={Key}>Unlock</NavLink>
           <NavLink href="#tropematcher" icon={BookHeart}>Tropes</NavLink>
           <NavLink href="#finishscene" icon={Edit3}>Co-Write</NavLink>
@@ -93,6 +94,7 @@ const Navigation: React.FC = () => {
       {isOpen && (
         <div className="lg:hidden absolute top-full left-0 w-full bg-[#0F0F0F]/95 backdrop-blur-xl border-t border-white/5 p-8 flex flex-col gap-6 text-center shadow-2xl animate-fade-in border-b border-white/5">
            <NavLink href="#books">Novels</NavLink>
+           <NavLink href="#gallery">Visual Gallery</NavLink>
            <NavLink href="#cliffhanger">Unlock Scene</NavLink>
            <NavLink href="#tropematcher">Find Your Trope</NavLink>
            <NavLink href="#translator">Jasmine Translator</NavLink>
