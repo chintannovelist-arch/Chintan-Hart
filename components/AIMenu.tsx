@@ -1,9 +1,11 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
     BrainCircuit, Activity, PenTool, Search, Flame, Key, 
     Music, Sparkles, MessageSquare, Heart, Lock, MapPin, 
-    Box, Wand2, ChevronRight, Zap
+    Box, Wand2, ChevronRight, Zap, HeartHandshake, Gem,
+    CloudRain
 } from 'lucide-react';
 
 interface AIMenuProps {
@@ -42,6 +44,30 @@ const FEATURES = [
         icon: PenTool, 
         color: 'text-emerald-400',
         category: 'Interactive'
+    },
+    { 
+        id: 'sensory', 
+        label: 'Sensory Immersion', 
+        desc: 'Feel the atmosphere.', 
+        icon: CloudRain, 
+        color: 'text-teal-300',
+        category: 'Immersion'
+    },
+    { 
+        id: 'apology', 
+        label: 'Apology Architect', 
+        desc: 'Generate the perfect grovel.', 
+        icon: HeartHandshake, 
+        color: 'text-amber-400',
+        category: 'Creative'
+    },
+    { 
+        id: 'memory', 
+        label: 'Memory Weaver', 
+        desc: 'Weave sensory flashbacks.', 
+        icon: Gem, 
+        color: 'text-indigo-300',
+        category: 'Creative'
     },
     { 
         id: 'muse', 

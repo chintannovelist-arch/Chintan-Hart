@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ZoomIn, Image as ImageIcon, Quote, ChevronLeft, ChevronRight, ArrowDownCircle } from 'lucide-react';
 import { GALLERY_IMAGES } from '../constants';
@@ -8,6 +9,12 @@ const NovelGallery: React.FC = () => {
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
     const [imgErrors, setImgErrors] = useState<Record<number, boolean>>({});
     const [visibleCount, setVisibleCount] = useState(9);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+        return () => setMounted(false);
+    }, []);
 
     const handleImageError = (id: number) => {
         setImgErrors(prev => ({ ...prev, [id]: true }));
@@ -43,6 +50,95 @@ const NovelGallery: React.FC = () => {
 
     const selectedImage = selectedImageIndex !== null ? GALLERY_IMAGES[selectedImageIndex] : null;
     const visibleImages = GALLERY_IMAGES.slice(0, visibleCount);
+
+    const LightboxContent = (
+        <AnimatePresence>
+            {selectedImage && (
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-[10002] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-8"
+                    onClick={() => setSelectedImageIndex(null)}
+                >
+                    {/* Close Button */}
+                    <button 
+                        onClick={() => setSelectedImageIndex(null)}
+                        className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors z-50 group border border-white/10"
+                        aria-label="Close Gallery"
+                    >
+                        <X size={24} className="group-hover:rotate-90 transition-transform"/>
+                    </button>
+
+                    {/* Navigation Buttons */}
+                    <button 
+                        onClick={handlePrev}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 p-4 bg-black/50 hover:bg-primary/80 text-white rounded-full backdrop-blur-md transition-all z-50 group hidden md:block border border-white/10 hover:border-primary"
+                        aria-label="Previous Image"
+                    >
+                        <ChevronLeft size={32} className="group-hover:-translate-x-1 transition-transform" />
+                    </button>
+                    
+                    <button 
+                        onClick={handleNext}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 p-4 bg-black/50 hover:bg-primary/80 text-white rounded-full backdrop-blur-md transition-all z-50 group hidden md:block border border-white/10 hover:border-primary"
+                        aria-label="Next Image"
+                    >
+                        <ChevronRight size={32} className="group-hover:translate-x-1 transition-transform" />
+                    </button>
+
+                    <motion.div 
+                        key={selectedImage.id}
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.9, opacity: 0 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        className="relative max-w-6xl w-full max-h-[90vh] flex flex-col md:flex-row bg-[#0F0F0F] rounded-sm overflow-hidden border border-white/10 shadow-2xl"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Image Container - Constrained to Viewport */}
+                        <div className="flex-1 bg-black flex items-center justify-center relative overflow-hidden h-[50vh] md:h-[85vh]">
+                            {!imgErrors[selectedImage.id] ? (
+                                <img 
+                                    src={selectedImage.src} 
+                                    alt={selectedImage.caption}
+                                    className="max-w-full max-h-full object-contain shadow-2xl"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-slate-500">
+                                    <ImageIcon size={48} />
+                                </div>
+                            )}
+                        </div>
+                        
+                        {/* Caption Side Panel */}
+                        <div className="w-full md:w-96 bg-[#121212] p-8 md:p-10 flex flex-col justify-center border-l border-white/5 relative h-auto md:h-[85vh]">
+                            <div className="mb-8 text-primary hidden md:block">
+                                <Quote size={40} className="opacity-50" />
+                            </div>
+                            <div className="flex-1 flex items-center">
+                                <p className="font-serif text-xl md:text-2xl text-white leading-relaxed italic drop-shadow-lg">
+                                    {selectedImage.caption}
+                                </p>
+                            </div>
+                            <div className="mt-8 pt-8 border-t border-white/10 flex justify-between items-center">
+                                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">The Jasmine Knot</p>
+                                <p className="text-[10px] text-slate-600 uppercase tracking-widest font-mono">
+                                    {selectedImageIndex !== null ? selectedImageIndex + 1 : 0} / {GALLERY_IMAGES.length}
+                                </p>
+                            </div>
+                            
+                            {/* Mobile Nav (Inside Card) */}
+                            <div className="flex md:hidden justify-between mt-6 pt-4 border-t border-white/5">
+                                <button onClick={handlePrev} className="p-2 text-slate-400 hover:text-white"><ChevronLeft/></button>
+                                <button onClick={handleNext} className="p-2 text-slate-400 hover:text-white"><ChevronRight/></button>
+                            </div>
+                        </div>
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
 
     return (
         <section id="gallery" className="bg-black/20 relative min-h-screen w-full">
@@ -119,93 +215,8 @@ const NovelGallery: React.FC = () => {
                 )}
             </div>
 
-            {/* Lightbox Modal - Z-index higher than FeatureModal */}
-            <AnimatePresence>
-                {selectedImage && (
-                    <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[10002] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-8"
-                        onClick={() => setSelectedImageIndex(null)}
-                    >
-                        {/* Close Button */}
-                        <button 
-                            onClick={() => setSelectedImageIndex(null)}
-                            className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors z-50 group border border-white/10"
-                            aria-label="Close Gallery"
-                        >
-                            <X size={24} className="group-hover:rotate-90 transition-transform"/>
-                        </button>
-
-                        {/* Navigation Buttons */}
-                        <button 
-                            onClick={handlePrev}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 p-4 bg-black/50 hover:bg-primary/80 text-white rounded-full backdrop-blur-md transition-all z-50 group hidden md:block border border-white/10 hover:border-primary"
-                            aria-label="Previous Image"
-                        >
-                            <ChevronLeft size={32} className="group-hover:-translate-x-1 transition-transform" />
-                        </button>
-                        
-                        <button 
-                            onClick={handleNext}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 p-4 bg-black/50 hover:bg-primary/80 text-white rounded-full backdrop-blur-md transition-all z-50 group hidden md:block border border-white/10 hover:border-primary"
-                            aria-label="Next Image"
-                        >
-                            <ChevronRight size={32} className="group-hover:translate-x-1 transition-transform" />
-                        </button>
-
-                        <motion.div 
-                            key={selectedImage.id}
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            className="relative max-w-6xl w-full max-h-[90vh] flex flex-col md:flex-row bg-[#0F0F0F] rounded-sm overflow-hidden border border-white/10 shadow-2xl"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            {/* Image Container - Constrained to Viewport */}
-                            <div className="flex-1 bg-black flex items-center justify-center relative overflow-hidden h-[50vh] md:h-[85vh]">
-                                {!imgErrors[selectedImage.id] ? (
-                                    <img 
-                                        src={selectedImage.src} 
-                                        alt={selectedImage.caption}
-                                        className="max-w-full max-h-full object-contain shadow-2xl"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-slate-500">
-                                        <ImageIcon size={48} />
-                                    </div>
-                                )}
-                            </div>
-                            
-                            {/* Caption Side Panel */}
-                            <div className="w-full md:w-96 bg-[#121212] p-8 md:p-10 flex flex-col justify-center border-l border-white/5 relative h-auto md:h-[85vh]">
-                                <div className="mb-8 text-primary hidden md:block">
-                                    <Quote size={40} className="opacity-50" />
-                                </div>
-                                <div className="flex-1 flex items-center">
-                                    <p className="font-serif text-xl md:text-2xl text-white leading-relaxed italic drop-shadow-lg">
-                                        {selectedImage.caption}
-                                    </p>
-                                </div>
-                                <div className="mt-8 pt-8 border-t border-white/10 flex justify-between items-center">
-                                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">The Jasmine Knot</p>
-                                    <p className="text-[10px] text-slate-600 uppercase tracking-widest font-mono">
-                                        {selectedImageIndex !== null ? selectedImageIndex + 1 : 0} / {GALLERY_IMAGES.length}
-                                    </p>
-                                </div>
-                                
-                                {/* Mobile Nav (Inside Card) */}
-                                <div className="flex md:hidden justify-between mt-6 pt-4 border-t border-white/5">
-                                    <button onClick={handlePrev} className="p-2 text-slate-400 hover:text-white"><ChevronLeft/></button>
-                                    <button onClick={handleNext} className="p-2 text-slate-400 hover:text-white"><ChevronRight/></button>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {/* Use Portal to ensure Lightbox breaks out of FeatureModal's z-index/transform constraints */}
+            {mounted && createPortal(LightboxContent, document.body)}
         </section>
     );
 };

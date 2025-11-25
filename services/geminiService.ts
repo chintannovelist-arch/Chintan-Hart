@@ -22,6 +22,10 @@ const getAiClients = () => {
       process.env.API_KEY_3
   ].filter(key => key && typeof key === 'string' && key.length > 0) as string[];
 
+  if (typeof window !== 'undefined') {
+      console.log(`[Gemini Service] Initialized with ${keys.length} API key(s).`);
+  }
+
   if (keys.length === 0) {
       console.warn("[Gemini Service] API Key is missing. AI features will be disabled.");
       return [];
@@ -365,25 +369,43 @@ export const callGeminiSensory = async (sense: string) => {
     );
 };
 
-export const callGeminiAnatomy = async (partnerName: string, bodyPart: string) => {
-    const subjectName = partnerName === "Meena" ? "Vijay" : "Meena";
-    
-    const system = `You are the sensory engine for the romance novel 'The Jasmine Knot'.
-    Describe the physical and emotional reaction of ${subjectName} when ${partnerName} focuses on or touches their ${bodyPart}.
+// --- NEW FEATURES ---
+
+export const callGeminiApology = async (mistake: string, character: string) => {
+    const system = `You are ${character} from the romance novel 'The Jasmine Knot'.
     
     Context:
-    - ${subjectName} is the one being touched/observed.
-    - ${partnerName} is the one interacting.
-    - Focus on the tension, the heat, the specific texture of skin, pulse, or breath.
-    - Style: Intimate, sensory, poetic. Max 40 words.`;
+    - Vijay: Stoic, intense, man of few words. He apologizes through action and promises of change. He rarely says "I'm sorry" directly but means it deeply.
+    - Meena: Emotional, poetic, articulate. She explains her feelings and the hurt caused. Her apology is a plea for reconnection.
     
-    const prompt = `Scenario: ${partnerName} interacts with ${subjectName}'s ${bodyPart}. Describe the sensation.`;
-    
+    Task: Write a short, heartfelt apology/grovel speech for the provided mistake.
+    Tone: Serious, romantic, sincere.
+    Max 100 words.`;
+
+    const prompt = `Mistake: "${mistake}". Write the apology.`;
+
     return safeGenerate(
         prompt,
         system,
-        "Anatomy of Desire",
-        "A shiver traces down the spine, unspoken and electric."
+        "Apology Architect",
+        "The words are stuck in my throat. I cannot speak right now."
+    );
+};
+
+export const callGeminiMemoryWeaver = async (keywords: string[]) => {
+    const system = `You are the narrator of 'The Jasmine Knot'.
+    Task: Weave the provided keywords into a single, lush, sensory-rich paragraph describing a memory between Vijay and Meena.
+    Style: Atmospheric, slow-burn, focusing on humidity, silence, and touch.
+    Structure: Start with the sensory detail, move to the emotion, end with the connection.
+    Max 100 words.`;
+
+    const prompt = `Keywords to weave: ${keywords.join(", ")}.`;
+
+    return safeGenerate(
+        prompt,
+        system,
+        "Memory Weaver",
+        "The memory is too fragmented to recall clearly."
     );
 };
 

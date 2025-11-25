@@ -11,6 +11,7 @@ export interface Book {
     }[];
     amazonLink: string;
     sampleLink: string;
+    kindleUnlimitedLink?: string;
     status: string;
     tags: string[];
 }

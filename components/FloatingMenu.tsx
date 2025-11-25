@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useSpring, useMotionValue, useTransform } from 'framer-motion';
 import { 
-    Menu, X, BookOpen, PenTool, MessageSquare, PlayCircle, Zap
+    Menu, X, BookOpen, PenTool, PlayCircle, Zap
 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 
@@ -15,7 +15,6 @@ const MENU_LINKS = [
     { label: "AI Experience Hub", href: "#ai-hub", icon: Zap, desc: "Interactive Tools" },
     { label: "The Characters", href: "#protagonists", icon: PlayCircle, desc: "Meet Vijay & Meena" },
     { label: "The Author", href: "#author", icon: PenTool, desc: "Meet Chintan" },
-    { label: "Subscribe", href: "#newsletter", icon: MessageSquare, desc: "Join the circle" },
 ];
 
 const FloatingMenu: React.FC = () => {

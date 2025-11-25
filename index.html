@@ -3,42 +3,53 @@
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Jasmine Knot | Chintan Hart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Jasmine Knot | Immersive Romance Experience</title>
+    <meta name="description" content="Dive into the slow-burn romance of 'The Jasmine Knot' by Chintan Hart. Experience the heat of Chennai and the tension of an arranged marriage through interactive AI features.">
+    <meta name="author" content="Chintan Hart">
+    <meta name="keywords" content="The Jasmine Knot, Chintan Hart, Romance Novel, Slow Burn, Arranged Marriage, Interactive Fiction, Gemini AI">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://thejasmineknot.com/">
+    <meta property="og:title" content="The Jasmine Knot | Interactive Romance Novel">
+    <meta property="og:description" content="Experience the tension, the heat, and the silence. An immersive journey into love, powered by AI.">
+    <meta property="og:image" content="assets/cover-jasmine-knot-main.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="The Jasmine Knot | Chintan Hart">
+    <meta property="twitter:description" content="Interactive romance novel experience powered by Gemini AI.">
+    <meta property="twitter:image" content="assets/cover-jasmine-knot-main.jpg">
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TS372QJF56"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-TS372QJF56');
     </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Montserrat:wght@200;300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        primary: 'rgb(37, 150, 190)', // Cinematic Cerulean (Fixed)
+                        primary: 'rgb(37, 150, 190)', 
                         'primary-dark': '#186a8a',
-                        
-                        // Dynamic Colors via CSS Variables
                         onyx: 'rgb(var(--c-onyx) / <alpha-value>)', 
                         secondary: 'rgb(var(--c-secondary) / <alpha-value>)',
                         paper: 'rgb(var(--c-paper) / <alpha-value>)',
                         surface: 'rgb(var(--c-surface) / <alpha-value>)',
                         muted: 'rgb(var(--c-muted) / <alpha-value>)',
-                        
-                        // Inverted Logic: Black becomes White in light mode, White becomes Dark
                         black: 'rgb(var(--c-black) / <alpha-value>)', 
                         white: 'rgb(var(--c-white) / <alpha-value>)',
-                        
-                        blush: '#F4C2C2', // Keep constant
-                        
-                        // Override Slate scales for automatic text inversion
+                        blush: '#F4C2C2', 
                         slate: {
                             50: 'rgb(var(--c-slate-50) / <alpha-value>)',
                             100: 'rgb(var(--c-slate-100) / <alpha-value>)',
@@ -55,53 +66,30 @@
                     fontFamily: {
                         display: ['"Cinzel Decorative"', 'serif'],
                         body: ['"Montserrat"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif'],
                     },
                     transitionTimingFunction: {
-                        'cinematic': 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', // Heavy Settle
-                        'snappy': 'cubic-bezier(0.19, 1, 0.22, 1)', // Snappy interaction
-                        'exit': 'cubic-bezier(0.55, 0.085, 0.68, 0.53)', // Sharp exit
+                        'cinematic': 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', 
+                        'snappy': 'cubic-bezier(0.19, 1, 0.22, 1)',
                     },
                     animation: {
                         'fade-in': 'fadeIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                         'fade-in-up': 'fadeInUp 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                         'reveal': 'reveal 1.5s cubic-bezier(0.16, 1, 0.3, 1)',
-                        'ken-burns': 'kenBurns 20s ease-in-out infinite alternate',
                         'pulse-slow': 'pulseGlow 4s ease-in-out infinite',
                         'shimmer': 'shimmer 2s linear infinite',
+                        'title-reveal': 'titleReveal 2s cubic-bezier(0.1, 0.8, 0.1, 1) forwards',
                     },
                     keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0', filter: 'blur(5px)' },
-                            '100%': { opacity: '1', filter: 'blur(0)' },
-                        },
-                        fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(40px)', filter: 'blur(10px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)', filter: 'blur(0)' },
-                        },
-                        reveal: {
-                             '0%': { opacity: '0', transform: 'scale(0.98)', filter: 'blur(8px)' },
-                             '100%': { opacity: '1', transform: 'scale(1)', filter: 'blur(0)' }
-                        },
-                        kenBurns: {
-                            '0%': { transform: 'scale(1)' },
-                            '100%': { transform: 'scale(1.15)' },
-                        },
-                        pulseGlow: {
-                            '0%, 100%': { boxShadow: '0 0 20px -5px rgba(37, 150, 190, 0.1)' },
-                            '50%': { boxShadow: '0 0 40px -5px rgba(37, 150, 190, 0.4)' },
-                        },
-                        shimmer: {
-                            '0%': { backgroundPosition: '-1000px 0' },
-                            '100%': { backgroundPosition: '1000px 0' }
-                        }
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        fadeInUp: { '0%': { opacity: '0', transform: 'translateY(40px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        pulseGlow: { '0%, 100%': { boxShadow: '0 0 20px -5px rgba(37, 150, 190, 0.1)' }, '50%': { boxShadow: '0 0 40px -5px rgba(37, 150, 190, 0.4)' } },
+                        shimmer: { '0%': { backgroundPosition: '-1000px 0' }, '100%': { backgroundPosition: '1000px 0' } },
+                        titleReveal: { '0%': { opacity: '0', transform: 'scale(0.9) translateY(40px)', filter: 'blur(25px)' }, '100%': { opacity: '1', transform: 'scale(1) translateY(0)', filter: 'blur(0)' } }
                     },
                     boxShadow: {
                         'glow': '0 0 30px -5px rgba(37, 150, 190, 0.3)',
                         'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.5)',
-                        'volumetric': '0 20px 50px -5px rgba(37, 150, 190, 0.2)',
-                    },
-                    backgroundImage: {
-                        'vignette': 'radial-gradient(circle, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 100%)',
                     }
                 }
             }
@@ -111,18 +99,13 @@
         :root {
             --mouse-x: 50%;
             --mouse-y: 50%;
-
-            /* DARK MODE (DEFAULT) */
             --c-black: 0 0 0;
             --c-white: 255 255 255;
-            
-            --c-onyx: 15 15 15;        /* #0F0F0F */
-            --c-secondary: 18 18 18;   /* #121212 */
-            --c-paper: 5 5 5;          /* #050505 */
-            --c-surface: 26 26 26;     /* #1A1A1A */
-            --c-muted: 38 38 38;       /* #262626 */
-            
-            /* Slate Scale (Standard) */
+            --c-onyx: 15 15 15;
+            --c-secondary: 18 18 18;
+            --c-paper: 5 5 5;
+            --c-surface: 26 26 26;
+            --c-muted: 38 38 38;
             --c-slate-50: 248 250 252;
             --c-slate-100: 241 245 249;
             --c-slate-200: 226 232 240;
@@ -134,102 +117,49 @@
             --c-slate-800: 30 41 59;
             --c-slate-900: 15 23 42;
         }
-
         .light-theme {
-            /* LIGHT MODE (INVERTED) */
-            --c-black: 255 255 255;    /* Bg becomes white */
-            --c-white: 15 23 42;       /* Text becomes dark slate */
-            
-            --c-onyx: 248 250 252;     /* Slate-50 */
-            --c-secondary: 241 245 249;/* Slate-100 */
-            --c-paper: 255 255 255;    /* White */
-            --c-surface: 255 255 255;  /* White */
-            --c-muted: 226 232 240;    /* Slate-200 */
-
-            /* Inverted Slate Scale for Text Contrast */
-            /* text-slate-300 (light gray) -> becomes text-slate-700 (dark gray) */
-            --c-slate-50: 15 23 42;    /* was slate-900 */
-            --c-slate-100: 30 41 59;   /* was slate-800 */
-            --c-slate-200: 51 65 85;   /* was slate-700 */
-            --c-slate-300: 71 85 105;  /* was slate-600 */
-            --c-slate-400: 100 116 139;/* was slate-500 */
-            --c-slate-500: 148 163 184;/* was slate-400 */
-            --c-slate-600: 203 213 225;/* was slate-300 */
-            --c-slate-700: 226 232 240;/* was slate-200 */
-            --c-slate-800: 241 245 249;/* was slate-100 */
-            --c-slate-900: 248 250 252;/* was slate-50 */
+            --c-black: 255 255 255;
+            --c-white: 15 23 42;
+            --c-onyx: 248 250 252;
+            --c-secondary: 241 245 249;
+            --c-paper: 255 255 255;
+            --c-surface: 255 255 255;
+            --c-muted: 226 232 240;
+            --c-slate-50: 15 23 42;
+            --c-slate-100: 30 41 59;
+            --c-slate-200: 51 65 85;
+            --c-slate-300: 71 85 105;
+            --c-slate-400: 100 116 139;
+            --c-slate-500: 148 163 184;
+            --c-slate-600: 203 213 225;
+            --c-slate-700: 226 232 240;
+            --c-slate-800: 241 245 249;
+            --c-slate-900: 248 250 252;
         }
-        
         body {
             background-color: rgb(var(--c-black));
             color: rgb(var(--c-white));
             overflow-x: hidden;
             transition: background-color 0.5s ease, color 0.5s ease;
         }
-
-        /* Cinematic Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgb(var(--c-black));
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #2596be;
-            border-radius: 2px;
-        }
-
-        /* Spotlight Card Logic */
-        .spotlight-card {
-            position: relative;
-            overflow: hidden;
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgb(var(--c-black)); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #2596be; border-radius: 2px; }
+        
+        .spotlight-card { position: relative; overflow: hidden; }
         .spotlight-card::before {
-            content: "";
-            position: absolute;
-            inset: -1px;
-            z-index: 0;
-            background: radial-gradient(
-                600px circle at var(--mouse-x) var(--mouse-y),
-                rgba(37, 150, 190, 0.15),
-                transparent 40%
-            );
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
+            content: ""; position: absolute; inset: -1px; z-index: 0;
+            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(37, 150, 190, 0.15), transparent 40%);
+            opacity: 0; transition: opacity 0.3s; pointer-events: none;
         }
-        .spotlight-card:hover::before {
-            opacity: 1;
-        }
-
-        /* Text selection for high contrast */
-        ::selection {
-            background: #2596be;
-            color: #ffffff;
-            text-shadow: none;
-        }
+        .spotlight-card:hover::before { opacity: 1; }
+        ::selection { background: #2596be; color: #ffffff; text-shadow: none; }
+        html { scroll-behavior: smooth; }
         
-        /* Smooth Scroll Behavior Override */
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        /* MODAL OVERRIDES for re-used sections */
+        /* Feature Modal Styles */
         .feature-modal-content section {
-            padding-top: 2rem !important;
-            padding-bottom: 2rem !important;
-            min-height: auto !important;
-            background-color: transparent !important;
-            border: none !important;
-        }
-        .feature-modal-content section > div {
-           max-width: 100% !important;
-        }
-
-        /* Global Animations */
-        @keyframes loadingBar {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(200%); }
+            padding-top: 2rem !important; padding-bottom: 2rem !important;
+            min-height: auto !important; background-color: transparent !important; border: none !important;
         }
     </style>
 <script type="importmap">
@@ -238,15 +168,13 @@
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
     "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
     "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
     "firebase/": "https://aistudiocdn.com/firebase@^12.6.0/",
     "framer-motion": "https://aistudiocdn.com/framer-motion@^11.0.8",
     "html2canvas": "https://aistudiocdn.com/html2canvas@^1.4.1",
-    "jspdf": "https://aistudiocdn.com/jspdf@^2.5.1",
-    "three": "https://aistudiocdn.com/three@^0.181.2",
-    "@react-three/drei": "https://aistudiocdn.com/@react-three/drei@^10.7.7",
-    "@react-three/fiber": "https://aistudiocdn.com/@react-three/fiber@^9.4.0"
+    "jspdf": "https://aistudiocdn.com/jspdf@^2.5.1"
   }
 }
 </script>
@@ -254,28 +182,16 @@
 <body class="antialiased selection:bg-primary/30 selection:text-white">
     <div id="root"></div>
     <script>
-        // Global mouse tracking for spotlight effects
         document.addEventListener('mousemove', (e) => {
             document.documentElement.style.setProperty('--mouse-x', e.clientX + 'px');
             document.documentElement.style.setProperty('--mouse-y', e.clientY + 'px');
         });
-        
-        // Init Theme
         const storedTheme = localStorage.getItem('theme');
-        if (storedTheme === 'light') {
-            document.documentElement.classList.add('light-theme');
-        }
-
-        // Define Global placeholders for Firebase to prevent ReferenceErrors during static hosting
-        if (typeof window.__firebase_config === 'undefined') {
-            window.__firebase_config = undefined;
-        }
-        if (typeof window.__app_id === 'undefined') {
-            window.__app_id = 'demo-app';
-        }
-        if (typeof window.__initial_auth_token === 'undefined') {
-            window.__initial_auth_token = undefined;
-        }
+        if (storedTheme === 'light') document.documentElement.classList.add('light-theme');
+        
+        if (typeof window.__firebase_config === 'undefined') window.__firebase_config = undefined;
+        if (typeof window.__app_id === 'undefined') window.__app_id = 'demo-app';
+        if (typeof window.__initial_auth_token === 'undefined') window.__initial_auth_token = undefined;
     </script>
     <script type="module" src="./index.tsx"></script>
 </body>

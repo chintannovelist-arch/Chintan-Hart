@@ -5,9 +5,10 @@ import {
     User, Shuffle, History, Trash2, X, Palette, Scan, 
     ChevronDown, MapPin, Shirt, Move, CheckCircle2,
     Layers, Crown, Sun, Video,
-    Watch, Gem, Signal, Type, Clapperboard, Focus,
+    Watch, Gem, Signal, Clapperboard, Focus,
     Terminal, LayoutTemplate, ChevronRight, Loader2,
-    Maximize2, Grid, Circle, Film
+    Maximize2, Grid, Circle, Film, ArrowUpRight, Repeat,
+    CloudRain, Wind, Zap, ChevronUp, AlertCircle
 } from 'lucide-react';
 import { callGeminiImageGenerator } from '../services/geminiService';
 import { 
@@ -17,10 +18,11 @@ import {
     WARDROBE_FABRICS, WARDROBE_COLORS, WARDROBE_ACCESSORIES, POSE_INTENSITIES,
     LIGHTING_OPTIONS, CAMERA_ANGLES, TOUCH_POINT_CATEGORIES,
     LIGHTING_META, MOOD_META, WARDROBE_DESCRIPTIONS, FABRIC_META, SCENE_META,
-    WARDROBE_FITS, TIMES_OF_DAY, WEATHER_CONDITIONS
+    WARDROBE_FITS, TIMES_OF_DAY, WEATHER_CONDITIONS, SCENE_PRESETS
 } from '../constants';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// Enhanced type definition for robustness
 interface GeneratedImage {
     id: string;
     url: string;
@@ -28,16 +30,60 @@ interface GeneratedImage {
     mood: string;
     touchPoint: string;
     timestamp: number;
+    config: {
+        vijayWardrobe: any;
+        meenaWardrobe: any;
+        setting: string;
+        position: string;
+        poseIntensity: string;
+        mood: string;
+        lighting: string;
+        camera: string;
+        style: string;
+        time: string;
+        weather: string;
+        selectedCharacter: string;
+        selectedTouchPoint: string;
+        activePoseTab: string;
+    }; 
 }
 
 // --- VISUAL UI COMPONENTS ---
+
+const PresetCard = ({ preset, onClick, isActive }: any) => {
+    const settingKey = preset.config.setting;
+    const meta = SCENE_META[settingKey] || { icon: "🎬", desc: "" };
+    
+    return (
+        <button
+            onClick={onClick}
+            className={`group relative w-full h-full rounded-sm p-3 text-left flex flex-col gap-2 transition-all duration-300 hover:-translate-y-1 shadow-lg border ${isActive ? 'bg-white/10 border-primary ring-1 ring-primary/50 shadow-[0_0_20px_rgba(37,150,190,0.2)]' : 'bg-[#151515] hover:bg-[#1a1a1a] border-white/5 hover:border-primary/40 hover:shadow-primary/10'}`}
+        >
+            <div className="flex justify-between items-start w-full border-b border-white/5 pb-2 mb-1">
+                <span className={`text-[10px] font-bold uppercase tracking-wider truncate max-w-[80%] transition-colors ${isActive ? 'text-white' : 'text-primary group-hover:text-white'}`}>
+                    {preset.label}
+                </span>
+                <span className={`text-lg transition-all filter ${isActive ? 'scale-110 grayscale-0 opacity-100' : 'opacity-50 group-hover:opacity-100 group-hover:scale-110 grayscale group-hover:grayscale-0'}`}>
+                    {meta.icon}
+                </span>
+            </div>
+            
+            <p className={`text-[9px] leading-relaxed line-clamp-2 font-light h-7 ${isActive ? 'text-slate-200' : 'text-slate-500 group-hover:text-slate-400'}`}>
+                {preset.desc}
+            </p>
+            
+            {isActive && (
+                <div className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full animate-pulse shadow-[0_0_10px_rgba(37,150,190,0.8)]"></div>
+            )}
+        </button>
+    );
+};
 
 const VisualCard = ({ label, isActive, onClick, icon: Icon, subLabel, color, metaStyle }: any) => (
     <button
         onClick={onClick}
         className={`relative group flex flex-col items-center justify-center p-4 rounded-sm border transition-all duration-300 overflow-hidden ${isActive ? 'bg-white/10 border-primary shadow-[0_0_15px_rgba(37,150,190,0.3)]' : 'bg-[#151515] border-white/5 hover:border-white/20 hover:bg-[#1a1a1a]'}`}
     >
-        {/* Optional Background Meta Style (e.g. gradient for Mood) */}
         {metaStyle && (
             <div className="absolute inset-0 opacity-10" style={metaStyle}></div>
         )}
@@ -58,7 +104,6 @@ const VisualCard = ({ label, isActive, onClick, icon: Icon, subLabel, color, met
 );
 
 const ColorSwatch = ({ color, isActive, onClick }: any) => {
-    // Map text colors to CSS values
     const colorMap: Record<string, string> = {
         "Red": "#ef4444", "Blue": "#3b82f6", "Gold": "#eab308",
         "Black": "#171717", "White": "#f5f5f5", "Green": "#22c55e",
@@ -86,7 +131,6 @@ const TabButton = ({ isActive, onClick, children, icon: Icon, colorClass }: any)
     </button>
 );
 
-// Enhanced Dropdown with Visual Previews and High Z-Index for Visibility
 const UnifiedDropdown = ({ label, value, options, onChange, icon: Icon, placeholder = "Select...", getMeta }: any) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -101,7 +145,6 @@ const UnifiedDropdown = ({ label, value, options, onChange, icon: Icon, placehol
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Meta Helper
     const currentMeta = getMeta ? getMeta(value) : null;
 
     return (
@@ -115,13 +158,11 @@ const UnifiedDropdown = ({ label, value, options, onChange, icon: Icon, placehol
                 className={`w-full text-left p-4 rounded-sm border transition-all flex items-center justify-between group relative ${isOpen ? 'bg-white/10 border-primary text-white shadow-lg ring-1 ring-primary/20' : 'bg-[#151515] border-white/5 text-slate-300 hover:bg-white/5 hover:border-white/20'}`}
             >
                 <div className="flex items-center gap-3 overflow-hidden flex-1">
-                    {/* Visual Preview in Trigger */}
                     {currentMeta?.preview && (
                         <div 
                             className="w-4 h-4 rounded-full shadow-sm border border-white/20 shrink-0" 
                             style={currentMeta.previewStyle || {}}
                         >
-                             {/* Text fallback if style is missing but text exists (e.g. icon) */}
                              {!currentMeta.previewStyle && currentMeta.preview} 
                         </div>
                     )}
@@ -146,10 +187,9 @@ const UnifiedDropdown = ({ label, value, options, onChange, icon: Icon, placehol
                                 <button
                                     key={opt}
                                     onClick={() => { onChange(opt); setIsOpen(false); }}
-                                    className={`w-full text-left px-4 py-3 text-sm border-b border-white/5 last:border-0 hover:bg-primary/20 hover:text-white transition-colors flex items-center justify-between whitespace-normal group/opt ${value === opt ? 'text-primary font-bold bg-white/5' : 'text-slate-400'}`}
+                                    className={`w-full text-left px-4 py-3 text-sm border-b border-white/5 last:border-0 hover:bg-primary/20 hover:text-white transition-colors flex items-center justify-center whitespace-normal group/opt ${value === opt ? 'text-primary font-bold bg-white/5' : 'text-slate-400'}`}
                                 >
-                                    <div className="flex items-center gap-3">
-                                        {/* Visual Preview in Option */}
+                                    <div className="flex items-center gap-3 w-full">
                                         {meta?.preview && (
                                             <div 
                                                 className="w-8 h-8 rounded-sm shadow-sm border border-white/10 flex items-center justify-center bg-black/20 shrink-0"
@@ -176,23 +216,18 @@ const UnifiedDropdown = ({ label, value, options, onChange, icon: Icon, placehol
     );
 };
 
-// --- VISUAL PREVIEW BOX ---
 const VisualPreviewBox = ({ type, value }: { type: 'lighting' | 'mood' | 'fabric', value: string }) => {
     let backgroundStyle = {};
     let icon = null;
-    let label = "Preview";
 
     if (type === 'lighting') {
         backgroundStyle = { background: LIGHTING_META[value] || '#000' };
-        label = "Light Temp";
         icon = <Sun size={12} className="text-white drop-shadow-md"/>;
     } else if (type === 'mood') {
         backgroundStyle = { backgroundColor: MOOD_META[value] || '#000' };
-        label = "Atmosphere";
         icon = <Sparkles size={12} className="text-white drop-shadow-md"/>;
     } else if (type === 'fabric') {
          backgroundStyle = { background: FABRIC_META[value] || '#111' };
-         label = "Texture";
          icon = <Layers size={12} className="text-white drop-shadow-md"/>;
     }
 
@@ -209,7 +244,6 @@ const VisualPreviewBox = ({ type, value }: { type: 'lighting' | 'mood' | 'fabric
         </div>
     );
 };
-
 
 const WardrobePanel = ({ character, settings, setSettings, color }: any) => {
     const update = (field: string, val: string) => {
@@ -270,7 +304,6 @@ const WardrobePanel = ({ character, settings, setSettings, color }: any) => {
                 icon={Scan}
             />
 
-            {/* Granular Detail Section - Ensure Z-Index allows dropdowns above to overflow */}
             <div className="p-6 bg-[#121212] border border-white/5 rounded-sm mt-6 relative z-0">
                 <div className="flex justify-between items-center mb-4">
                     <h4 className={`text-[10px] font-bold uppercase tracking-widest ${color} opacity-80 flex items-center gap-2`}>
@@ -298,7 +331,6 @@ const WardrobePanel = ({ character, settings, setSettings, color }: any) => {
                                 icon={Layers}
                             />
                         </div>
-                        {/* Fabric Preview */}
                         <VisualPreviewBox type="fabric" value={settings.fabric} />
                     </div>
 
@@ -315,7 +347,33 @@ const WardrobePanel = ({ character, settings, setSettings, color }: any) => {
     );
 };
 
-// --- LOADING COMPONENT ---
+const AtmosphericOverlay = ({ weather }: { weather: string }) => {
+    if (!weather) return null;
+    
+    if (weather.includes("Rain")) {
+        return (
+            <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden opacity-40">
+                <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,rgba(255,255,255,0.4)_10%,transparent_20%)] w-full h-full animate-[rain_0.5s_linear_infinite] bg-[length:100%_200px]"></div>
+                <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,rgba(255,255,255,0.2)_5%,transparent_10%)] w-full h-full animate-[rain_0.7s_linear_infinite] bg-[length:100%_150px] ml-10"></div>
+            </div>
+        );
+    }
+    if (weather.includes("Storm")) {
+        return (
+            <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden mix-blend-overlay">
+                <div className="absolute inset-0 bg-black/30 animate-pulse"></div>
+            </div>
+        );
+    }
+    if (weather.includes("Fog") || weather.includes("Hazy")) {
+        return (
+            <div className="absolute inset-0 pointer-events-none z-20 bg-white/10 backdrop-blur-[1px]">
+                <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent"></div>
+            </div>
+        );
+    }
+    return null;
+};
 
 const TerminalLoader = () => {
     const [log, setLog] = useState<string[]>([]);
@@ -373,7 +431,6 @@ const TerminalLoader = () => {
 // --- MAIN COMPONENT ---
 
 const YourDesiredMoment: React.FC = () => {
-    // Helper to safely get initial outfit
     const getInitialOutfit = (char: string) => {
         try { return WARDROBE_DB["India"]["Traditional (Grand)"][char][0]; } catch (e) { return "Standard Attire"; }
     };
@@ -403,28 +460,30 @@ const YourDesiredMoment: React.FC = () => {
     const [lighting, setLighting] = useState(LIGHTING_OPTIONS[0]);
     const [camera, setCamera] = useState(CAMERA_ANGLES[0]);
 
-    const [aspectRatio, setAspectRatio] = useState(ASPECT_RATIOS[1]); // Default 3:4 for cinematic cover
+    const [aspectRatio, setAspectRatio] = useState(ASPECT_RATIOS[1]);
     const [style, setStyle] = useState(IMAGE_STYLES[0]);
     const [customDetails, setCustomDetails] = useState("");
-    const [showWatermark, setShowWatermark] = useState(true);
 
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [generationError, setGenerationError] = useState("");
     const [history, setHistory] = useState<GeneratedImage[]>([]);
+    const [isLightboxOpen, setIsLightboxOpen] = useState(false);
     const outputRef = useRef<HTMLDivElement>(null);
+    const visualizerBtnRef = useRef<HTMLButtonElement>(null);
+    
+    const [showAllPresets, setShowAllPresets] = useState(false);
+    const [activePresetId, setActivePresetId] = useState<string | null>(null);
 
-    // Initialize position when DB loads
-    useEffect(() => {
-        if (POSITIONS_DB[activePoseTab] && !POSITIONS_DB[activePoseTab].includes(position)) {
-             setPosition(POSITIONS_DB[activePoseTab][0]);
-        }
-    }, [activePoseTab]);
-
-    // Load History
     useEffect(() => {
         const savedHistory = localStorage.getItem('jasmine_knot_gallery');
         if (savedHistory) {
-            try { setHistory(JSON.parse(savedHistory)); } catch (e) { console.error("Failed to parse history", e); }
+            try { 
+                const parsed = JSON.parse(savedHistory);
+                if (Array.isArray(parsed)) {
+                    setHistory(parsed as GeneratedImage[]);
+                }
+            } catch (e) { console.error("Failed to parse history", e); }
         }
     }, []);
 
@@ -434,8 +493,8 @@ const YourDesiredMoment: React.FC = () => {
 
     const handleGenerate = async () => {
         setIsLoading(true);
+        setGenerationError("");
 
-        // Scroll to output immediately
         setTimeout(() => {
              outputRef.current?.scrollIntoView({ behavior: 'smooth' });
         }, 100);
@@ -479,11 +538,64 @@ const YourDesiredMoment: React.FC = () => {
                 character: selectedCharacter,
                 mood: mood,
                 touchPoint: touchLabel,
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                config: {
+                    vijayWardrobe, meenaWardrobe, setting, position, poseIntensity,
+                    mood, lighting, camera, style, time, weather,
+                    selectedCharacter, selectedTouchPoint, activePoseTab
+                }
             };
             setHistory(prev => [newItem, ...prev]);
+        } else {
+            setGenerationError("Failed to develop image. Please try again.");
         }
         setIsLoading(false);
+    };
+
+    const handleLoadConfig = (config: any) => {
+        if (!config) return;
+        setVijayWardrobe(config.vijayWardrobe);
+        setMeenaWardrobe(config.meenaWardrobe);
+        setSetting(config.setting);
+        setPosition(config.position);
+        setPoseIntensity(config.poseIntensity);
+        setMood(config.mood);
+        setLighting(config.lighting);
+        setCamera(config.camera);
+        setStyle(config.style);
+        setTime(config.time);
+        setWeather(config.weather);
+        setSelectedCharacter(config.selectedCharacter);
+        setSelectedTouchPoint(config.selectedTouchPoint);
+        setActivePoseTab(config.activePoseTab);
+        
+        setActivePresetId(null); 
+        
+        const editor = document.getElementById('visualizer');
+        editor?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const handleApplyPreset = (preset: any) => {
+        const c = preset.config;
+        setSetting(c.setting);
+        setMood(c.mood);
+        setTime(c.time);
+        setWeather(c.weather);
+        setActivePoseTab(c.poseCat);
+        setPosition(c.position);
+        setPoseIntensity(c.intensity);
+        setLighting(c.lighting);
+        setStyle(c.style);
+        setVijayWardrobe(prev => ({ ...prev, outfit: c.vijay.outfit, color: c.vijay.color, style: c.vijay.style }));
+        setMeenaWardrobe(prev => ({ ...prev, outfit: c.meena.outfit, color: c.meena.color, style: c.meena.style }));
+        setSelectedCharacter(c.char);
+        setSelectedTouchPoint(c.touch);
+        
+        setActivePresetId(preset.id);
+        
+        if (visualizerBtnRef.current) {
+            visualizerBtnRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     };
 
     const handleSurprise = () => {
@@ -507,6 +619,8 @@ const YourDesiredMoment: React.FC = () => {
 
         setLighting(LIGHTING_OPTIONS[Math.floor(Math.random() * LIGHTING_OPTIONS.length)]);
         setCamera(CAMERA_ANGLES[Math.floor(Math.random() * CAMERA_ANGLES.length)]);
+        
+        setActivePresetId(null); 
     };
 
     const handleDownload = (url: string, filename: string) => {
@@ -536,8 +650,6 @@ const YourDesiredMoment: React.FC = () => {
         setSelectedTouchPoint(selectedTouchPoint === id ? "" : id);
     };
 
-    // --- SUB-UI ELEMENTS ---
-    
     const StepNav = () => (
         <div className="flex border-b border-white/5 bg-[#0A0A0A]">
             {[
@@ -560,28 +672,99 @@ const YourDesiredMoment: React.FC = () => {
 
     return (
         <div id="visualizer" className="py-32 px-4 md:px-8 bg-[#050505] relative min-h-screen font-body border-b border-white/5">
+            <style dangerouslySetInnerHTML={{__html: `
+                @keyframes rain {
+                    0% { background-position: 0 0; }
+                    100% { background-position: 0 100%; }
+                }
+            `}} />
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(37,150,190,0.15),transparent_70%)] pointer-events-none"></div>
             
-            <div className="max-w-[1800px] mx-auto relative z-10 flex flex-col gap-12">
-                 <div className="text-center">
+            <div className="max-w-[1800px] mx-auto relative z-10 flex flex-col gap-8">
+                 <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-2 px-6 py-2 bg-white/5 border border-white/10 rounded-full text-slate-300 text-xs tracking-[0.3em] uppercase mb-8 font-bold shadow-sm backdrop-blur-md">
                         <Clapperboard size={14} className="text-primary" /> <span>Director's Studio</span>
                     </div>
                     <h2 className="font-display text-5xl md:text-7xl lg:text-8xl text-white mb-6 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">Your Desired Moment</h2>
-                    <p className="text-slate-400 font-light max-w-3xl mx-auto text-xl leading-relaxed mb-8">
-                        Orchestrate the chemistry. Design every detail of Vijay and Meena's intimacy in our high-fidelity visual studio.
+                    <p className="text-slate-400 font-light max-w-3xl mx-auto text-xl leading-relaxed mb-12">
+                        Orchestrate the chemistry. Design every detail of Vijay and Meena's intimacy.
                     </p>
                     
-                    {/* Randomize Only */}
-                    <div className="flex justify-center mb-8">
-                        <button onClick={handleSurprise} className="px-6 py-3 text-primary hover:text-white text-[10px] uppercase font-bold tracking-wider flex items-center gap-2 transition-colors border border-white/5 hover:border-white/10 rounded-sm bg-white/5 hover:bg-white/10">
-                             <Shuffle size={12} /> Randomize Configuration
+                    {/* --- TOP CONTROL HUB --- */}
+                    <div className="flex flex-col items-center gap-8 w-full max-w-6xl mx-auto">
+                        
+                        {/* Row 1: Scene Selection Grid */}
+                        <div className="w-full max-w-[1400px] mx-auto mb-4 animate-fade-in-up">
+                            <div className="flex items-center justify-between mb-4 px-1">
+                                <div className="flex items-center gap-2 text-slate-500">
+                                    <Film size={14} className="text-primary" />
+                                    <span className="text-[10px] uppercase tracking-[0.25em] font-bold">Scene Presets ({SCENE_PRESETS.length})</span>
+                                </div>
+                            </div>
+
+                            <div className="bg-[#0A0A0A] p-6 rounded-sm border border-white/10">
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 transition-all duration-500">
+                                    {SCENE_PRESETS.slice(0, showAllPresets ? undefined : 10).map(preset => (
+                                        <PresetCard 
+                                            key={preset.id} 
+                                            preset={preset} 
+                                            isActive={activePresetId === preset.id}
+                                            onClick={() => handleApplyPreset(preset)} 
+                                        />
+                                    ))}
+                                </div>
+                                
+                                <div className="mt-8 flex flex-col md:flex-row items-center justify-center gap-4">
+                                     <button 
+                                        onClick={() => setShowAllPresets(!showAllPresets)}
+                                        className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-all flex items-center gap-2"
+                                    >
+                                        {showAllPresets ? (
+                                            <>Show Less <ChevronUp size={14} /></>
+                                        ) : (
+                                            <>View All {SCENE_PRESETS.length} Scenes <ChevronDown size={14} /></>
+                                        )}
+                                    </button>
+                                    
+                                    <button 
+                                        onClick={handleSurprise} 
+                                        className="px-6 py-3 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/30 hover:border-primary text-primary hover:text-white rounded-full text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 shadow-sm hover:shadow-glow"
+                                    >
+                                        <Shuffle size={14} /> Randomize
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Row 2: Primary Visualize Button */}
+                        <button 
+                            ref={visualizerBtnRef}
+                            onClick={handleGenerate} 
+                            disabled={isLoading} 
+                            className="group relative px-20 py-5 bg-white text-black hover:bg-slate-200 rounded-sm font-bold uppercase text-sm tracking-[0.3em] transition-all flex items-center justify-center gap-4 shadow-[0_0_50px_rgba(255,255,255,0.3)] disabled:opacity-70 disabled:cursor-wait hover:-translate-y-1 hover:scale-105 overflow-hidden w-full max-w-md"
+                        >
+                            {isLoading ? (
+                                <><Loader2 className="animate-spin" size={20} /> DEVELOPING SCENE...</>
+                            ) : (
+                                <>
+                                    <Sparkles size={20} className="group-hover:rotate-12 transition-transform"/> VISUALIZE SCENE
+                                    <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
+                                </>
+                            )}
                         </button>
+
+                        {/* Row 3: Live Script Preview */}
+                        <div className="w-full max-w-4xl bg-[#080808]/80 border border-white/10 py-3 px-6 font-mono text-xs text-slate-400 flex items-center gap-4 justify-center backdrop-blur-md rounded-sm">
+                            <Terminal size={12} className="text-primary" />
+                            <span className="truncate">
+                                <span className="text-primary font-bold">SCENE:</span> {selectedCharacter} wearing <span className="text-slate-200">{selectedCharacter === "Vijay" ? vijayWardrobe.outfit : meenaWardrobe.outfit}</span> in <span className="text-slate-200">{setting}</span>. <span className="text-primary font-bold">ACTION:</span> {position} ({poseIntensity}). <span className="text-primary font-bold">ATMOSPHERE:</span> {mood}, {time}.
+                            </span>
+                        </div>
                     </div>
                 </div>
 
                 {/* --- STUDIO CONTROLS (WIZARD) --- */}
-                <div className="bg-[#0c0c0c] border border-white/5 rounded-lg shadow-2xl relative min-h-[600px] flex flex-col max-w-[1600px] mx-auto w-full">
+                <div className="bg-[#0c0c0c] border border-white/5 rounded-lg shadow-2xl relative min-h-[500px] flex flex-col max-w-[1600px] mx-auto w-full">
                     <StepNav />
 
                     <div className="p-8 md:p-12 flex-1 relative">
@@ -595,7 +778,6 @@ const YourDesiredMoment: React.FC = () => {
                                     exit={{ opacity: 0, x: -20 }}
                                     className="grid xl:grid-cols-2 gap-16"
                                 >
-                                     {/* Left: Focal Point */}
                                      <div className="space-y-8">
                                         <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2 border-b border-white/5 pb-2">
                                             <Focus size={14} /> Subject Focus
@@ -614,8 +796,6 @@ const YourDesiredMoment: React.FC = () => {
                                                     </button>
                                                 )}
                                             </div>
-                                            
-                                            {/* Scrollable List for Touch Points */}
                                             <div className="bg-[#121212] border border-white/5 rounded-sm max-h-[450px] overflow-y-auto custom-scrollbar shadow-inner">
                                                 {Object.entries(TOUCH_POINT_CATEGORIES).map(([catKey, catLabel]) => {
                                                     const points = TOUCH_POINTS_DATA[selectedCharacter].filter(p => p.category === catKey);
@@ -643,7 +823,6 @@ const YourDesiredMoment: React.FC = () => {
                                         </div>
                                      </div>
 
-                                     {/* Right: Wardrobe */}
                                      <div className="space-y-8 relative z-10">
                                         <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2 border-b border-white/5 pb-2">
                                             <Crown size={14} /> Wardrobe Department
@@ -679,12 +858,10 @@ const YourDesiredMoment: React.FC = () => {
                                     exit={{ opacity: 0, x: -20 }}
                                     className="grid lg:grid-cols-12 gap-16"
                                 >
-                                     {/* Left Column: Posture */}
                                      <div className="lg:col-span-6 space-y-8 relative z-10">
                                         <label className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] block flex items-center gap-2 border-b border-white/5 pb-2">
                                             <Move size={12}/> Intimate Position
                                         </label>
-                                        {/* Category Tabs */}
                                         <div className="flex flex-wrap gap-2 bg-[#151515] p-2 rounded-sm border border-white/5 mb-4">
                                             {Object.keys(POSITIONS_DB).map(cat => (
                                                 <button 
@@ -696,8 +873,6 @@ const YourDesiredMoment: React.FC = () => {
                                                 </button>
                                             ))}
                                         </div>
-                                        
-                                        {/* Visual Grid for Poses (Replaces simple dropdown) */}
                                         <div className="grid grid-cols-2 gap-4 max-h-[400px] overflow-y-auto custom-scrollbar p-1">
                                             {POSITIONS_DB[activePoseTab].map(pose => (
                                                 <VisualCard 
@@ -709,17 +884,13 @@ const YourDesiredMoment: React.FC = () => {
                                                 />
                                             ))}
                                         </div>
-
                                         <UnifiedDropdown label="Pose Intensity" value={poseIntensity} options={POSE_INTENSITIES} onChange={setPoseIntensity} icon={Signal} />
                                     </div>
 
-                                    {/* Right Column: Setting & Mood */}
                                     <div className="lg:col-span-6 space-y-8 relative z-0">
                                         <label className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] block flex items-center gap-2 border-b border-white/5 pb-2">
                                             <LayoutTemplate size={12}/> Environment
                                         </label>
-                                        
-                                        {/* Visual Mood Selector */}
                                         <div>
                                             <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 block">Atmosphere & Mood</label>
                                             <div className="grid grid-cols-3 gap-3">
@@ -734,7 +905,6 @@ const YourDesiredMoment: React.FC = () => {
                                                         metaStyle={{ backgroundColor: MOOD_META[m] }}
                                                     />
                                                 ))}
-                                                {/* Fallback for others */}
                                                 <div className="col-span-3">
                                                     <UnifiedDropdown 
                                                         value={mood} 
@@ -756,7 +926,6 @@ const YourDesiredMoment: React.FC = () => {
                                                  icon={MapPin} 
                                                  getMeta={(val: string) => ({ preview: SCENE_META[val]?.icon, subtitle: SCENE_META[val]?.desc })}
                                              />
-                                             
                                              <div className="space-y-4">
                                                  <UnifiedDropdown 
                                                      label="Lighting" 
@@ -766,7 +935,6 @@ const YourDesiredMoment: React.FC = () => {
                                                      icon={Sun} 
                                                      getMeta={(val: string) => ({ preview: '', previewStyle: { background: LIGHTING_META[val] } })}
                                                  />
-                                                 {/* Live Lighting Preview */}
                                                  <VisualPreviewBox type="lighting" value={lighting} />
                                              </div>
                                         </div>
@@ -788,7 +956,6 @@ const YourDesiredMoment: React.FC = () => {
                                     exit={{ opacity: 0, x: -20 }}
                                     className="grid lg:grid-cols-3 gap-12"
                                 >
-                                    {/* Visual Style Selector */}
                                     <div className="space-y-6 relative z-10">
                                         <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2 border-b border-white/5 pb-2"><Palette size={14}/> Visual Style</h4>
                                         <div className="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto custom-scrollbar p-1">
@@ -807,10 +974,7 @@ const YourDesiredMoment: React.FC = () => {
                                     
                                     <div className="space-y-8 relative z-0">
                                         <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2 border-b border-white/5 pb-2"><Camera size={14}/> Camera Work</h4>
-                                        
                                         <UnifiedDropdown label="Camera Shot" value={camera} options={CAMERA_ANGLES} onChange={setCamera} icon={Video} />
-                                        
-                                        {/* Visual Aspect Ratio */}
                                         <div>
                                             <label className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-3 block flex items-center gap-2"><Scan size={12} /> Aspect Ratio</label>
                                             <div className="flex flex-wrap gap-4">
@@ -825,18 +989,6 @@ const YourDesiredMoment: React.FC = () => {
                                                     </button>
                                                 ))}
                                             </div>
-                                        </div>
-                                        <div className="flex items-center gap-3 p-4 bg-[#151515] border border-white/5 rounded-sm">
-                                            <input 
-                                                type="checkbox" 
-                                                id="watermark-toggle"
-                                                checked={showWatermark}
-                                                onChange={(e) => setShowWatermark(e.target.checked)}
-                                                className="w-4 h-4 bg-black border border-white/20 rounded accent-primary cursor-pointer"
-                                            />
-                                            <label htmlFor="watermark-toggle" className="text-xs text-slate-300 font-bold uppercase tracking-wider cursor-pointer select-none flex items-center gap-2">
-                                                <Type size={12} /> Show Title Watermark
-                                            </label>
                                         </div>
                                     </div>
                                     
@@ -854,47 +1006,26 @@ const YourDesiredMoment: React.FC = () => {
                         </AnimatePresence>
                     </div>
 
-                    {/* STICKY FOOTER / ACTION BAR - Adjusted Z-Index to prevent covering open dropdowns */}
-                    <div className="bg-[#080808] border-t border-white/10 p-6 flex flex-col md:flex-row items-center justify-between gap-6 sticky bottom-0 z-40">
-                        <div className="hidden md:flex flex-col gap-1 text-xs text-slate-500 font-mono">
-                            <div><span className="text-primary uppercase tracking-widest font-bold">Config:</span> {activePoseTab} • {mood}</div>
-                            <div><span className="text-primary uppercase tracking-widest font-bold">Focus:</span> {selectedCharacter} {selectedTouchPoint ? `• ${selectedTouchPoint}` : ''}</div>
-                        </div>
+                    {/* Secondary Action Bar */}
+                    <div className="bg-[#080808] border-t border-white/10 p-6 flex items-center justify-between sticky bottom-0 z-40">
+                        <button onClick={() => setActiveTab(prev => prev === "cinematography" ? "choreography" : "casting")} className={`px-6 py-3 border border-white/10 hover:bg-white/5 text-slate-400 rounded-sm font-bold uppercase text-xs tracking-widest ${activeTab === 'casting' ? 'invisible' : ''}`}>
+                            Back
+                        </button>
                         
-                        <div className="flex items-center gap-4 w-full md:w-auto">
-                            {activeTab !== "casting" && (
-                                <button onClick={() => setActiveTab(prev => prev === "cinematography" ? "choreography" : "casting")} className="px-6 py-4 border border-white/10 hover:bg-white/5 text-slate-400 rounded-sm font-bold uppercase text-xs tracking-widest">Back</button>
-                            )}
-                            
-                            {activeTab !== "cinematography" ? (
-                                <button onClick={() => setActiveTab(prev => prev === "casting" ? "choreography" : "cinematography")} className="flex-1 md:flex-none px-10 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-sm font-bold uppercase text-xs tracking-widest flex items-center justify-center gap-2">
-                                    Next Step <ChevronRight size={14} />
-                                </button>
-                            ) : (
-                                <button 
-                                    onClick={handleGenerate} 
-                                    disabled={isLoading} 
-                                    className="flex-1 md:flex-none group relative px-16 py-4 bg-white text-black hover:bg-slate-200 rounded-sm font-bold uppercase text-sm tracking-[0.3em] transition-all flex items-center justify-center gap-4 shadow-[0_0_40px_rgba(255,255,255,0.2)] disabled:opacity-70 disabled:cursor-wait hover:-translate-y-1 hover:scale-105 overflow-hidden"
-                                >
-                                    {isLoading ? (
-                                        <><Loader2 className="animate-spin" size={20} /> DEVELOPING...</>
-                                    ) : (
-                                        <>
-                                            <Sparkles size={20} className="group-hover:rotate-12 transition-transform"/> VISUALIZE SCENE
-                                            <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
-                                        </>
-                                    )}
-                                </button>
-                            )}
-                        </div>
+                        {activeTab !== "cinematography" ? (
+                            <button onClick={() => setActiveTab(prev => prev === "casting" ? "choreography" : "cinematography")} className="px-8 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-sm font-bold uppercase text-xs tracking-widest flex items-center justify-center gap-2">
+                                Next Step <ChevronRight size={14} />
+                            </button>
+                        ) : (
+                            <span className="text-xs text-slate-500 italic">Ready to Visualize</span>
+                        )}
                     </div>
                 </div>
 
-                {/* --- OUTPUT THEATER (THE STAGE) --- */}
+                {/* --- OUTPUT THEATER --- */}
                 <div ref={outputRef} className="scroll-mt-32 relative z-0">
                      <div className="bg-[#080808] border-t-8 border-b-8 border-x-[1px] border-x-white/5 border-y-black shadow-[0_0_100px_rgba(0,0,0,1)] rounded-sm p-4 md:p-12 flex items-center justify-center min-h-[600px] md:min-h-[800px] relative overflow-hidden group">
                          
-                         {/* Cinema Screen Glow */}
                          <div className="absolute inset-0 shadow-[inset_0_0_150px_rgba(0,0,0,0.9)] z-10 pointer-events-none"></div>
                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent blur-md"></div>
 
@@ -902,16 +1033,19 @@ const YourDesiredMoment: React.FC = () => {
 
                         {generatedImage ? (
                             <div className="relative w-full h-full flex flex-col items-center justify-center animate-fade-in group/image z-0">
-                                <div className="relative bg-black shadow-2xl">
-                                    <img src={generatedImage} alt="Generated Moment" className="max-h-[85vh] w-auto object-contain shadow-[0_0_50px_rgba(0,0,0,0.8)]" />
-                                    {/* Watermark */}
-                                    {showWatermark && (
-                                        <div className="absolute bottom-6 right-6 opacity-60 text-[10px] uppercase tracking-[0.3em] text-white/70 font-bold drop-shadow-lg pointer-events-none font-display">The Jasmine Knot</div>
-                                    )}
+                                <div className="relative shadow-2xl group/overlay cursor-zoom-in" onClick={() => setIsLightboxOpen(true)}>
+                                    <img src={generatedImage} alt="Generated Moment" className="max-h-[75vh] w-auto object-contain shadow-black/50" />
+                                    <AtmosphericOverlay weather={weather} />
+                                    
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover/overlay:opacity-100 transition-opacity duration-300 pointer-events-none">
+                                        <div className="bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full text-white text-xs uppercase tracking-widest font-bold flex items-center gap-2">
+                                            <Maximize2 size={14} /> Expand
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <div className="absolute bottom-10 right-10 flex gap-4 opacity-0 group-hover/image:opacity-100 transition-opacity duration-500 z-30">
-                                    <button onClick={() => handleDownload(generatedImage!, `JasmineKnot-${selectedCharacter}-${Date.now()}.png`)} className="p-4 bg-black/80 backdrop-blur-md border border-white/20 rounded-full text-white hover:bg-primary hover:border-primary transition-all shadow-lg hover:scale-110 group/btn" title="Download">
+                                    <button onClick={() => handleDownload(generatedImage!, `JasmineKnot-Scene-${Date.now()}.png`)} className="p-4 bg-black/80 backdrop-blur-md border border-white/20 rounded-full text-white hover:bg-primary hover:border-primary transition-all shadow-lg hover:scale-110 group/btn" title="Download">
                                         <Download size={24} className="group-hover/btn:animate-bounce" />
                                     </button>
                                     <button onClick={() => { const currentItem = history.find(item => item.url === generatedImage); if (currentItem) deleteHistoryItem(currentItem.id); }} className="p-4 bg-black/80 backdrop-blur-md border border-white/20 rounded-full text-white hover:bg-red-600 hover:border-red-600 transition-all shadow-lg hover:scale-110" title="Delete">
@@ -922,11 +1056,21 @@ const YourDesiredMoment: React.FC = () => {
                         ) : (
                             !isLoading && (
                                 <div className="flex flex-col items-center justify-center text-slate-700 gap-8 opacity-40 z-0">
-                                    <div className="w-40 h-40 border border-white/5 flex items-center justify-center bg-black/40 rotate-3 rounded-sm"><ImageIcon size={64} strokeWidth={0.5} /></div>
-                                    <div className="text-center">
-                                        <p className="font-display text-4xl tracking-widest text-slate-600 mb-4">Screen Empty</p>
-                                        <p className="text-sm font-light uppercase tracking-[0.3em]">Awaiting Director's Input</p>
-                                    </div>
+                                    {generationError ? (
+                                        <div className="flex flex-col items-center gap-4 animate-fade-in">
+                                            <AlertCircle size={64} className="text-red-500/50" strokeWidth={1} />
+                                            <p className="text-red-400 font-mono text-xs uppercase tracking-widest">{generationError}</p>
+                                            <button onClick={handleGenerate} className="text-[10px] uppercase underline text-slate-500 hover:text-white">Retry Visualization</button>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="w-40 h-40 border border-white/5 flex items-center justify-center bg-black/40 rotate-3 rounded-sm"><ImageIcon size={64} strokeWidth={0.5} /></div>
+                                            <div className="text-center">
+                                                <p className="font-display text-4xl tracking-widest text-slate-600 mb-4">Screen Empty</p>
+                                                <p className="text-sm font-light uppercase tracking-[0.3em]">Awaiting Director's Input</p>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             )
                         )}
@@ -949,6 +1093,16 @@ const YourDesiredMoment: React.FC = () => {
                                     <div key={item.id} className="relative group shrink-0 w-40 flex flex-col gap-2">
                                         <div className={`w-40 h-40 bg-black rounded-sm overflow-hidden border-2 cursor-pointer transition-all duration-300 ${generatedImage === item.url ? 'border-primary shadow-[0_0_20px_rgba(37,150,190,0.4)] scale-105' : 'border-white/10 hover:border-white/50 opacity-70 hover:opacity-100'}`} onClick={() => setGeneratedImage(item.url)}>
                                             <img src={item.url} alt="History thumbnail" className="w-full h-full object-cover" />
+                                            {item.config && (
+                                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                    <button 
+                                                        onClick={(e) => { e.stopPropagation(); handleLoadConfig(item.config); }}
+                                                        className="bg-primary text-white text-[10px] uppercase font-bold px-3 py-2 rounded-sm shadow-lg hover:scale-105 transition-transform flex items-center gap-1"
+                                                    >
+                                                        <Repeat size={12} /> Remix
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
                                         <span className="text-[9px] uppercase tracking-wider text-center text-slate-600 truncate">{item.mood}</span>
                                     </div>
@@ -958,6 +1112,29 @@ const YourDesiredMoment: React.FC = () => {
                     )}
                 </div>
             </div>
+
+            {/* LIGHTBOX MODAL */}
+            <AnimatePresence>
+                {isLightboxOpen && generatedImage && (
+                    <motion.div 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[10000] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-8"
+                        onClick={() => setIsLightboxOpen(false)}
+                    >
+                        <button className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors z-50">
+                            <X size={24} />
+                        </button>
+                        <img 
+                            src={generatedImage} 
+                            alt="Full Screen Moment" 
+                            className="max-w-full max-h-full object-contain shadow-[0_0_100px_rgba(0,0,0,0.8)] rounded-sm" 
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

@@ -12,9 +12,10 @@ const SectionLoader = () => (
 interface LazyLoadProps {
   children: React.ReactNode;
   delay?: number;
+  id?: string;
 }
 
-const LazyLoad: React.FC<LazyLoadProps> = ({ children, delay = 0 }) => {
+const LazyLoad: React.FC<LazyLoadProps> = ({ children, delay = 0, id }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -40,7 +41,7 @@ const LazyLoad: React.FC<LazyLoadProps> = ({ children, delay = 0 }) => {
   }, []);
 
   return (
-    <div ref={ref} className="min-h-[100px] w-full relative">
+    <div id={id} ref={ref} className="min-h-[100px] w-full relative">
       {isVisible ? (
         <motion.div
             initial={{ opacity: 0, y: 60, filter: 'blur(10px)' }}

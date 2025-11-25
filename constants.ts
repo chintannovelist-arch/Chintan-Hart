@@ -22,6 +22,7 @@ export const BOOKS: Book[] = [
     ],
     amazonLink: "https://amzn.in/d/b4xx7hF",
     sampleLink: "#",
+    kindleUnlimitedLink: "https://www.amazon.in/kindle-dbs/hz/subscribe/ku?passThroughAsin=B0G3HND3FQ",
     status: "Available Now",
     tags: ["Arranged Marriage", "Slow Burn", "Chennai Romance", "Intimacy"]
   }
@@ -82,8 +83,8 @@ export const SCENARIOS: Record<string, Scenario[]> = {
 // --- NEW EXPORTS ---
 
 export const BOOK_SAMPLE = {
-    title: "Chapter 1: The Arrangement",
-    content: "The fan whirred overhead, a rhythmic slicing of the humid Chennai air that did little to cool the sweat prickling at Meena's hairline. She sat on the edge of the bed, the heavy silk of her wedding saree pooling around her like a crimson tide. The door clicked shut. \n\nVijay stood there. He looked different without the garland, without the crowd, without the noise of the nadaswaram filling the space between them. He looked... real. \n\n'I can sleep on the floor,' he said, his voice rough, uncertain. \n\nMeena looked up, meeting his eyes for the first time since the ceremony. They were dark, unreadable, but not unkind. 'No,' she whispered, surprising herself. 'The bed is big enough.' \n\nHe hesitated, then nodded, moving to the other side. He placed a pillow between them—a white, fluffy barrier. 'Friends first?' he asked, a ghost of a smile touching his lips. \n\n'Friends first,' she agreed, though as she lay down, listening to the steady rhythm of his breathing, she knew that friendship was a dangerous place to start when your heart was already racing."
+    title: "The Jasmine Knot: Exclusive Preview",
+    content: `Chapter 1: The Scent of Jasmine\nThe noise had been relentless. It was a physical assault that had lasted for what felt like a lifetime rather than just two days. Meena felt as though she had been living inside the hollow belly of a giant drum. The deafening, rhythmic thumping of the thavil had become her heartbeat, replacing her own pulse with a frantic, heavy bass. The piercing, high-pitched shrill of the nadaswaram seemed to vibrate right through the marrow of her bones, leaving a low-level buzz in her ears that simply wouldn't go away.\nIt was a typical, grand Vellore wedding magnificent, chaotic, and utterly exhausting. Thousands of faces she barely recognized had flashed before her like a kaleidoscope on fast-forward. It was a blur of heavy Kanjeevaram silk sarees in blinding shades of parrot green and chili red, the glitter of antique temple jewelry that weighed down earlobes and necks, and the weight of curious, assessing eyes judging the new bride.\nIs she fair enough? Is she tall enough? Does she smile enough?\nThe blinding white flashes of the professional cameras had left permanent purple spots dancing in her peripheral vision. Her cheeks actually ached, a dull muscular throb from hours of forced, demure smiling at distant relatives who grabbed her hand too hard and pinched her cheeks with aggressive affection.\nBut now, that cacophony was finally fading into the distance. The guests were dispersing, the dining hall was being cleared, and the cars were driving away. The noise was being replaced by something far more terrifying, far heavier: silence.\nMeena stood alone in the long, dimly lit corridor of her ancestral home in Vellore. The heavy teak door of the nuptial chamber loomed in front of her, dark and imposing, like the entrance to a different world. Behind her, down the winding hallway, she could still hear the faint, muffled chatter of close relatives dissecting the feast arguing about whether the sambhar had enough salt or if the payasam was too sweet but here, in this shadow, she was isolated.\nHer heart hammered against her ribs like a frantic bird trapped in a cage, desperate for flight but finding no escape. She looked down at her hands; they were trembling uncontrollably. The intricate henna patterns, dark and rusty red on her skin, seemed to mock her nervousness with their beauty. She was twenty-six, a grown woman, an Assistant Professor who lectured classrooms full of unruly college students with effortless confidence. She could debate literature and politics without blinking. Yet, standing before this wooden door, clutching a tray of cut fruits and sweets she didn't want, she felt like a terrified child being sent to the principal's office for a crime she didn't commit.\n"Just breathe, Meena," she whispered to herself, her voice sounding thin and reedy in the quiet hallway. "It’s just Vijay. It’s just a room. It’s just... marriage."\nThat was the problem. She barely knew him. He was the "good match" her parents had found a Senior Data Analyst, well-settled, from a decent, respectable family. On paper, he was perfect. A horoscope match made in heaven. In reality, he was a stranger she was expected to sleep next to for the rest of her life, starting tonight. They had spoken twice over the phone stilted, polite conversations about hobbies and career goals and met once in a coffee shop with their parents hovering three tables away like hawk-eyed chaperones.\nShe reached out, her fingers brushing the cool, polished wood of the door. It felt solid, unyielding. Taking a deep, shuddering breath that filled her lungs with the scent of incense and fear, she pushed it open.\nThe air inside hit her like a physical wall heavy, humid, and cloying. It wasn't just the lack of ventilation in the old house; the room was drowning in the scent of flowers. It was suffocating. The four-poster bed, a massive heirloom piece of dark rosewood that dominated the room, was draped in thick, suffocating layers of jasmine and tuberose strings. They hung from the posts, lay across the pillows, and festooned the headboard. The scent was narcotic, sweet to the point of dizziness, a thick perfume that coated the back of her throat. It was the smell of a First Night unmistakable, overwhelming, and screaming of expectation.\nMeena stepped inside and softly closed the door behind her. The click of the latch sounded like a gunshot in the silence, sealing her fate.\nVijay was there.\nHe was sitting on the edge of the mattress, bathed in the warm, golden glow of a single bedside night lamp. The rest of the room was steeped in shadow, making the bed feel like a lit stage where a play she hadn't rehearsed for was about to begin. He had discarded the heavy, formal wedding turban that had made him look like a prince, and his dark hair was slightly messed up, as if he had run his fingers through it in frustration or sheer exhaustion.\nHe didn't look up immediately. Meena took a moment to just look at him really look at him without the buffer of a hundred guests and the noise of the wedding hall between them.\nHe was... substantial. That was the first word that came to her mind. In the matrimonial photos, he had looked fit, average. But in the flesh, sitting just a few feet away in the intimacy of a bedroom, the sheer visual impact of his masculinity hit her hard. He took up space. His silk shirt was unbuttoned at the top, the first two buttons undone to reveal the dark hollow of his throat and a hint of chest hair. His sleeves were rolled up to his elbows, exposing forearms that were veined and tensed, the muscles shifting under his skin as he leaned forward, resting his elbows on his knees.\nHe looked powerful, yes, but he also looked tired. There was a heaviness in the slope of his broad shoulders that mirrored her own exhaustion.\nSuddenly, he lifted his head. His eyes found hers.\nMeena’s breath hitched in her throat. His eyes were dark, intense, and completely unreadable. They weren't the polite, smiling eyes he had worn for the guests on the stage or the respectful gaze he offered her father. These were raw, stripped of social pretense. He looked at her, sweeping his gaze slowly from the hem of her heavy red Kanjeevaram saree, up over her waist, to her face. The air in the room seemed to thicken, charged with a sudden, spiking tension that made the fine hairs on her arms stand up.\nShe breathed in, noticing a new scent cutting through the overwhelming flowers. It was sharp, clean a mix of expensive musk aftershave and the natural, salty scent of a man who had been through a long, physical day. It was his scent. It fought for dominance against the jasmine, spellbound by the sensory overload of being alone with a man who was now her husband.\n"Hi," he said. His voice was deeper than she remembered, rough with the fatigue of the day, creating a low rumble in the quiet room.\n"Hi," Meena squeaked. She winced internally, cleared her throat, and tried to find her professor voice. "Hi."\nShe took a tentative step forward, the heavy silver anklets on her feet chiming softly. The sound was incredibly loud in the quiet room ching, ching a delicate, feminine announcement of her movement that seemed to draw attention to her ankles and feet.\nVijay shifted, sitting up straighter, the mattress groaning slightly under him. The movement drew her eyes to his hands large, broad-palmed, resting on his thighs. Hands that were now legally allowed to touch her. The realization made her knees weak.\n"You finally escaped the aunties? I saw them circling you like sharks," he said, a small, tired smile playing on his lips.\nMeena managed a weak, genuine smile in return. "I think my Chithi was planning to give me a two-hour lecture on 'duties of a wife' until dawn. I had to literally run away while she was drinking water."\nVijay chuckled, a low, warm sound that seemed to vibrate in the air and soften the edges of the tension. "My uncle cornered me about the stock market. During the reception. Right when we were cutting the cake. I thought I was going to pass out from boredom right there on the stage."\nThe small exchange of words loosened a tiny knot in Meena's chest, but the massive tension remained. It was the elephant in the room the flower-bedecked bed, the closed door, the societal expectations pressing down on them like the roof.\nMeena moved closer, placing the tray of fruits and sweets on the small table near the door. Her bangles clinked as she set it down. Vijay watched her, his gaze following her movements with a predator's focus. He wasn't leering, but there was an intensity in his eyes that made her skin prickle with heat. He looked at her like he was trying to solve a complex puzzle, or perhaps, like he was trying to restrain himself.\n"The room..." Meena started, gesturing vaguely at the flower-draped bed, needing to break the silence. "It's a bit... much, isn't it?"\nVijay looked at the bed, then back at her, a wry, dry smile playing on his lips. "It looks like a garden threw up in here. I’m honestly worried I might wake up with a bee in my ear or pollen up my nose."\nMeena laughed, a genuine sound this time. "I think my mother bought the entire flower market's stock. She takes these things very seriously."\nShe took another step towards the bed, and the reality of the situation crashed back down on her. There was nowhere else to sit. The only chair in the room was covered with his bag and clothes. There was just the bed, and him on it.\nVijay seemed to sense her hesitation. He shifted slightly, moving to the far left, creating a space for her. "Sit, Meena. You’ve been standing for six hours in those heels. Your feet must be killing you."\n"They are," she admitted, the ache in her arches suddenly sharp.\nShe sat down on the edge of the bed, maintaining a respectable, rigid distance of about two feet between them. The mattress dipped under her weight, tilting her slightly towards him. She stiffened, engaging her core to correct her balance, refusing to slide closer.\nSilence descended again, but it wasn't empty. It was heavy with the unspoken. Meena stared at her hands in her lap, twisting her wedding ring, acutely aware of his presence next to her. She could feel the heat radiating from his body a steady, warm hum that seemed to reach out and touch her bare arm even without physical contact.\nShe glanced at him sideways through her lashes. He was looking at her profile. His gaze dropped to her neck, where the heavy gold jewelry rested against her skin, then lower, to where the saree pallu draped over her chest. He looked away quickly, almost guiltily, scrubbing a hand over his face, his jaw tightening as he stared at the wall.\nHe’s nervous too, Meena realized with a sudden jolt of clarity. He’s a man, a stranger, in a room with a woman he’s legally allowed to... do anything with. And he’s holding back. He’s fighting something.\nThe thought was both terrifying and strangely thrilling. It made him human. It made the air in the room thick with potential, a heavy cloud waiting to burst.\nChapter 2: The Milk and the Tremor\nThe tradition was old, cliché, and frankly, extremely awkward. On the bedside table, right next to the lamp, sat a traditional silver tumbler filled with warm, saffron-infused milk. It was steaming slightly, the condensation beading on the intricate carvings of the silver. It was supposed to be for energy, or fertility, or whatever the old wives' tales said about stamina for the wedding night. Meena stared at it like it was a live grenade that was about to explode.\n"You should drink it," Vijay said softly, gesturing to the glass with a nod of his head. The silence in the room was so profound that his voice felt like a touch. "You didn't eat much at the reception. I was watching you. You pushed the rice around your plate, but you barely took three bites."\nMeena looked at him, surprised, her eyes widening. The heavy gold jhumkas in her ears swayed with the movement. "You noticed?"\n"I notice a lot of things," he said, his voice dropping to a lower register, intimate and observant. He wasn't looking at the milk; he was looking at her mouth. "You looked overwhelmed. Like you wanted to disappear. Go on. Drink it. It’ll help you sleep, if nothing else."\nMeena reached out and picked up the tumbler. The metal was warm against her palm, almost hot. But as she lifted it from the table, her nerves finally betrayed her completely. Her hand started to shake.\nIt wasn't just a little, imperceptible tremble; it was a visible, violent vibration that traveled from her wrist to her fingertips. The heavy silver rings on her fingers clattered against the metal tumbler tink, tink, tink a rapid, staccato rhythm that echoed loudly in the silence of the room. The golden liquid sloshed dangerously near the rim.\n"Oh god," she whispered, mortified.\nShe tried to steady it with her other hand, clutching the cup with both palms, but that only made it worse, highlighting her total loss of control. A single droplet of golden milk spilled over the rim and landed on her henna-stained knuckles, burning slightly. She felt humiliated, heat rising to her cheeks that had nothing to do with the temperature of the room. Here she was, a grown woman, shaking like a leaf in a storm just because a handsome man was sitting next to her.\nVijay tracked the movement with sharp, hawk-like eyes. He didn't mock her. He didn't laugh. He didn't look away to spare her embarrassment. His gaze traveled from her shaking hands to the rapid rise and fall of her heavy silk saree as her breathing hitched in panic. He saw the flush creeping up her neck, staining her skin red.\nHe didn't stay seated.\nIn one fluid, decisive motion, he stood up. The mattress shifted drastically, and suddenly he was looming over her. He took a step into her personal space, closing the gap between them, his height towering over her seated form. Meena froze, looking up at him, her eyes wide and fearful, the glass still rattling in her grip.\n"Here," he whispered, his voice rough but incredibly gentle. "Let me."\nHe reached out. His hand was large much larger than hers broad-palmed and long-fingered, with a light dusting of dark hair on the back. It was a rough hand, the hand of a man who lifted weights, who worked with his hands, calloused and firm. He covered her hand completely, his fingers wrapping around both her trembling fist and the cold metal tumbler, engulfing her in his grip.\nThe contact was electric.\nMeena gasped, a small, sharp intake of breath that sounded too loud. His skin was burning hot compared to her cold, clammy hands. It was a shock to her system, a contrast that was grounding and heavy. He didn't just hold the glass; he held her. His thumb pressed firmly against the back of her hand, applying just enough pressure to stabilize the tremors.\n"Easy," he murmured, bending his knees slightly so his face was closer to her level. "I've got you. I've got it. Just breathe."\nThe heat from his palm seemed to seep instantly into her skin, rushing up her arm, bypassing her brain, and settling deep in her chest. It startled her into stillness. For a second, the shaking stopped, replaced by a rigid, hyper-aware tension. This was the first time he had touched her like this skin on skin, without a crowd, without a ritual demanding it. It wasn't a handshake; it wasn't a blessing. It was intimate. It was raw. It was a touch that claimed control.\nThe air between them crackled, thick enough to cut with a knife. It was that static charge born of "stranger danger" colliding head-on with undeniable biology. They were two young, healthy people locked in a soundproof room, and the biology was screaming. His scent that musk and sweat was stronger now that he was this close, filling her nose. Meena could see the texture of his skin, the pores, the dark stubble on his jaw that was just starting to grow out, the pulse beating steadily in the hollow of his neck.\n"I... I'm sorry," she stammered, her voice barely a whisper, staring at the top button of his shirt. "I don't know why I'm... I'm just..."\n"Don't apologize," Vijay said firmly, cutting her off. His eyes were locked on hers, dark and intense, refusing to let her look away. "It's a weird situation, Meena. It's okay to be nervous. Hell, I'm nervous too."\nMeena looked up, surprised. "You don't look nervous," she countered, her voice shaky, looking at the steadiness of his hand over hers. "You look... solid. Like a rock."\nA corner of his mouth quirked up in a half-smile, self-deprecating and charming. "I'm good at hiding it. It's a professional hazard. But right now? My heart is beating just as fast as yours. Probably faster."\nHe gently, slowly pried the glass away from her rigid fingers. As he pulled it back to set it down, his fingers grazed the sensitive skin of her inner wrist. It was a light, accidental touch just the tips of his calloused fingers trailing over the soft, pale skin where her blue veins were visible.\nA jolt of electricity shot straight to Meena’s core, hot and sharp. It was physical, visceral. Her knees, even though she was sitting, felt like they turned to water. A shiver ran down her spine, making her shoulders twitch involuntarily.\nVijay noticed. Of course, he noticed. He missed nothing. His eyes darkened, the pupils dilating until his irises were almost entirely black. He paused, the glass hovering mid-air, his gaze dropping to her wrist where he had just touched her, watching the reaction of her skin, then snapping back up to her lips.\nFor a heartbeat, neither of them breathed. The sound of the air conditioner hummed in the background, but all Meena could hear was the blood rushing in her ears like a waterfall. He was so close. If he leaned in just six inches, he could kiss her. And looking at the way his gaze was fixed on her mouth, hungry and focused, she thought he might. She almost wanted him to.\nBut then, he stepped back.\nHe placed the milk on the bedside table with a soft clink. The distance between them opened up again, physically, but the air was still vibrating with the energy of that touch, leaving a ghost sensation on her wrist.\nMeena let out a breath she didn't know she was holding, her hand still tingling where he had held it. She clutched her hands together in her lap, trying to preserve that warmth, terrified and exhilarated all at once.\nChapter 3: The Pact and the Missed Kiss\nVijay turned away from her, running a hand through his thick hair, messing it up further. He looked like he was wrestling with something internally, a physical struggle against his own instincts. He didn't sit back down on the bed immediately. He paced a few steps away to the window, looked out at the dark street, then turned to face her, leaning his hip against the heavy wooden wardrobe, crossing his arms.\nThe distance helped Meena breathe, but only slightly. Her skin was still humming from his touch.\n"Meena," he started, his voice serious, almost business-like but with an undercurrent of softness that she was beginning to recognize. "We need to talk. Before... before we try to sleep. Before we try to figure out this bed situation."\nMeena nodded, her throat dry, her eyes wide. "Okay. Talk."\n"Look," he said, the muscles in his arms flexing as he squeezed his own biceps. The movement pulled the fabric of his silk shirt tight across his chest and shoulders, emphasizing his build. "I know what everyone expects. I know what this night is supposed to be. The flowers, the milk, the door locking... it's a setup. It's basically an orchestrated attempt to force two people into intimacy."\nMeena looked down at the intricate floral pattern on the bedsheet, tracing a vine with her finger. "I know. It's... a lot of pressure."\n"I don't want to rush this," Vijay continued, his voice softening as he pushed off the wardrobe and walked back towards the bed. He sat down again, but he was careful to keep a respectful distance, giving her space to breathe. "I don't want you to feel pressured just because we signed a paper and walked around a fire today. You looked terrified when you walked in here, Meena. Like you were walking to the gallows."\n"I was," Meena admitted honestly, looking up at him. "I still am, a little. I don't know what to expect. I don't know... you. We are married, but we are strangers."\n"Exactly. You shouldn't be scared. Not with me." He leaned forward, resting his elbows on his knees, catching her gaze and holding it. "So, here is what I’m proposing. A pact. Friends first."\nMeena blinked, confused. "Friends first?"\n"Yes. We live together. We get to know each other. We figure out how to be roommates, how to share a bathroom, how to make coffee for each other, before we try to be... lovers."\nHe said the word lovers with a slight hesitation, his voice dipping, and the sound of it made Meena’s stomach flip. It sounded dangerous and promising.\n"I promise you, Meena," he said, his eyes locking onto hers with a fierce intensity. "I won't touch you. Not intimately. Not until you want it. Not until you ask for it. Until you... beg for it."\nHe didn't mean to say the last part; she could tell by the way his eyes widened slightly in surprise at his own words. But the words hung in the air, heavy, smoky, and incredibly provocative. Until you beg for it.\nMeena felt a flush rise from her chest, burning up her neck to her hairline. The idea was scandalous, embarrassing, and deeply, deeply hot. The thought of begging him...\n"Okay," she whispered, her voice barely audible, forcing herself to focus on the "Friends" part and ignore the "Begging" part. "Friends first. I... I would like that. Thank you, Vijay. That means a lot. I really appreciate you giving me time."\nThe wave of relief that crashed over her was immense, washing away the immediate fear. Her rigid posture slumped against the carved wooden headboard. She hadn't realized how tight her muscles were until he said those words. He wasn't going to pounce on her. He respected her. He was safe.\n"Good," Vijay said, exhaling a long breath, his shoulders dropping. He looked relieved too, as if the pressure had been weighing on him just as heavily. "So, deal?"\n"Deal."\nTo seal this verbal contract, Vijay leaned in.\nMeena held her breath, her eyes widening. Was he going to shake her hand? Hug her? The distance between them shrank rapidly.\nHe moved closer, shifting his weight on the mattress. He raised a hand, not to touch her, but to brace himself on the headboard behind her neck, caging her slightly but not touching her. He leaned his face towards hers.\nMeena’s heart stopped. Is he going to kiss me? We just said friends! What is he doing?`
 };
 
 export const NOVEL_SCENES: Record<string, string> = {
@@ -385,6 +386,610 @@ export const WEATHER_CONDITIONS = [
     "Foggy / Misty", "Windy", "Stormy", "Humid / Hazy"
 ];
 
+// --- PRESETS (QUICK SETS) ---
+export const SCENE_PRESETS = [
+    {
+        id: "wedding",
+        label: "The Wedding Night",
+        desc: "High stakes, pillow wall, heavy silk.",
+        config: {
+            setting: "Bedroom (Night)",
+            mood: "Tense",
+            time: "Midnight (Dark)",
+            weather: "Humid / Hazy",
+            poseCat: "Sitting",
+            position: "Side by Side",
+            intensity: "Subtle",
+            lighting: "Candlelight",
+            style: "Cinematic (Film Look)",
+            vijay: { outfit: "Kurta Pyjama (Silk)", color: "White", style: "Traditional (Grand)" },
+            meena: { outfit: "Kanjeevaram Saree", color: "Red", style: "Traditional (Grand)" },
+            char: "Vijay",
+            touch: "v_hand_hold"
+        }
+    },
+    {
+        id: "monsoon",
+        label: "Monsoon Argument",
+        desc: "Drenched clothes, raw emotion.",
+        config: {
+            setting: "Rainy Balcony",
+            mood: "Steamy",
+            time: "Twilight (Purple)",
+            weather: "Monsoon Rain (Heavy)",
+            poseCat: "Standing",
+            position: "Face to Face",
+            intensity: "Intense",
+            lighting: "Moonlight",
+            style: "Photorealistic (Sharp)",
+            vijay: { outfit: "Linen Shirt", color: "White", style: "Casual" },
+            meena: { outfit: "Cotton Saree", color: "Blue", style: "Casual" },
+            char: "Meena",
+            touch: "m_waist_pull"
+        }
+    },
+    {
+        id: "kitchen",
+        label: "Kitchen Midnight",
+        desc: "Domestic intimacy, stolen glances.",
+        config: {
+            setting: "Kitchen Counter",
+            mood: "Domestic",
+            time: "Midnight (Dark)",
+            weather: "Clear Sky",
+            poseCat: "Standing",
+            position: "Cornered",
+            intensity: "Moderate",
+            lighting: "Firelight",
+            style: "Oil Painting (Classic)",
+            vijay: { outfit: "Boxers & Tee", color: "Black", style: "Nightwear" },
+            meena: { outfit: "Nightie", color: "Pastel Pink", style: "Nightwear" },
+            char: "Vijay",
+            touch: "v_neck_graze"
+        }
+    },
+    {
+        id: "bus",
+        label: "The Crowded Bus",
+        desc: "Public proximity, secret touch.",
+        config: {
+            setting: "Crowded Bus",
+            mood: "Forbidden",
+            time: "Morning (Soft)",
+            weather: "Humid / Hazy",
+            poseCat: "Standing",
+            position: "Back to Chest",
+            intensity: "Subtle",
+            lighting: "Overcast (Soft)",
+            style: "Cinematic (Film Look)",
+            vijay: { outfit: "Formal Shirt & Trousers", color: "Blue", style: "Workwear" },
+            meena: { outfit: "Cotton Saree", color: "Green", style: "Workwear" },
+            char: "Meena",
+            touch: "m_wrist_pulse"
+        }
+    },
+    {
+        id: "morning_coffee",
+        label: "Morning Coffee",
+        desc: "Soft light, quiet shared moment.",
+        config: {
+            setting: "Bedroom (Morning)",
+            mood: "Domestic",
+            time: "Morning (Soft)",
+            weather: "Clear Sky",
+            poseCat: "Sitting",
+            position: "Side by Side",
+            intensity: "Subtle",
+            lighting: "Golden Hour",
+            style: "Watercolor (Dreamy)",
+            vijay: { outfit: "Lungis", color: "White", style: "Nightwear" },
+            meena: { outfit: "Cotton Saree", color: "Gold", style: "Casual" },
+            char: "Vijay",
+            touch: "v_hand_hold"
+        }
+    },
+    {
+        id: "temple",
+        label: "Temple Prayers",
+        desc: "Peaceful devotion, arm in arm.",
+        config: {
+            setting: "Temple Corridor",
+            mood: "Peaceful",
+            time: "Dawn (Blue Hour)",
+            weather: "Clear Sky",
+            poseCat: "Standing",
+            position: "Side by Side",
+            intensity: "Subtle",
+            lighting: "Golden Hour",
+            style: "Oil Painting (Classic)",
+            vijay: { outfit: "Dhoti & Angavastram", color: "White", style: "Traditional (Grand)" },
+            meena: { outfit: "Kanjeevaram Saree", color: "Green", style: "Traditional (Grand)" },
+            char: "Meena",
+            touch: "v_arm_link"
+        }
+    },
+    {
+        id: "office_secret",
+        label: "Office Secret",
+        desc: "Stolen moment in a sterile world.",
+        config: {
+            setting: "Office Cubicle",
+            mood: "Forbidden",
+            time: "High Noon (Harsh)",
+            weather: "Clear Sky",
+            poseCat: "Standing",
+            position: "Cornered",
+            intensity: "Moderate",
+            lighting: "Studio (High Key)",
+            style: "Photorealistic (Sharp)",
+            vijay: { outfit: "Formal Shirt & Trousers", color: "Blue", style: "Workwear" },
+            meena: { outfit: "Silk Saree (Office)", color: "Black", style: "Formal" },
+            char: "Vijay",
+            touch: "v_waist_hold"
+        }
+    },
+    {
+        id: "beach_sunset",
+        label: "Marina Beach",
+        desc: "Windy evening, sand and sea.",
+        config: {
+            setting: "Beach at Sunset",
+            mood: "Romantic",
+            time: "Golden Hour (Sunset)",
+            weather: "Windy",
+            poseCat: "Dynamic",
+            position: "Walking Away",
+            intensity: "Subtle",
+            lighting: "Golden Hour",
+            style: "Cinematic (Film Look)",
+            vijay: { outfit: "Short Kurta & Jeans", color: "Blue", style: "Casual" },
+            meena: { outfit: "Salwar Kameez (Simple)", color: "Pastel Pink", style: "Casual" },
+            char: "Meena",
+            touch: "m_hand_kiss"
+        }
+    },
+    {
+        id: "rooftop",
+        label: "Rooftop Breeze",
+        desc: "City lights and quiet confessions.",
+        config: {
+            setting: "Rooftop Terrace",
+            mood: "Nostalgic",
+            time: "Twilight (Purple)",
+            weather: "Windy",
+            poseCat: "Standing",
+            position: "Leaning against wall",
+            intensity: "Subtle",
+            lighting: "Moonlight",
+            style: "Noir (B&W)",
+            vijay: { outfit: "T-shirt & Jeans", color: "Black", style: "Casual" },
+            meena: { outfit: "Kurti & Leggings", color: "White", style: "Casual" },
+            char: "Vijay",
+            touch: "v_shoulder_squeeze"
+        }
+    },
+    {
+        id: "auto_rain",
+        label: "Auto Rain",
+        desc: "Cozy ride in the monsoon downpour.",
+        config: {
+            setting: "Auto Rickshaw (Rain)",
+            mood: "Cozy",
+            time: "Evening",
+            weather: "Monsoon Rain (Heavy)",
+            poseCat: "Sitting",
+            position: "Side by Side",
+            intensity: "Moderate",
+            lighting: "Streetlamps",
+            style: "Digital Art (Modern)",
+            vijay: { outfit: "Formal Shirt & Trousers", color: "White", style: "Workwear" },
+            meena: { outfit: "Churidar", color: "Blue", style: "Workwear" },
+            char: "Vijay",
+            touch: "v_thigh_rest"
+        }
+    },
+    {
+        id: "fever_care",
+        label: "Sick Day",
+        desc: "Tender caretaking in the quiet.",
+        config: {
+            setting: "Bedroom (Night)",
+            mood: "Melancholic",
+            time: "Late Night",
+            weather: "Clear Sky",
+            poseCat: "Sitting",
+            position: "On Lap (Away)",
+            intensity: "Subtle",
+            lighting: "Candlelight",
+            style: "Watercolor (Dreamy)",
+            vijay: { outfit: "T-shirt & Jeans", color: "Black", style: "Casual" },
+            meena: { outfit: "Nightie", color: "Blue", style: "Nightwear" },
+            char: "Vijay",
+            touch: "v_forehead_lean"
+        }
+    },
+    {
+        id: "saree_pleats",
+        label: "The Saree Pleats",
+        desc: "Intimate assistance with dressing.",
+        config: {
+            setting: "Bedroom (Morning)",
+            mood: "Steamy",
+            time: "Morning (Soft)",
+            weather: "Clear Sky",
+            poseCat: "Standing",
+            position: "Back to Chest",
+            intensity: "Moderate",
+            lighting: "Golden Hour",
+            style: "Cinematic (Film Look)",
+            vijay: { outfit: "Boxers & Tee", color: "Black", style: "Nightwear" },
+            meena: { outfit: "Kanjeevaram Saree", color: "Red", style: "Traditional (Grand)" },
+            char: "Meena",
+            touch: "m_waist_pull"
+        }
+    },
+    {
+        id: "diwali_spark",
+        label: "Diwali Spark",
+        desc: "Festive lights and hidden heat.",
+        config: {
+            setting: "Rainy Balcony",
+            mood: "Electric",
+            time: "Midnight (Dark)",
+            weather: "Clear Sky",
+            poseCat: "Standing",
+            position: "Face to Face",
+            intensity: "Intense",
+            lighting: "Firelight",
+            style: "Photorealistic (Sharp)",
+            vijay: { outfit: "Kurta Pyjama (Silk)", color: "Gold", style: "Traditional (Grand)" },
+            meena: { outfit: "Lehenga Choli", color: "Green", style: "Traditional (Grand)" },
+            char: "Vijay",
+            touch: "v_chin_lift"
+        }
+    },
+    {
+        id: "library_silence",
+        label: "Library Silence",
+        desc: "Quiet brush of hands among books.",
+        config: {
+            setting: "Library Aisle",
+            mood: "Playful",
+            time: "Afternoon",
+            weather: "Clear Sky",
+            poseCat: "Standing",
+            position: "Face to Face",
+            intensity: "Subtle",
+            lighting: "Overcast (Soft)",
+            style: "Concept Art (Detailed)",
+            vijay: { outfit: "Polo Shirt", color: "Green", style: "Casual" },
+            meena: { outfit: "Sundress", color: "White", style: "Casual" },
+            char: "Meena",
+            touch: "m_fingertip_trace"
+        }
+    },
+    {
+        id: "waiting_room",
+        label: "Hospital Wait",
+        desc: "Anxiety shared in silence.",
+        config: {
+            setting: "Hospital Waiting Room",
+            mood: "Tense",
+            time: "Late Night",
+            weather: "Stormy",
+            poseCat: "Sitting",
+            position: "Side by Side",
+            intensity: "Moderate",
+            lighting: "Neon",
+            style: "Cinematic (Film Look)",
+            vijay: { outfit: "Formal Shirt & Trousers", color: "White", style: "Workwear" },
+            meena: { outfit: "Salwar Kameez (Simple)", color: "Pastel Pink", style: "Casual" },
+            char: "Vijay",
+            touch: "v_hand_hold"
+        }
+    },
+    {
+        id: "pani_puri",
+        label: "Street Food Fun",
+        desc: "Feeding each other amidst chaos.",
+        config: {
+            setting: "Street Food Stall",
+            mood: "Playful",
+            time: "Evening",
+            weather: "Humid / Hazy",
+            poseCat: "Standing",
+            position: "Face to Face",
+            intensity: "Subtle",
+            lighting: "Streetlamps",
+            style: "Digital Art (Modern)",
+            vijay: { outfit: "Linen Shirt", color: "Blue", style: "Casual" },
+            meena: { outfit: "Jeans & Top", color: "Black", style: "Casual" },
+            char: "Meena",
+            touch: "m_nose_boop"
+        }
+    },
+    {
+        id: "power_cut",
+        label: "Power Cut",
+        desc: "Darkness brings them closer.",
+        config: {
+            setting: "Living Room Sofa",
+            mood: "Intimate",
+            time: "Midnight (Dark)",
+            weather: "Stormy",
+            poseCat: "Sitting",
+            position: "Legs Tangled",
+            intensity: "Intense",
+            lighting: "Candlelight",
+            style: "Rembrandt (Dramatic)",
+            vijay: { outfit: "Lungis", color: "White", style: "Nightwear" },
+            meena: { outfit: "Loose Cotton Set", color: "Purple", style: "Nightwear" },
+            char: "Vijay",
+            touch: "v_knee_brush"
+        }
+    },
+    {
+        id: "cold_shoulder",
+        label: "The Cold Shoulder",
+        desc: "Distance in the same bed.",
+        config: {
+            setting: "Bedroom (Night)",
+            mood: "Heartbroken",
+            time: "Midnight (Dark)",
+            weather: "Clear Sky",
+            poseCat: "Lying",
+            position: "Back to Back",
+            intensity: "Subtle",
+            lighting: "Moonlight",
+            style: "Noir (B&W)",
+            vijay: { outfit: "Loose Pyjamas", color: "Blue", style: "Nightwear" },
+            meena: { outfit: "Nightie", color: "White", style: "Nightwear" },
+            char: "Meena",
+            touch: "m_sleep_watch"
+        }
+    },
+    {
+        id: "mirror_reflection",
+        label: "Mirror Reflection",
+        desc: "Caught admiring in the glass.",
+        config: {
+            setting: "Bedroom (Morning)",
+            mood: "Admiring",
+            time: "Morning (Soft)",
+            weather: "Clear Sky",
+            poseCat: "Standing",
+            position: "Back to Chest",
+            intensity: "Moderate",
+            lighting: "Studio (High Key)",
+            style: "Photorealistic (Sharp)",
+            vijay: { outfit: "Boxers & Tee", color: "White", style: "Nightwear" },
+            meena: { outfit: "Kanjeevaram Saree", color: "Gold", style: "Traditional (Grand)" },
+            char: "Meena",
+            touch: "m_neck_nuzzle"
+        }
+    },
+    {
+        id: "laptop_lullaby",
+        label: "Laptop Lullaby",
+        desc: "Working while she sleeps.",
+        config: {
+            setting: "Living Room Sofa",
+            mood: "Domestic",
+            time: "Late Night",
+            weather: "Clear Sky",
+            poseCat: "Sitting",
+            position: "On Lap (Away)",
+            intensity: "Subtle",
+            lighting: "Neon",
+            style: "Digital Art (Modern)",
+            vijay: { outfit: "T-shirt & Jeans", color: "Black", style: "Casual" },
+            meena: { outfit: "Loose Cotton Set", color: "Pastel Pink", style: "Nightwear" },
+            char: "Vijay",
+            touch: "v_hair_run"
+        }
+    },
+    {
+        id: "monsoon_dance",
+        label: "Rain Dance",
+        desc: "Joyful spin in the downpour.",
+        config: {
+            setting: "Rainy Balcony",
+            mood: "Playful",
+            time: "Evening",
+            weather: "Monsoon Rain (Heavy)",
+            poseCat: "Dynamic",
+            position: "Spinning",
+            intensity: "Moderate",
+            lighting: "Overcast (Soft)",
+            style: "Watercolor (Dreamy)",
+            vijay: { outfit: "Cotton Kurta", color: "White", style: "Casual" },
+            meena: { outfit: "Salwar Kameez (Simple)", color: "Blue", style: "Casual" },
+            char: "Meena",
+            touch: "m_rain_dance"
+        }
+    },
+    {
+        id: "cooking_together",
+        label: "Cooking Together",
+        desc: "Domestic harmony in the kitchen.",
+        config: {
+            setting: "Kitchen Counter",
+            mood: "Domestic",
+            time: "Evening",
+            weather: "Clear Sky",
+            poseCat: "Standing",
+            position: "Side by Side",
+            intensity: "Subtle",
+            lighting: "Golden Hour",
+            style: "Oil Painting (Classic)",
+            vijay: { outfit: "T-shirt & Jeans", color: "Black", style: "Casual" },
+            meena: { outfit: "Kurti & Leggings", color: "Red", style: "Casual" },
+            char: "Meena",
+            touch: "m_shoulder_lean"
+        }
+    },
+    {
+        id: "reception_party",
+        label: "Reception Party",
+        desc: "Public formality, hidden touch.",
+        config: {
+            setting: "Wedding Hall",
+            mood: "Forbidden",
+            time: "Evening",
+            weather: "Clear Sky",
+            poseCat: "Standing",
+            position: "Side by Side",
+            intensity: "Subtle",
+            lighting: "Studio (High Key)",
+            style: "Photorealistic (Sharp)",
+            vijay: { outfit: "Three-Piece Suit", color: "Black", style: "Formal" },
+            meena: { outfit: "Kanjeevaram Saree", color: "Purple", style: "Traditional (Grand)" },
+            char: "Vijay",
+            touch: "v_waist_hold"
+        }
+    },
+    {
+        id: "makeup_fix",
+        label: "The Makeup Fix",
+        desc: "Gentle intimacy before an event.",
+        config: {
+            setting: "Bedroom (Night)",
+            mood: "Romantic",
+            time: "Evening",
+            weather: "Clear Sky",
+            poseCat: "Standing",
+            position: "Close Up",
+            intensity: "Subtle",
+            lighting: "Studio (High Key)",
+            style: "Cinematic (Film Look)",
+            vijay: { outfit: "Sherwani", color: "Gold", style: "Traditional (Grand)" },
+            meena: { outfit: "Lehenga Choli", color: "Red", style: "Traditional (Grand)" },
+            char: "Meena",
+            touch: "m_cheek_caress"
+        }
+    },
+    {
+        id: "angry_silence",
+        label: "Angry Silence",
+        desc: "Tension in the car.",
+        config: {
+            setting: "Auto Rickshaw (Rain)",
+            mood: "Tense",
+            time: "Evening",
+            weather: "Stormy",
+            poseCat: "Sitting",
+            position: "Looking Away",
+            intensity: "Intense",
+            lighting: "Streetlamps",
+            style: "Noir (B&W)",
+            vijay: { outfit: "Formal Shirt & Trousers", color: "White", style: "Workwear" },
+            meena: { outfit: "Silk Saree (Office)", color: "Black", style: "Formal" },
+            char: "Vijay",
+            touch: "v_wrist_grip"
+        }
+    },
+    {
+        id: "reconciliation",
+        label: "Reconciliation",
+        desc: "Tearful hug after a fight.",
+        config: {
+            setting: "Living Room Sofa",
+            mood: "Passionate",
+            time: "Late Night",
+            weather: "Stormy",
+            poseCat: "Standing",
+            position: "Face to Face",
+            intensity: "Intense",
+            lighting: "Firelight",
+            style: "Cinematic (Film Look)",
+            vijay: { outfit: "Linen Shirt", color: "White", style: "Casual" },
+            meena: { outfit: "Cotton Saree", color: "Green", style: "Casual" },
+            char: "Meena",
+            touch: "m_tear_wipe"
+        }
+    },
+    {
+        id: "sunday_paper",
+        label: "Sunday Paper",
+        desc: "Lazy morning reading.",
+        config: {
+            setting: "Garden Bench",
+            mood: "Peaceful",
+            time: "Morning (Soft)",
+            weather: "Clear Sky",
+            poseCat: "Sitting",
+            position: "Side by Side",
+            intensity: "Subtle",
+            lighting: "Golden Hour",
+            style: "Watercolor (Dreamy)",
+            vijay: { outfit: "Short Kurta & Jeans", color: "White", style: "Casual" },
+            meena: { outfit: "Maxi Dress", color: "Pastel Pink", style: "Casual" },
+            char: "Meena",
+            touch: "m_leg_drape"
+        }
+    },
+    {
+        id: "oil_massage",
+        label: "Oil Massage",
+        desc: "Caretaking relaxation.",
+        config: {
+            setting: "Living Room Sofa",
+            mood: "Domestic",
+            time: "Evening",
+            weather: "Clear Sky",
+            poseCat: "Sitting",
+            position: "On Lap (Away)",
+            intensity: "Moderate",
+            lighting: "Candlelight",
+            style: "Oil Painting (Classic)",
+            vijay: { outfit: "Lungis", color: "Blue", style: "Nightwear" },
+            meena: { outfit: "Loose Cotton Set", color: "White", style: "Nightwear" },
+            char: "Vijay",
+            touch: "v_neck_graze"
+        }
+    },
+    {
+        id: "bike_ride",
+        label: "Bike Ride",
+        desc: "Thrilling ride on the highway.",
+        config: {
+            setting: "Street Food Stall",
+            mood: "Electric",
+            time: "Evening",
+            weather: "Windy",
+            poseCat: "Sitting",
+            position: "Back to Chest",
+            intensity: "Moderate",
+            lighting: "Streetlamps",
+            style: "Digital Art (Modern)",
+            vijay: { outfit: "Hoodie", color: "Black", style: "Casual" },
+            meena: { outfit: "Jeans & Top", color: "Blue", style: "Casual" },
+            char: "Meena",
+            touch: "m_waist_pull"
+        }
+    },
+    {
+        id: "jasmine_knot",
+        label: "The Jasmine Knot",
+        desc: "The symbolic union.",
+        config: {
+            setting: "Bedroom (Night)",
+            mood: "Romantic",
+            time: "Midnight (Dark)",
+            weather: "Humid / Hazy",
+            poseCat: "Sitting",
+            position: "Face to Face",
+            intensity: "Intense",
+            lighting: "Candlelight",
+            style: "Cinematic (Film Look)",
+            vijay: { outfit: "Sherwani", color: "White", style: "Traditional (Grand)" },
+            meena: { outfit: "Kanjeevaram Saree", color: "Gold", style: "Traditional (Grand)" },
+            char: "Vijay",
+            touch: "v_hand_hold"
+        }
+    }
+];
+
 export const GALLERY_IMAGES = [
     { id: 1, src: "assets/gallery-1.jpg", caption: "She was his safe place. He was her fortress." },
     { id: 2, src: "assets/gallery-2.jpg", caption: "Above the table, they were strangers. Below, he owned her." },
@@ -415,5 +1020,10 @@ export const GALLERY_IMAGES = [
     { id: 27, src: "assets/gallery-27.jpg", caption: "In the chaos of the crowd, he built a wall of silence around her." },
     { id: 28, src: "assets/gallery-28.jpg", caption: "She thought she was just fixing his tie. He knew she was tightening the leash." },
     { id: 29, src: "assets/gallery-29.jpg", caption: "She tried to look away. She failed." },
-    { id: 30, src: "assets/gallery-30.jpg", caption: "He didn't use a napkin. He used his thumb. And then..." }
+    { id: 30, src: "assets/gallery-30.jpg", caption: "He didn't use a napkin. He used his thumb. And then..." },
+    { id: 31, src: "assets/gallery-31.jpg", caption: "The distance was a lie. His shadow always touched hers." },
+    { id: 32, src: "assets/gallery-32.jpg", caption: "Caught in the rain, soaked in truth." },
+    { id: 33, src: "assets/gallery-33.jpg", caption: "A fleeting glance, a lifetime of promise." },
+    { id: 34, src: "assets/gallery-34.jpg", caption: "In the quiet morning light, the walls dissolved." },
+    { id: 35, src: "assets/gallery-35.jpg", caption: "Her laughter was the only sound he wanted to hear." }
 ];

@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { X, BookOpen, ShoppingBag, Share2, Twitter, Facebook, Mail, Heart, Instagram, ChevronLeft, ChevronRight, ImageOff } from 'lucide-react';
+import { X, BookOpen, ShoppingBag, Share2, Twitter, Facebook, Mail, Heart, Instagram, ChevronLeft, ChevronRight, ImageOff, Infinity } from 'lucide-react';
 import { BOOKS, BOOK_SAMPLE, AUTHOR_NAME } from '../constants';
 
 const SampleModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
@@ -36,13 +37,35 @@ const SampleModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
                 
                 <div className="overflow-y-auto px-8 py-6 sm:px-12 sm:py-10 custom-scrollbar bg-[#0A0A0A]">
                     <div className="prose prose-lg prose-invert max-w-none font-body font-light leading-loose text-slate-300 text-justify selection:bg-primary/30 selection:text-white">
-                        {BOOK_SAMPLE.content.split('\n').map((para, i) => (
-                            <p key={i} className="mb-6 first-letter:text-5xl first-letter:font-display first-letter:text-primary first-letter:mr-2 first-letter:float-left">{para}</p>
-                        ))}
+                        {BOOK_SAMPLE.content.split('\n').map((para, i) => {
+                            if (!para.trim()) return null;
+                            const isHeader = para.startsWith('Chapter');
+                            // Heuristic: Apply drop cap to the first non-header paragraph after a header, or the very first non-header text.
+                            // In this simple version, we just check if it's the very first paragraph of content (index 1 usually, after title at index 0).
+                            // A more robust way for multiple chapters: Check if previous line was a header.
+                            const prevLine = BOOK_SAMPLE.content.split('\n')[i-1];
+                            const isAfterHeader = prevLine && prevLine.startsWith('Chapter');
+                            const showDropCap = !isHeader && (i === 1 || isAfterHeader);
+
+                            return (
+                                <p 
+                                    key={i} 
+                                    className={`mb-6 ${showDropCap ? "first-letter:text-5xl first-letter:font-display first-letter:text-primary first-letter:mr-2 first-letter:float-left" : ""} ${isHeader ? "font-display text-2xl text-white mt-12 mb-8 text-center tracking-widest uppercase border-b border-white/10 pb-4" : ""}`}
+                                >
+                                    {para}
+                                </p>
+                            );
+                        })}
                     </div>
                     
                     <div className="mt-16 pt-8 border-t border-white/5 text-center pb-8">
                         <p className="italic text-slate-500 mb-8 font-display text-xl">"The story is just beginning..."</p>
+                        
+                        {/* Added Kindle CTA as requested */}
+                        <p className="text-sm text-primary uppercase tracking-[0.2em] font-bold mb-6 animate-pulse">
+                            Asking for reading the remaining story in Amazon Kindle or Kindle Unlimited
+                        </p>
+
                         <a 
                             href={BOOKS[0].amazonLink}
                             target="_blank"
@@ -57,6 +80,36 @@ const SampleModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
         </div>
     );
 };
+
+// Sub-component for Blur-Up Image Loading
+const CoverImage = React.memo(({ img, onError }: any) => {
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    return (
+        <>
+            {/* Placeholder (Blurry Background Simulation) */}
+            <div 
+                className={`absolute inset-0 bg-white/5 backdrop-blur-2xl transition-opacity duration-700 ${isLoaded ? 'opacity-0' : 'opacity-100'}`}
+                aria-hidden="true"
+            />
+            
+            <img 
+                src={img.src} 
+                srcSet={img.srcSet} 
+                sizes="(max-width: 768px) 100vw, 500px"
+                alt={img.alt} 
+                loading="lazy"
+                decoding="async"
+                onError={onError}
+                onLoad={() => setIsLoaded(true)}
+                className={`w-full h-full object-cover transition-all duration-1000 ease-out 
+                    ${isLoaded ? 'blur-0 scale-100 opacity-90 group-hover:opacity-100 group-hover:scale-105' : 'blur-xl scale-110 opacity-0'}
+                `} 
+            />
+        </>
+    );
+});
+CoverImage.displayName = 'CoverImage';
 
 const BookSection: React.FC = () => {
     const [isSampleOpen, setIsSampleOpen] = useState(false);
@@ -116,6 +169,13 @@ const BookSection: React.FC = () => {
         setTouchStart(0);
         setTouchEnd(0);
     };
+
+    // Common High-Attraction Button Style
+    const buttonClass = "flex-1 min-w-[200px] px-8 py-5 bg-gradient-to-r from-primary to-[#186a8a] hover:from-[#186a8a] hover:to-primary text-white text-xs font-bold uppercase tracking-[0.25em] rounded-sm shadow-[0_0_25px_rgba(37,150,190,0.4)] transition-all duration-500 ease-snappy hover:-translate-y-1 hover:scale-105 hover:shadow-[0_0_40px_rgba(37,150,190,0.8)] flex items-center justify-center gap-3 group relative overflow-hidden border border-white/20";
+    
+    const shimmerEffect = (
+        <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
+    );
     
     return (
     <section id="books" className="py-32 bg-onyx relative overflow-hidden">
@@ -145,16 +205,10 @@ const BookSection: React.FC = () => {
                             className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${index === currentCoverIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
                        >
                            {!imgError ? (
-                               <img 
-                                    src={img.src} 
-                                    srcSet={img.srcSet} 
-                                    sizes="(max-width: 768px) 100vw, 500px"
-                                    alt={img.alt} 
-                                    loading="lazy"
-                                    decoding="async"
-                                    onError={() => setImgError(true)}
-                                    className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105" 
-                                />
+                               <CoverImage 
+                                    img={img} 
+                                    onError={() => setImgError(true)} 
+                               />
                            ) : (
                                // Fallback if assets are missing
                                <div className="w-full h-full bg-gradient-to-br from-slate-900 to-black flex flex-col items-center justify-center p-8 text-center text-slate-600">
@@ -220,21 +274,36 @@ const BookSection: React.FC = () => {
                     {book.description}
                 </p>
                 
-                <div className="flex flex-wrap gap-6 pt-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                <div className="flex flex-wrap gap-4 pt-6 animate-fade-in-up w-full" style={{ animationDelay: '0.2s' }}>
+                    {/* Button 1: Buy */}
                     <a 
                         href={book.amazonLink} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="px-12 py-5 bg-gradient-to-r from-primary to-[#186a8a] hover:from-[#186a8a] hover:to-primary text-white text-sm font-bold uppercase tracking-[0.25em] rounded-sm shadow-[0_0_25px_rgba(37,150,190,0.6)] transition-all duration-500 ease-snappy hover:-translate-y-1 hover:scale-105 hover:shadow-[0_0_40px_rgba(37,150,190,0.8)] flex items-center justify-center gap-3 group relative overflow-hidden"
+                        className={buttonClass}
                     >
-                         <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
+                        {shimmerEffect}
                         <ShoppingBag size={18} className="group-hover:animate-bounce"/> Buy on Amazon
                     </a>
+
+                    {/* Button 2: Kindle Unlimited */}
+                    <a 
+                        href={book.kindleUnlimitedLink || book.amazonLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className={buttonClass}
+                    >
+                        {shimmerEffect}
+                        <Infinity size={20} className="group-hover:spin-slow"/> Read Free with KU
+                    </a>
+
+                    {/* Button 3: Read Sample */}
                     <button 
                         onClick={() => setIsSampleOpen(true)}
-                        className="px-10 py-5 border border-white/20 hover:border-white bg-transparent hover:bg-white/5 text-slate-300 hover:text-white text-xs font-bold uppercase tracking-[0.25em] rounded-sm transition-all duration-500 ease-snappy flex items-center justify-center gap-3 hover:shadow-glass group"
+                        className={buttonClass}
                     >
-                        <BookOpen size={16} className="group-hover:text-primary transition-colors"/> Read Sample
+                        {shimmerEffect}
+                        <BookOpen size={18} className="group-hover:scale-110 transition-transform"/> Read Sample
                     </button>
                 </div>
 

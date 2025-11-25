@@ -6,11 +6,11 @@ import { AnimatePresence } from 'framer-motion';
 
 // Eagerly load critical components
 import FloatingMenu from './components/FloatingMenu'; 
+import Navigation from './components/Navigation';
 import Hero from './components/Hero';
 import BookSection from './components/BookSection';
 import LazyLoad from './components/LazyLoad';
 import ScrollReveal from './components/ScrollReveal';
-import Newsletter from './components/Newsletter';
 import Footer from './components/Footer';
 import FeaturePresentation from './components/FeaturePresentation';
 import AIMenu from './components/AIMenu';
@@ -37,6 +37,9 @@ const MoodPlaylist = lazy(() => import('./components/MoodPlaylist'));
 const LoveLetterMuse = lazy(() => import('./components/LoveLetterMuse'));
 const DestinyMatch = lazy(() => import('./components/DestinyMatch'));
 const YourDesiredMoment = lazy(() => import('./components/YourDesiredMoment'));
+const ApologyArchitect = lazy(() => import('./components/ApologyArchitect'));
+const MemoryWeaver = lazy(() => import('./components/MemoryWeaver'));
+const SensoryImmersion = lazy(() => import('./components/SensoryImmersion'));
 
 const App: React.FC = () => {
   const [user, setUser] = useState<any>(null);
@@ -58,11 +61,13 @@ const App: React.FC = () => {
   // Helper to render the correct component based on ID (Modal Features)
   const renderFeature = (id: string) => {
       switch(id) {
-          case 'gallery': return <NovelGallery />;
+          // Note: Gallery, Visualizer, Connect etc. are now on page, 
+          // but these cases remain for fallback or specific modal invocations if needed.
+          case 'gallery': return <NovelGallery />; 
           case 'unspoken': return <UnspokenThoughts />;
           case 'heatmap': return <TensionHeatmap />;
           case 'finishscene': return <FinishTheScene />;
-          case 'connect': return <CharacterConnect />;
+          case 'connect': return <CharacterConnect />; 
           case 'tropematcher': return <TropeFinder />;
           case 'cliffhanger': return <Cliffhanger />;
           case 'prediction': return <PredictionGame />;
@@ -73,12 +78,14 @@ const App: React.FC = () => {
           case 'translator': return <RomanceTranslator />;
           case 'dateplanner': return <DatePlanner />;
           case 'povshift': return <ObjectPerspective />;
+          case 'apology': return <ApologyArchitect />;
+          case 'memory': return <MemoryWeaver />;
+          case 'sensory': return <SensoryImmersion />;
           default: return null;
       }
   };
 
   const getFeatureTitle = (id: string) => {
-     // Simple mapping for modal title
      const titles: Record<string, string> = {
          'gallery': 'Visual Gallery',
          'unspoken': 'Unspoken Thoughts',
@@ -95,12 +102,37 @@ const App: React.FC = () => {
          'translator': 'Romance Translator',
          'dateplanner': 'Date Planner',
          'povshift': 'Object Perspective',
+         'apology': 'Apology Architect',
+         'memory': 'Memory Weaver',
+         'sensory': 'Sensory Immersion'
      };
      return titles[id] || 'AI Feature';
   };
 
+  const handleFeatureSelect = (featureId: string) => {
+      // Smart Routing: Check if the feature ID corresponds to a section currently on the page.
+      // If so, scroll to it. If not, open it in a modal.
+      const onPageSections = [
+          'books', 'protagonists', 'timeline', 'gallery', 'visualizer', 'connect', 'experience'
+      ];
+      
+      if (onPageSections.includes(featureId)) {
+          const element = document.getElementById(featureId);
+          if (element) {
+              element.scrollIntoView({ behavior: 'smooth' });
+              return;
+          }
+      }
+      
+      // Fallback for modal features
+      setActiveFeature(featureId);
+  };
+
   return (
     <main className="bg-black min-h-screen text-slate-300 font-body selection:bg-primary/40 selection:text-white overflow-x-hidden">
+        {/* Navigation Bar */}
+        <Navigation />
+
         {/* Onboarding Presentation */}
         <AnimatePresence mode="wait">
             {showPresentation && <FeaturePresentation onClose={() => setShowPresentation(false)} />}
@@ -125,28 +157,43 @@ const App: React.FC = () => {
         {/* Main Content Flow */}
         <Hero 
             onStartPresentation={() => setShowPresentation(true)} 
-            onOpenGallery={() => setActiveFeature('gallery')}
+            onOpenGallery={() => handleFeatureSelect('gallery')}
         />
         
         <ScrollReveal>
             <BookSection />
         </ScrollReveal>
 
-        {/* Narrative Context */}
-        <LazyLoad><CharacterProfiles /></LazyLoad>
+        <LazyLoad id="timeline">
+            <VisualTimeline />
+        </LazyLoad>
 
-        {/* Main Feature: Your Desired Moment */}
-        <LazyLoad>
+        <LazyLoad id="gallery">
+            <NovelGallery />
+        </LazyLoad>
+
+        <LazyLoad id="protagonists">
+            <CharacterProfiles />
+        </LazyLoad>
+
+        <LazyLoad id="visualizer">
             <YourDesiredMoment />
         </LazyLoad>
 
+        <LazyLoad id="connect">
+            <CharacterConnect />
+        </LazyLoad>
+
+        <LazyLoad id="experience">
+            <AestheticGallery />
+        </LazyLoad>
+
         {/* The New AI Hub (Remaining Features) */}
-        <AIMenu onSelect={setActiveFeature} />
+        <AIMenu onSelect={handleFeatureSelect} />
 
         {/* Static Content / Footer */}
         <div className="relative bg-black shadow-[0_-50px_100px_rgba(0,0,0,1)] z-10">
              <LazyLoad><Author /></LazyLoad>
-             <LazyLoad><Newsletter user={user} /></LazyLoad>
              <LazyLoad><Footer /></LazyLoad>
         </div>
     </main>
