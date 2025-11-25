@@ -47,15 +47,22 @@ interface GeneratedImage {
     }; 
 }
 
-const PresetCard = ({ preset, onClick, isActive }: any) => {
+const PresetCard = ({ preset, onClick, isActive, isApplying }: any) => {
     const settingKey = preset.config.setting;
     const meta = SCENE_META[settingKey] || { icon: "🎬", desc: "" };
     
     return (
         <button
             onClick={onClick}
-            className={`group relative w-full h-full rounded-sm p-3 text-left flex flex-col gap-2 transition-all duration-300 hover:-translate-y-1 shadow-lg border ${isActive ? 'bg-white/10 border-primary ring-1 ring-primary/50 shadow-[0_0_20px_rgba(37,150,190,0.2)]' : 'bg-[#151515] hover:bg-[#1a1a1a] border-white/5 hover:border-primary/40 hover:shadow-primary/10'}`}
+            disabled={isApplying}
+            className={`group relative w-full h-full rounded-sm p-3 text-left flex flex-col gap-2 transition-all duration-300 hover:-translate-y-1 shadow-lg border overflow-hidden ${isActive ? 'bg-white/10 border-primary ring-1 ring-primary/50 shadow-[0_0_20px_rgba(37,150,190,0.2)]' : 'bg-[#151515] hover:bg-[#1a1a1a] border-white/5 hover:border-primary/40 hover:shadow-primary/10'}`}
         >
+            {isApplying && (
+                <div className="absolute inset-0 z-20 bg-black/60 backdrop-blur-[1px] flex items-center justify-center">
+                    <Loader2 className="animate-spin text-primary" size={20} />
+                </div>
+            )}
+
             <div className="flex justify-between items-start w-full border-b border-white/5 pb-2 mb-1">
                 <span className={`text-[10px] font-bold uppercase tracking-wider truncate max-w-[80%] transition-colors ${isActive ? 'text-white' : 'text-primary group-hover:text-white'}`}>
                     {preset.label}
@@ -69,7 +76,7 @@ const PresetCard = ({ preset, onClick, isActive }: any) => {
                 {preset.desc}
             </p>
             
-            {isActive && (
+            {isActive && !isApplying && (
                 <div className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full animate-pulse shadow-[0_0_10px_rgba(37,150,190,0.8)]"></div>
             )}
         </button>
@@ -473,6 +480,7 @@ const YourDesiredMoment: React.FC = () => {
     
     const [showAllPresets, setShowAllPresets] = useState(false);
     const [activePresetId, setActivePresetId] = useState<string | null>(null);
+    const [applyingPresetId, setApplyingPresetId] = useState<string | null>(null);
 
     useEffect(() => {
         const savedHistory = localStorage.getItem('jasmine_knot_gallery');
@@ -575,26 +583,32 @@ const YourDesiredMoment: React.FC = () => {
     };
 
     const handleApplyPreset = (preset: any) => {
-        const c = preset.config;
-        setSetting(c.setting);
-        setMood(c.mood);
-        setTime(c.time);
-        setWeather(c.weather);
-        setActivePoseTab(c.poseCat);
-        setPosition(c.position);
-        setPoseIntensity(c.intensity);
-        setLighting(c.lighting);
-        setStyle(c.style);
-        setVijayWardrobe(prev => ({ ...prev, outfit: c.vijay.outfit, color: c.vijay.color, style: c.vijay.style }));
-        setMeenaWardrobe(prev => ({ ...prev, outfit: c.meena.outfit, color: c.meena.color, style: c.meena.style }));
-        setSelectedCharacter(c.char);
-        setSelectedTouchPoint(c.touch);
+        setApplyingPresetId(preset.id);
         
-        setActivePresetId(preset.id);
-        
-        if (visualizerBtnRef.current) {
-            visualizerBtnRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        // Simulate loading delay for better UX
+        setTimeout(() => {
+            const c = preset.config;
+            setSetting(c.setting);
+            setMood(c.mood);
+            setTime(c.time);
+            setWeather(c.weather);
+            setActivePoseTab(c.poseCat);
+            setPosition(c.position);
+            setPoseIntensity(c.intensity);
+            setLighting(c.lighting);
+            setStyle(c.style);
+            setVijayWardrobe(prev => ({ ...prev, outfit: c.vijay.outfit, color: c.vijay.color, style: c.vijay.style }));
+            setMeenaWardrobe(prev => ({ ...prev, outfit: c.meena.outfit, color: c.meena.color, style: c.meena.style }));
+            setSelectedCharacter(c.char);
+            setSelectedTouchPoint(c.touch);
+            
+            setActivePresetId(preset.id);
+            setApplyingPresetId(null);
+            
+            if (visualizerBtnRef.current) {
+                visualizerBtnRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 500);
     };
 
     const handleSurprise = () => {
@@ -704,6 +718,7 @@ const YourDesiredMoment: React.FC = () => {
                                 key={preset.id} 
                                 preset={preset} 
                                 isActive={activePresetId === preset.id}
+                                isApplying={applyingPresetId === preset.id}
                                 onClick={() => handleApplyPreset(preset)} 
                             />
                         ))}

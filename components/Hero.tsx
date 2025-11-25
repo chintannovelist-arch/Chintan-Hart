@@ -51,11 +51,11 @@ const Hero: React.FC<HeroProps> = ({ onStartPresentation, onOpenGallery }) => {
         <div className="mb-10 md:mb-16 relative select-none p-4 w-full">
             <h1 className="font-display font-bold flex flex-col items-center justify-center w-full">
                 {/* Line 1: THE JASMINE */}
-                <span className="block text-4xl sm:text-5xl md:text-7xl lg:text-[7.5rem] xl:text-[9.5rem] text-[rgb(var(--c-white))] tracking-[0.15em] leading-[1.6] mb-2 md:mb-6 px-4 py-2 whitespace-nowrap opacity-0 animate-title-reveal drop-shadow-[0_0_35px_rgba(255,255,255,0.15)]" style={{ animationDelay: '0.2s' }}>
+                <span className="block text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-[7rem] text-[rgb(var(--c-white))] tracking-[0.15em] leading-[1.6] mb-2 md:mb-6 px-4 py-2 whitespace-nowrap opacity-0 animate-title-reveal drop-shadow-[0_0_35px_rgba(255,255,255,0.15)]" style={{ animationDelay: '0.2s' }}>
                     THE JASMINE
                 </span>
                 {/* Line 2: KNOT */}
-                <span className="block text-6xl sm:text-7xl md:text-8xl lg:text-[9rem] xl:text-[12rem] tracking-[0.05em] leading-[1.2] text-white drop-shadow-[0_0_50px_rgba(37,150,190,0.4)] px-4 pb-4 opacity-0 animate-title-reveal" style={{ animationDelay: '0.5s' }}>
+                <span className="block text-6xl sm:text-7xl md:text-8xl lg:text-[8rem] xl:text-[10rem] tracking-[0.05em] leading-[1.2] text-white drop-shadow-[0_0_50px_rgba(37,150,190,0.4)] px-4 pb-4 opacity-0 animate-title-reveal" style={{ animationDelay: '0.5s' }}>
                     KNOT
                 </span>
             </h1>
