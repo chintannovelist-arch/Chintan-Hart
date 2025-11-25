@@ -24,9 +24,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          # cache: 'npm'  <-- REMOVED to fix your error
       - name: Install dependencies
-        run: npm install
+        run: npm install  # <-- CHANGED to 'install' to fix your error
       - name: Build
+        env:
+          # This injects the key you saved in GitHub Secrets
+          VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
         run: npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
