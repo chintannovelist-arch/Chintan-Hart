@@ -1020,10 +1020,5 @@ export const GALLERY_IMAGES = [
     { id: 27, src: "assets/gallery-27.jpg", caption: "In the chaos of the crowd, he built a wall of silence around her." },
     { id: 28, src: "assets/gallery-28.jpg", caption: "She thought she was just fixing his tie. He knew she was tightening the leash." },
     { id: 29, src: "assets/gallery-29.jpg", caption: "She tried to look away. She failed." },
-    { id: 30, src: "assets/gallery-30.jpg", caption: "He didn't use a napkin. He used his thumb. And then..." },
-    { id: 31, src: "assets/gallery-31.jpg", caption: "The distance was a lie. His shadow always touched hers." },
-    { id: 32, src: "assets/gallery-32.jpg", caption: "Caught in the rain, soaked in truth." },
-    { id: 33, src: "assets/gallery-33.jpg", caption: "A fleeting glance, a lifetime of promise." },
-    { id: 34, src: "assets/gallery-34.jpg", caption: "In the quiet morning light, the walls dissolved." },
-    { id: 35, src: "assets/gallery-35.jpg", caption: "Her laughter was the only sound he wanted to hear." }
+    { id: 30, src: "assets/gallery-30.jpg", caption: "He didn't use a napkin. He used his thumb. And then..." }
 ];

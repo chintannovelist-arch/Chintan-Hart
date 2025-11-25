@@ -61,8 +61,6 @@ const App: React.FC = () => {
   // Helper to render the correct component based on ID (Modal Features)
   const renderFeature = (id: string) => {
       switch(id) {
-          // Note: Gallery, Visualizer, Connect etc. are now on page, 
-          // but these cases remain for fallback or specific modal invocations if needed.
           case 'gallery': return <NovelGallery />; 
           case 'unspoken': return <UnspokenThoughts />;
           case 'heatmap': return <TensionHeatmap />;
@@ -110,8 +108,6 @@ const App: React.FC = () => {
   };
 
   const handleFeatureSelect = (featureId: string) => {
-      // Smart Routing: Check if the feature ID corresponds to a section currently on the page.
-      // If so, scroll to it. If not, open it in a modal.
       const onPageSections = [
           'books', 'protagonists', 'timeline', 'gallery', 'visualizer', 'connect', 'experience'
       ];
@@ -124,7 +120,6 @@ const App: React.FC = () => {
           }
       }
       
-      // Fallback for modal features
       setActiveFeature(featureId);
   };
 
