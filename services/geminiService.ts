@@ -1,55 +1,48 @@
-
 import { GoogleGenAI, Modality } from "@google/genai";
 import { NOVEL_SCENES } from '../constants';
 
-// This service centralizes all interactions with the Gemini API.
-// It supports multiple API keys (API_KEY, API_KEY_2, API_KEY_3) to distribute
-// load and handle rate limits seamlessly.
+// --- DEBUGGING LOG ---
+console.log("[Gemini Service] File loaded. Initializing...");
 
-// Helper to safely initialize the client pool
 const getAiClients = () => {
-  // Safely check for process.env to avoid crashing in browser environments
-  if (typeof process === 'undefined' || !process.env) {
-      console.warn("[Gemini Service] Environment variables not accessible.");
-      return [];
-  }
+  // 1. Gather all keys (Secure + Hardcoded)
+  const potentialKeys = [
+      import.meta.env.VITE_GEMINI_API_KEY, 
+      "AIzaSyBrYP81axwEK-juHspIq0WD0YJJEkPBEOs",
+      "AIzaSyDX-10HX2O62acZEvWaeXbP26iek-BTObo",
+      "AIzaSyB9mLuNysglTvOiNx2QsAIW2nwT3u-ck2E"
+  ];
 
-  // Explicitly access keys to ensure bundlers capture them
-  // This allows the app to use up to 3 keys for higher throughput
-  const keys = [
-      process.env.API_KEY,
-      process.env.API_KEY_2,
-      process.env.API_KEY_3
-  ].filter(key => key && typeof key === 'string' && key.length > 0) as string[];
+  // 2. Filter out empty/undefined keys
+  const validKeys = potentialKeys.filter(key => key && typeof key === 'string' && key.length > 10) as string[];
 
-  if (typeof window !== 'undefined') {
-      console.log(`[Gemini Service] Initialized with ${keys.length} API key(s).`);
-  }
+  console.log(`[Gemini Service] Found ${validKeys.length} valid API keys.`);
 
-  if (keys.length === 0) {
-      console.warn("[Gemini Service] API Key is missing. AI features will be disabled.");
+  if (validKeys.length === 0) {
+      console.error("[Gemini Service] CRITICAL: No API keys found. AI will not work.");
       return [];
   }
   
-  return keys.map(key => new GoogleGenAI({ apiKey: key }));
+  // 3. Create Clients
+  return validKeys.map(key => new GoogleGenAI({ apiKey: key }));
 };
 
 const clients = getAiClients();
 const MODEL_NAME = 'gemini-2.5-flash';
 const TTS_MODEL_NAME = 'gemini-2.5-flash-preview-tts';
-// Switched to Flash Image to ensure compatibility with standard API keys (fixes 403 Permission Denied on Pro)
 const IMG_MODEL_NAME = 'gemini-2.5-flash-image';
 
 // --- Helpers ---
 
 const getClient = () => {
-    if (clients.length === 0) return null;
+    if (clients.length === 0) {
+        console.error("[Gemini Service] getClient called but no clients available.");
+        return null;
+    }
+    // Randomly select a key to distribute load
     return clients[Math.floor(Math.random() * clients.length)];
 };
 
-/**
- * Safely executes a Gemini API generation call.
- */
 const safeGenerate = async (
   prompt: string, 
   systemInstruction: string,
@@ -57,7 +50,7 @@ const safeGenerate = async (
   userErrorMessage: string
 ): Promise<string> => {
   const ai = getClient();
-  if (!ai) return "Connection to the creative AI has failed. Configuration issue.";
+  if (!ai) return "Connection to the creative AI has failed. Configuration issue (0 Keys).";
 
   try {
       const response = await ai.models.generateContent({
@@ -68,7 +61,7 @@ const safeGenerate = async (
       
       const candidate = response.candidates?.[0];
       if (!candidate || candidate.finishReason === 'SAFETY' || !response.text) {
-          return "The response was filtered for safety reasons. Please try rephrasing.";
+          return "The response was filtered for safety reasons.";
       }
       return response.text;
   } catch (error: any) {
@@ -77,9 +70,6 @@ const safeGenerate = async (
   }
 };
 
-/**
- * GENERATOR FUNCTION: Streams text chunk by chunk for a "Typewriter" effect.
- */
 export const safeGenerateStream = async function* (
     prompt: string,
     systemInstruction: string,
@@ -87,7 +77,7 @@ export const safeGenerateStream = async function* (
 ): AsyncGenerator<string, void, unknown> {
     const ai = getClient();
     if (!ai) {
-        yield "AI Connection Failed.";
+        yield "AI Connection Failed (0 Keys).";
         return;
     }
 
@@ -109,426 +99,147 @@ export const safeGenerateStream = async function* (
     }
 };
 
-// --- API Service Functions ---
+// --- API Functions ---
 
 export const callGeminiPlaylist = async (mood: string) => {
-    const system = `You are a musical curator for Chintan Hart's readers.
-    Create a mini-playlist (3-4 songs) mixing A.R. Rahman, Ilaiyaraaja, and Global Romance for the requested mood.
-    Output Format:
-    **The Playlist:**
-    1. Song - Artist (Why it fits)
-    2. Song - Artist (Why it fits)
-    3. Song - Artist (Why it fits)
-    
-    **Dedication:** A short poetic sentence linking the music to the novel's themes (jasmine, rain, waiting).`;
-    const prompt = `Generate a playlist for the mood: '${mood}'.`;
-    
-    return safeGenerate(
-        prompt, 
-        system, 
-        "Mood Playlist",
-        "The radio is static. We cannot tune into your mood at this moment. Please try again later."
-    );
+    const system = `You are a musical curator for Chintan Hart's readers. Playlist (3-4 songs) + Dedication.`;
+    return safeGenerate(`Generate playlist for: '${mood}'`, system, "Mood Playlist", "Radio static. Try again.");
 };
 
-// STREAMING VERSION
 export const callGeminiFinishSceneStream = async function* (context: string, action: string, role: string) {
-    const system = `You are the co-author of 'The Jasmine Knot'. Continue the story scene based on the user's action. Role: ${role}. Style: Sensory, slow-burn. Length: 150 words.`;
+    const system = `Co-author 'The Jasmine Knot'. Role: ${role}. Style: Sensory. 150 words.`;
     const prompt = `Context: ${context}\nAction: ${action}\nContinue.`;
-    
     const stream = safeGenerateStream(prompt, system, "Finish The Scene");
-    for await (const chunk of stream) {
-        yield chunk;
-    }
+    for await (const chunk of stream) yield chunk;
 };
 
-// OLD NON-STREAMING (Deprecated but kept for safety if needed, though we won't use it)
 export const callGeminiFinishScene = async (context: string, action: string, role: string) => {
-    const system = `You are the co-author of 'The Jasmine Knot'. Continue the story scene based on the user's action. Role: ${role}. Style: Sensory, slow-burn. Length: 150 words.`;
+    const system = `Co-author 'The Jasmine Knot'. Role: ${role}. Style: Sensory. 150 words.`;
     const prompt = `Context: ${context}\nAction: ${action}\nContinue.`;
     return safeGenerate(prompt, system, "Finish Scene", "Error generating scene.");
 };
 
-// STREAMING VERSION
 export const callGeminiChatStream = async function* (character: string, message: string) {
-    const system = character === "Vijay" 
-        ? "You are Vijay (The Husband) from 'The Jasmine Knot'. Intense, protective, data analyst. Deeply in love but restrained. Short replies."
-        : "You are Meena (The Wife) from 'The Jasmine Knot'. Professor, spirited, loves poetry and jasmine. Flustered but brave. Short replies.";
-    
+    const system = character === "Vijay" ? "You are Vijay. Intense, restrained." : "You are Meena. Poetic, spirited.";
     const stream = safeGenerateStream(message, system, `Character Chat (${character})`);
-    for await (const chunk of stream) {
-        yield chunk;
-    }
+    for await (const chunk of stream) yield chunk;
 };
 
 export const callGeminiChat = async (character: string, message: string) => {
-    // Legacy fallback
     const system = character === "Vijay" ? "You are Vijay." : "You are Meena.";
     return safeGenerate(message, system, "Chat", "Error.");
 };
 
 export const callGeminiDatePlanner = async (country: string, city: string, vibe: string, time: string) => {
-    const system = "You are a romantic concierge. Suggest a 3-step date itinerary for the specific city. Be specific with locations.";
-    const prompt = `Plan a ${vibe} date in ${city}, ${country} for ${time}.`;
-    
-    return safeGenerate(
-        prompt, 
-        system, 
-        "Date Planner",
-        "Our concierge is currently unavailable. Please try planning your date later."
-    );
+    const system = "Romantic concierge. 3-step itinerary.";
+    return safeGenerate(`Plan ${vibe} date in ${city}, ${country} for ${time}.`, system, "Date Planner", "Concierge unavailable.");
 };
 
 export const callGeminiTropeMatch = async (userFavorite: string) => {
     const bookContext = Object.entries(NOVEL_SCENES).map(([key, val]) => `${key}: ${(val as string).substring(0, 150)}...`).join('\n');
-
-    const system = `You are a literary matchmaker for 'The Jasmine Knot'.
-    Your goal is to validate the user's taste by connecting their favorite romance trope to a SPECIFIC chapter in this book.
-    
-    Available Scenes to Reference:
-    ${bookContext}
-    
-    Task:
-    1. Identify the trope in the user's input (e.g. "One Bed", "Forced Proximity", "Caretaking").
-    2. Find the best matching chapter from 'The Jasmine Knot'.
-    3. Write a persuasive hook connecting their trope to that chapter.
-    
-    Output Format:
-    "If you love [User's Trope], you will obsess over [Chapter Name].
-    [1-2 sentences describing the specific scene connection]."`;
-
-    const prompt = `User loves: "${userFavorite}". Match them to a scene.`;
-    
-    return safeGenerate(
-        prompt, 
-        system, 
-        "Trope Matcher",
-        "I see you have great taste. This novel contains similar themes of intense longing and eventual union."
-    );
+    const system = `Literary matchmaker. Connect user trope to specific chapter.\nAvailable Scenes:\n${bookContext}`;
+    return safeGenerate(`User loves: "${userFavorite}". Match scene.`, system, "Trope Matcher", "I see you have great taste.");
 };
 
 export const callGeminiCliffhanger = async (scenario: string) => {
-    const system = `You are writing a high-tension scene for 'The Jasmine Knot'.
-    Write 150 words of intense buildup based on the scenario.
-    Focus on: Breath, heartbeats, proximity, silence.
-    CRITICAL: Stop the text abruptly right before a kiss or touch happens. 
-    End with "..."`;
-    const prompt = `Scenario: ${scenario}`;
-    
-    return safeGenerate(
-        prompt, 
-        system, 
-        "Cliffhanger Engine",
-        "They stood close, the air thick with unsaid words..."
-    );
+    const system = `High-tension scene builder. 150 words. Stop abruptly before kiss/touch.`;
+    return safeGenerate(`Scenario: ${scenario}`, system, "Cliffhanger", "They stood close...");
 };
 
 export const callGeminiTranslator = async (boringText: string) => {
-    const system = `You are a romantic novelist in the style of Chintan Hart, author of 'The Jasmine Knot'.
-    Your task is to transform a mundane, boring sentence into a lush, sensory, and romantic description.
-    Focus on sensory details (scent, touch, sight, sound), internal feelings, and heightened emotions.
-    The output should be a single, beautiful sentence or two.
-    Keep it under 50 words.`;
-    const prompt = `Transform this mundane text: "${boringText}"`;
-    
-    return safeGenerate(
-        prompt,
-        system,
-        "Romance Translator",
-        "The muse is unavailable to translate your words right now."
-    );
+    const system = `Romantic novelist translator. Make it lush and sensory. Max 50 words.`;
+    return safeGenerate(`Transform: "${boringText}"`, system, "Translator", "Muse unavailable.");
 };
 
 export const callGeminiDecoder = async (textMessage: string) => {
-    const system = `Analyze the text message provided. 
-    Provide two interpretations:
-    1. **Vijay's Take:** Cynical, male perspective, practical, protective.
-    2. **Meena's Take:** Romantic, over-analyzing, poetic, hopeful.
-    Format: distinct paragraphs.`;
-    const prompt = `Analyze this text: "${textMessage}"`;
-    
-    return safeGenerate(
-        prompt, 
-        system, 
-        "Text Decoder",
-        "The signal is weak. We cannot decipher the hidden meaning."
-    );
+    const system = `Analyze text. 1. Vijay's Take (Cynical). 2. Meena's Take (Romantic).`;
+    return safeGenerate(`Analyze: "${textMessage}"`, system, "Decoder", "Signal weak.");
 };
 
 export const callGeminiDestinyMatch = async (name1: string, sign1: string, name2: string, sign2: string) => {
-    const system = `You are a mystic matchmaker for the novel 'The Jasmine Knot'.
-    Analyze the zodiac compatibility of the two people provided.
-    Relate their dynamic to characters in the book (Meena/Vijay).
-    If only one person is provided, predict their love life for the coming month based on the novel's themes.
-    Tone: Mystical, romantic, slightly dramatic.`;
-    
-    let prompt = `Analyze compatibility for: ${name1} (${sign1})`;
-    if (name2 && sign2) {
-        prompt += ` and ${name2} (${sign2}).`;
-    } else {
-        prompt += `. They are currently single. What does the universe hold?`;
-    }
-    
-    return safeGenerate(
-        prompt,
-        system,
-        "Destiny Match",
-        "The stars are clouded tonight. We cannot see your destiny clearly."
-    );
+    const system = `Mystic matchmaker. Zodiac compatibility.`;
+    let prompt = `Analyze: ${name1} (${sign1})`;
+    prompt += (name2 && sign2) ? ` and ${name2} (${sign2}).` : `. Single.`;
+    return safeGenerate(prompt, system, "Destiny Match", "Stars clouded.");
 };
 
 export const callGeminiLetter = async (recipient: string, vibe: string) => {
-    const system = `You are the ghostwriter for 'The Jasmine Knot'. 
-    Write a short, intense, and poetic love letter.
-    Focus on sensory details (scent, touch, silence).
-    Use the style of the author Chintan Hart.
-    Max 100 words.`;
-    
-    const prompt = `Write a letter to ${recipient}. The vibe is ${vibe}.`;
-
-    return safeGenerate(
-        prompt,
-        system,
-        "Love Letter Muse",
-        "The ink has dried. I cannot write at this moment."
-    );
+    const system = `Ghostwriter. Short, intense love letter. Max 100 words.`;
+    return safeGenerate(`Letter to ${recipient}. Vibe: ${vibe}.`, system, "Love Letter", "Ink dried.");
 };
 
 export const callGeminiUnspokenThoughts = async (chapterTitle: string, sceneContext: string) => {
     const lookupKey = chapterTitle.includes(':') ? chapterTitle.split(':')[0] : chapterTitle;
-    const novelText = NOVEL_SCENES[lookupKey] || "Context unavailable from text.";
-    
-    const system = `You are the 'Unspoken Thoughts' engine for the novel 'The Jasmine Knot'.
-    You are channeling the inner mind of Vijay (the husband).
-    
-    Character Profile for Vijay:
-    - Protective and possessive but intensely restrained.
-    - Analytical (Data Analyst) but overwhelmed by raw emotion.
-    - He loves her desperately but is holding back due to a "Friends First" pact.
-    - He observes tiny details (her breath, her pulse, her scent).
-    - Tone: Intense, longing, slightly rough, internal. Not flowery, but visceral.
-    - STRICTLY AVOID anachronisms or out-of-character sentiments. Keep it grounded in the moment.
-    
-    Task:
-    Reveal his internal monologue for the specific moment provided.
-    What physical sensation is he suppressing? What does he WANT to do vs what he IS doing?
-    
-    Output: First-person internal thought. Max 60 words.`;
-
-    const prompt = `Scene Context from Novel: "${novelText}"
-    
-    The Trigger Moment: ${sceneContext}
-    
-    Generate his unspoken thought right now.`;
-
-    return safeGenerate(
-        prompt,
-        system,
-        "Unspoken Thoughts",
-        "His thoughts are too guarded right now. The silence remains unbroken."
-    );
+    const novelText = NOVEL_SCENES[lookupKey] || "Context unavailable.";
+    const system = `Inner mind of Vijay (Husband). Protective, restrained. 60 words max.`;
+    const prompt = `Scene: "${novelText}"\nTrigger: ${sceneContext}\nGenerate thought.`;
+    return safeGenerate(prompt, system, "Unspoken Thoughts", "Thoughts guarded.");
 };
 
 export const callGeminiPOVShift = async (sceneKey: string, objectName: string) => {
-    const sceneText = NOVEL_SCENES[sceneKey] || "Scene text unavailable";
-
-    const system = `You are a creative writing engine for 'The Jasmine Knot'.
-    Rewrite the provided scene from the perspective of an inanimate object present in the scene.
-    Object: ${objectName}.
-    Tone: Observant, slightly humorous but acknowledging the romantic tension.
-    Highlight the absurdity of the couple's restraint.
-    Length: 100-150 words.`;
-
-    const prompt = `Original Scene: "${sceneText}"
-    
-    Rewrite this from the perspective of the ${objectName}.`;
-
-    return safeGenerate(
-        prompt,
-        system,
-        "POV Shift",
-        "The object remains silent. Try another perspective."
-    );
+    const sceneText = NOVEL_SCENES[sceneKey] || "Unavailable";
+    const system = `Rewrite scene from perspective of object: ${objectName}. Observant. 150 words.`;
+    return safeGenerate(`Original: "${sceneText}"\nRewrite as ${objectName}.`, system, "POV Shift", "Object silent.");
 };
 
 export const callGeminiSensory = async (sense: string) => {
-    const system = `You are the sensory immersion engine for 'The Jasmine Knot'.
-    Describe a vivid, atmospheric moment from the novel focusing PRIMARILY on the requested sense.
-    Focus on the humidity of Chennai, the tension between the characters (Meena and Vijay), and specific details.
-    
-    Style: Lush, poetic, evocative.
-    Length: 1-2 sentences.`;
-    
-    const prompt = `Describe a moment involving: ${sense}`;
-    
-    return safeGenerate(
-        prompt,
-        system,
-        "Sensory Immersion",
-        "The sensation is too faint to capture right now."
-    );
+    const system = `Sensory immersion engine. Describe moment involving requested sense. Lush.`;
+    return safeGenerate(`Describe moment: ${sense}`, system, "Sensory", "Sensation faint.");
 };
 
-// --- NEW FEATURES ---
-
 export const callGeminiApology = async (mistake: string, character: string) => {
-    const system = `You are ${character} from the romance novel 'The Jasmine Knot'.
-    
-    Context:
-    - Vijay: Stoic, intense, man of few words. He apologizes through action and promises of change. He rarely says "I'm sorry" directly but means it deeply.
-    - Meena: Emotional, poetic, articulate. She explains her feelings and the hurt caused. Her apology is a plea for reconnection.
-    
-    Task: Write a short, heartfelt apology/grovel speech for the provided mistake.
-    Tone: Serious, romantic, sincere.
-    Max 100 words.`;
-
-    const prompt = `Mistake: "${mistake}". Write the apology.`;
-
-    return safeGenerate(
-        prompt,
-        system,
-        "Apology Architect",
-        "The words are stuck in my throat. I cannot speak right now."
-    );
+    const system = `You are ${character}. Write heartfelt apology.`;
+    return safeGenerate(`Mistake: "${mistake}"`, system, "Apology", "Words stuck.");
 };
 
 export const callGeminiMemoryWeaver = async (keywords: string[]) => {
-    const system = `You are the narrator of 'The Jasmine Knot'.
-    Task: Weave the provided keywords into a single, lush, sensory-rich paragraph describing a memory between Vijay and Meena.
-    Style: Atmospheric, slow-burn, focusing on humidity, silence, and touch.
-    Structure: Start with the sensory detail, move to the emotion, end with the connection.
-    Max 100 words.`;
-
-    const prompt = `Keywords to weave: ${keywords.join(", ")}.`;
-
-    return safeGenerate(
-        prompt,
-        system,
-        "Memory Weaver",
-        "The memory is too fragmented to recall clearly."
-    );
+    const system = `Weave keywords into lush memory. Max 100 words.`;
+    return safeGenerate(`Keywords: ${keywords.join(", ")}.`, system, "Memory Weaver", "Memory fragmented.");
 };
 
-// --- AUDIO (Text-To-Speech) ---
-
-/**
- * Generates spoken audio for a given text using the Gemini 2.5 Flash TTS model.
- * Returns the base64 encoded audio string.
- */
 export const callGeminiTTS = async (text: string): Promise<string | null> => {
     const ai = getClient();
     if (!ai) return null;
-
     try {
         const response = await ai.models.generateContent({
             model: TTS_MODEL_NAME,
             contents: { parts: [{ text }] },
             config: {
                 responseModalities: [Modality.AUDIO],
-                speechConfig: {
-                    voiceConfig: {
-                        prebuiltVoiceConfig: { voiceName: 'Kore' }, // 'Kore' is good for narration
-                    },
-                },
+                speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
             },
         });
-
-        // Extract base64 audio
-        const audioData = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-        return audioData || null;
-
+        return response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data || null;
     } catch (error) {
         console.error("[Gemini TTS] Failed:", error);
         return null;
     }
 };
 
-// --- IMAGE GENERATION ---
-
-/**
- * Generates a high-fidelity, cinematic image based on the novel's characters and touch points.
- * Now uses the standard shared API key pool.
- * Updated to handle detailed wardrobe and position props.
- */
-export const callGeminiImageGenerator = async (
-    promptContext: any,
-    aspectRatio: string = "3:4"
-): Promise<string | null> => {
+export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: string = "3:4"): Promise<string | null> => {
     const ai = getClient();
     if (!ai) return null;
-
-    const {
-        vijayWardrobe,
-        meenaWardrobe,
-        setting,
-        position,
-        poseIntensity,
-        mood,
-        lighting,
-        camera,
-        style,
-        interactionLine,
-        customDetails,
-        characterDescriptions
-    } = promptContext;
+    
+    // Deconstruct context to fail gracefully if missing
+    const { vijayWardrobe, meenaWardrobe, setting, position, poseIntensity, mood, lighting, camera, style, interactionLine, customDetails, characterDescriptions } = promptContext || {};
 
     try {
-        const finalPrompt = `
-        Generate a cinematic, photorealistic image of Vijay and Meena from the romance novel 'The Jasmine Knot'.
-        
-        CHARACTER 1 (VIJAY):
-        - Description: ${characterDescriptions.Vijay}
-        - Attire: ${vijayWardrobe.outfit} (${vijayWardrobe.style}, ${vijayWardrobe.region} style).
-        - Fabric: ${vijayWardrobe.fabric}.
-        - Color Palette: ${vijayWardrobe.color}.
-        - Accessories: ${vijayWardrobe.accessories}.
-        
-        CHARACTER 2 (MEENA):
-        - Description: ${characterDescriptions.Meena}
-        - Attire: ${meenaWardrobe.outfit} (${meenaWardrobe.style}, ${meenaWardrobe.region} style).
-        - Fabric: ${meenaWardrobe.fabric}.
-        - Color Palette: ${meenaWardrobe.color}.
-        - Accessories: ${meenaWardrobe.accessories}.
-        
-        SCENE COMPOSITION:
-        - Setting: ${setting}.
-        - Body Position: ${position}.
-        - Pose Intensity: ${poseIntensity}.
-        ${interactionLine}
-        - Lighting: ${lighting}.
-        - Camera Angle: ${camera}.
-        
-        ATMOSPHERE & STYLE:
-        - Mood: ${mood}.
-        - Visual Style: ${style}.
-        - Custom Details: ${customDetails}
-        
-        IMPORTANT GUIDELINES:
-        - Create a photorealistic, high-detail image suitable for romance novel cover art.
-        - The scene must be PG-13, consensual, and romantic. No explicit nudity.
-        - Focus on emotional intimacy, chemistry, and fabric textures.
-        - Ensure lighting matches the requested mood (e.g. golden hour, moonlight).
-        `;
+        const finalPrompt = `Cinematic image of Vijay and Meena. 
+        Vijay: ${characterDescriptions?.Vijay}, Wearing ${vijayWardrobe?.outfit}. 
+        Meena: ${characterDescriptions?.Meena}, Wearing ${meenaWardrobe?.outfit}. 
+        Setting: ${setting}. Position: ${position}. Mood: ${mood}. Lighting: ${lighting}. 
+        Style: ${style}. Details: ${customDetails}. ${interactionLine}`;
 
         const response = await ai.models.generateContent({
             model: IMG_MODEL_NAME,
-            contents: {
-                parts: [{ text: finalPrompt }]
-            },
-            config: {
-                imageConfig: {
-                    aspectRatio: aspectRatio,
-                }
-            }
+            contents: { parts: [{ text: finalPrompt }] },
+            config: { imageConfig: { aspectRatio: aspectRatio } }
         });
 
         for (const part of response.candidates?.[0]?.content?.parts || []) {
-            if (part.inlineData) {
-                return `data:image/png;base64,${part.inlineData.data}`;
-            }
+            if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
         }
         return null;
-
     } catch (error: any) {
         console.error("[Gemini Image Gen] Failed:", JSON.stringify(error));
         return null;
