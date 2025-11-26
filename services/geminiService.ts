@@ -6,6 +6,7 @@ console.log("[Gemini Service] File loaded. Initializing...");
 
 const getAiClients = () => {
   // 1. Gather all keys (Secure + Hardcoded Fallbacks)
+  // We use import.meta.env because this is a Vite app, NOT a Node app.
   const potentialKeys = [
       import.meta.env.VITE_GEMINI_API_KEY, // The key from GitHub Secrets
       "AIzaSyBrYP81axwEK-juHspIq0WD0YJJEkPBEOs",
