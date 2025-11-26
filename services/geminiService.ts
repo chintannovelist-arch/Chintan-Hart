@@ -12,6 +12,7 @@ const getAiClients = () => {
       console.error("[Gemini Service] CRITICAL: No API keys found. AI will not work.");
       return [];
   }
+  // Create a client for EVERY key
   return validKeys.map(key => new GoogleGenAI({ apiKey: key }));
 };
 
@@ -20,16 +21,14 @@ const clients = getAiClients();
 // --- MODEL CONFIGURATION ---
 const MODEL_NAME = 'gemini-2.5-flash';
 const TTS_MODEL_NAME = 'gemini-2.5-flash-preview-tts';
-
-// SWITCH BACK TO FLASH EXP (Because Imagen 3 is 404/Paid Only)
 const IMG_MODEL_NAME = 'gemini-2.0-flash-exp'; 
 
 // --- Helpers ---
 
+// Get a random client for simple text tasks
 const getClient = () => {
     if (clients.length === 0) return null;
-    const randomIndex = Math.floor(Math.random() * clients.length);
-    return clients[randomIndex];
+    return clients[Math.floor(Math.random() * clients.length)];
 };
 
 const safeGenerate = async (
@@ -47,12 +46,7 @@ const safeGenerate = async (
         contents: prompt,
         config: { systemInstruction },
       });
-      
-      const candidate = response.candidates?.[0];
-      if (!candidate || candidate.finishReason === 'SAFETY' || !response.text) {
-          return "The response was filtered for safety reasons.";
-      }
-      return response.text;
+      return response.text || userErrorMessage;
   } catch (error: any) {
       console.error(`[${contextName}] Failed:`, error);
       return userErrorMessage;
@@ -65,10 +59,7 @@ export const safeGenerateStream = async function* (
     contextName: string
 ): AsyncGenerator<string, void, unknown> {
     const ai = getClient();
-    if (!ai) {
-        yield "AI Connection Failed (0 Keys).";
-        return;
-    }
+    if (!ai) { yield "AI Connection Failed."; return; }
 
     try {
         const responseStream = await ai.models.generateContentStream({
@@ -76,11 +67,8 @@ export const safeGenerateStream = async function* (
             contents: prompt,
             config: { systemInstruction },
         });
-
         for await (const chunk of responseStream) {
-            if (chunk.text) {
-                yield chunk.text;
-            }
+            if (chunk.text) yield chunk.text;
         }
     } catch (error) {
         console.error(`[${contextName}] Stream Failed:`, error);
@@ -89,6 +77,7 @@ export const safeGenerateStream = async function* (
 };
 
 // --- API Functions (Text) ---
+// (These remain unchanged, but included for completeness)
 
 export const callGeminiPlaylist = async (mood: string) => {
     const system = `You are a musical curator for Chintan Hart's readers. Playlist (3-4 songs) + Dedication.`;
@@ -194,7 +183,6 @@ export const callGeminiTTS = async (text: string): Promise<string | null> => {
             model: TTS_MODEL_NAME,
             contents: { parts: [{ text }] },
             config: {
-                // Safer string constant
                 responseModalities: ["AUDIO" as any], 
                 speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
             },
@@ -206,13 +194,11 @@ export const callGeminiTTS = async (text: string): Promise<string | null> => {
     }
 };
 
-// --- IMAGE GENERATION (Final Attempt with Fallback) ---
+// --- IMAGE GENERATION (With Round-Robin Retry) ---
 export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: string = "3:4"): Promise<string | null> => {
-    const ai = getClient();
-    if (!ai) return null;
+    if (clients.length === 0) return null;
     
-    // Deconstruct context
-    const { vijayWardrobe, meenaWardrobe, setting, position, mood, lighting, style, interactionLine, customDetails, characterDescriptions } = promptContext || {};
+    const { vijayWardrobe, meenaWardrobe, setting, mood, lighting, style, interactionLine, customDetails, characterDescriptions } = promptContext || {};
 
     const vijayDesc = characterDescriptions?.Vijay ? "A handsome Indian man, " + characterDescriptions.Vijay : "A handsome Indian man";
     const meenaDesc = characterDescriptions?.Meena ? "A beautiful Indian woman, " + characterDescriptions.Meena : "A beautiful Indian woman";
@@ -224,31 +210,44 @@ export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: 
     Style: ${style || "Photorealistic, 8k"}. Action: ${interactionLine || "Standing close together"}. 
     ${customDetails || ""}`;
 
-    try {
-        const response = await ai.models.generateContent({
-            model: IMG_MODEL_NAME, // gemini-2.0-flash-exp
-            contents: [
-                { parts: [{ text: finalPrompt }] } 
-            ],
-            // CRITICAL CHANGE: REMOVE ALL 'imageConfig' AND 'responseModalities' 
-            // We just send the prompt. If the model supports images, it will send one.
-            // If not, it will send text, and we catch that below.
-        });
+    // --- RETRY LOGIC START ---
+    // We try every key in the list until one works or all fail
+    for (let i = 0; i < clients.length; i++) {
+        const ai = clients[i];
+        try {
+            console.log(`[Gemini Image] Attempting with Key #${i + 1}...`);
+            const response = await ai.models.generateContent({
+                model: IMG_MODEL_NAME,
+                contents: [{ parts: [{ text: finalPrompt }] }],
+                config: { responseModalities: ["IMAGE" as any] }
+            });
 
-        // Loop through parts to find the image data
-        for (const part of response.candidates?.[0]?.content?.parts || []) {
-            if (part.inlineData) {
-                return `data:image/png;base64,${part.inlineData.data}`;
+            for (const part of response.candidates?.[0]?.content?.parts || []) {
+                if (part.inlineData) {
+                    console.log(`[Gemini Image] Success with Key #${i + 1}!`);
+                    return `data:image/png;base64,${part.inlineData.data}`;
+                }
+            }
+            // If we are here, the model returned text (refusal) but no error. Stop retrying.
+            console.warn("[Gemini Image] Model refused (Safety/Text only).");
+            break; 
+
+        } catch (error: any) {
+            // Check if it's a Rate Limit (429) or Overloaded (503)
+            if (error.status === 429 || error.status === 503) {
+                console.warn(`[Gemini Image] Key #${i + 1} exhausted (429). Switching to next key...`);
+                continue; // Try the next key in the loop
+            } else {
+                console.error("[Gemini Image] Fatal Error:", error);
+                break; // Stop retrying for other errors (like 400 Bad Request)
             }
         }
-        
-        console.warn("[Gemini Image Gen] Model returned text only (No Image Access on this Tier).");
-        // FALLBACK: Return a placeholder image so the site doesn't error out.
-        return "https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?q=80&w=600&auto=format&fit=crop";
-
-    } catch (error: any) {
-        console.error("[Gemini Image Gen] API FAILURE:", JSON.stringify(error, null, 2));
-        // FALLBACK: Return a placeholder image
-        return "https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?q=80&w=600&auto=format&fit=crop";
     }
+    // --- RETRY LOGIC END ---
+
+    // If all keys fail, we return null (or you can uncomment the fallback below)
+    console.error("[Gemini Image] All API keys exhausted.");
+    
+    // Change this URL if you want a different "Failure" image
+    return "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=600&auto=format&fit=crop"; 
 };
