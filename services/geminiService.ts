@@ -21,7 +21,7 @@ const clients = getAiClients();
 const MODEL_NAME = 'gemini-2.5-flash';
 const TTS_MODEL_NAME = 'gemini-2.5-flash-preview-tts';
 // Using the Experimental Flash model for better Free Tier image support
-const IMG_MODEL_NAME = 'gemini-2.0-flash-exp'; 
+const IMG_MODEL_NAME = 'imagen-3.0-generate-001'; 
 
 // --- Helpers ---
 
@@ -204,7 +204,7 @@ export const callGeminiTTS = async (text: string): Promise<string | null> => {
     }
 };
 
-// --- ROBUST IMAGE GENERATION FUNCTION ---
+// --- ROBUST IMAGE GENERATION FUNCTION (IMAGEN 3) ---
 export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: string = "3:4"): Promise<string | null> => {
     const ai = getClient();
     if (!ai) return null;
@@ -225,15 +225,16 @@ export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: 
 
     try {
         const response = await ai.models.generateContent({
-            model: IMG_MODEL_NAME, 
+            model: IMG_MODEL_NAME, // 'imagen-3.0-generate-001'
             contents: [
                 { parts: [{ text: finalPrompt }] } 
             ],
             config: { 
-                // FORCE IMAGE MODE
-                responseModalities: ["IMAGE" as any], 
-                imageConfig: { aspectRatio: aspectRatio },
-                // RELAX SAFETY FILTERS (Using String Constants to prevent Build Errors)
+                // Imagen 3 does NOT use 'responseModalities'. It only needs 'imageConfig'.
+                // 'numberOfImages' must be 1 for the basic tier.
+                imageConfig: { aspectRatio: aspectRatio, numberOfImages: 1 },
+                
+                // RELAX SAFETY FILTERS
                 safetySettings: [
                     { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT' as any, threshold: 'BLOCK_ONLY_HIGH' as any },
                     { category: 'HARM_CATEGORY_HARASSMENT' as any, threshold: 'BLOCK_ONLY_HIGH' as any },
@@ -243,6 +244,7 @@ export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: 
             }
         });
 
+        // Loop through parts to find the image data
         for (const part of response.candidates?.[0]?.content?.parts || []) {
             if (part.inlineData) {
                 return `data:image/png;base64,${part.inlineData.data}`;
