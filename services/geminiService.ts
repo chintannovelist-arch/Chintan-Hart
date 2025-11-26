@@ -5,16 +5,22 @@ import { NOVEL_SCENES } from '../constants';
 console.log("[Gemini Service] File loaded. Initializing...");
 
 const getAiClients = () => {
-  // 1. Get the Key from the Secure Environment (GitHub Secrets or .env file)
-  const secureKey = import.meta.env.VITE_GEMINI_API_KEY;
+  // 1. Get the Raw String from Environment
+  const rawKeys = import.meta.env.VITE_GEMINI_API_KEY || "";
 
-  if (!secureKey || secureKey.length < 10) {
+  // 2. Split the string by commas to get individual keys
+  // The .map(k => k.trim()) part removes accidental spaces if you copied them.
+  const validKeys = rawKeys.split(',').map(key => key.trim()).filter(key => key.length > 10);
+
+  console.log(`[Gemini Service] Found ${validKeys.length} valid API keys available for rotation.`);
+
+  if (validKeys.length === 0) {
       console.error("[Gemini Service] CRITICAL: No API keys found. AI will not work.");
       return [];
   }
   
-  // 2. Create the Client
-  return [new GoogleGenAI({ apiKey: secureKey })];
+  // 3. Create a Client for EVERY key found
+  return validKeys.map(key => new GoogleGenAI({ apiKey: key }));
 };
 
 const clients = getAiClients();
@@ -29,15 +35,13 @@ const getClient = () => {
         console.error("[Gemini Service] getClient called but no clients available.");
         return null;
     }
-    return clients[0]; // Returns the secure client
+    // Randomly select one of the 7 keys to distribute the workload
+    const randomIndex = Math.floor(Math.random() * clients.length);
+    return clients[randomIndex];
 };
 
-// ... (The rest of your functions: safeGenerate, safeGenerateStream, etc., remain exactly the same)
-// COPY THE REST OF YOUR FUNCTIONS FROM THE PREVIOUS FILE HERE
-// (I have omitted them to save space, but you need to keep them!)
-
-// PASTE THE REST OF THE FUNCTIONS (callGeminiPlaylist, callGeminiChat, etc.) BELOW THIS LINE:
-// -----------------------------------------------------------------------------------------
+// ... (PASTE THE REST OF YOUR FUNCTIONS BELOW AS BEFORE) ...
+// ... safeGenerate, safeGenerateStream, callGeminiPlaylist, etc. ...
 
 const safeGenerate = async (
   prompt: string, 
@@ -231,4 +235,11 @@ export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: 
         });
 
         for (const part of response.candidates?.[0]?.content?.parts || []) {
-            if (part.inlineData) return `data:image/png;base6
+            if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
+        }
+        return null;
+    } catch (error: any) {
+        console.error("[Gemini Image Gen] Failed:", JSON.stringify(error));
+        return null;
+    }
+};
