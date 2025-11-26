@@ -5,27 +5,16 @@ import { NOVEL_SCENES } from '../constants';
 console.log("[Gemini Service] File loaded. Initializing...");
 
 const getAiClients = () => {
-  // 1. Gather all keys (Secure + Hardcoded Fallbacks)
-  // We use import.meta.env because this is a Vite app, NOT a Node app.
-  const potentialKeys = [
-      import.meta.env.VITE_GEMINI_API_KEY, // The key from GitHub Secrets
-      "AIzaSyBrYP81axwEK-juHspIq0WD0YJJEkPBEOs",
-      "AIzaSyDX-10HX2O62acZEvWaeXbP26iek-BTObo",
-      "AIzaSyB9mLuNysglTvOiNx2QsAIW2nwT3u-ck2E"
-  ];
+  // 1. Get the Key from the Secure Environment (GitHub Secrets or .env file)
+  const secureKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-  // 2. Filter out empty/undefined keys
-  const validKeys = potentialKeys.filter(key => key && typeof key === 'string' && key.length > 10) as string[];
-
-  console.log(`[Gemini Service] Found ${validKeys.length} valid API keys.`);
-
-  if (validKeys.length === 0) {
+  if (!secureKey || secureKey.length < 10) {
       console.error("[Gemini Service] CRITICAL: No API keys found. AI will not work.");
       return [];
   }
   
-  // 3. Create Clients
-  return validKeys.map(key => new GoogleGenAI({ apiKey: key }));
+  // 2. Create the Client
+  return [new GoogleGenAI({ apiKey: secureKey })];
 };
 
 const clients = getAiClients();
@@ -40,9 +29,15 @@ const getClient = () => {
         console.error("[Gemini Service] getClient called but no clients available.");
         return null;
     }
-    // Randomly select a key to distribute load
-    return clients[Math.floor(Math.random() * clients.length)];
+    return clients[0]; // Returns the secure client
 };
+
+// ... (The rest of your functions: safeGenerate, safeGenerateStream, etc., remain exactly the same)
+// COPY THE REST OF YOUR FUNCTIONS FROM THE PREVIOUS FILE HERE
+// (I have omitted them to save space, but you need to keep them!)
+
+// PASTE THE REST OF THE FUNCTIONS (callGeminiPlaylist, callGeminiChat, etc.) BELOW THIS LINE:
+// -----------------------------------------------------------------------------------------
 
 const safeGenerate = async (
   prompt: string, 
@@ -99,8 +94,6 @@ export const safeGenerateStream = async function* (
         yield " ...[Connection Lost]";
     }
 };
-
-// --- API Functions ---
 
 export const callGeminiPlaylist = async (mood: string) => {
     const system = `You are a musical curator for Chintan Hart's readers. Playlist (3-4 songs) + Dedication.`;
@@ -238,11 +231,4 @@ export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: 
         });
 
         for (const part of response.candidates?.[0]?.content?.parts || []) {
-            if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
-        }
-        return null;
-    } catch (error: any) {
-        console.error("[Gemini Image Gen] Failed:", JSON.stringify(error));
-        return null;
-    }
-};
+            if (part.inlineData) return `data:image/png;base6
