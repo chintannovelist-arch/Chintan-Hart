@@ -35,13 +35,10 @@ const getClient = () => {
         console.error("[Gemini Service] getClient called but no clients available.");
         return null;
     }
-    // Randomly select one of the 7 keys to distribute the workload
+    // Randomly select one of the keys to distribute the workload
     const randomIndex = Math.floor(Math.random() * clients.length);
     return clients[randomIndex];
 };
-
-// ... (PASTE THE REST OF YOUR FUNCTIONS BELOW AS BEFORE) ...
-// ... safeGenerate, safeGenerateStream, callGeminiPlaylist, etc. ...
 
 const safeGenerate = async (
   prompt: string, 
@@ -98,6 +95,8 @@ export const safeGenerateStream = async function* (
         yield " ...[Connection Lost]";
     }
 };
+
+// --- API Functions ---
 
 export const callGeminiPlaylist = async (mood: string) => {
     const system = `You are a musical curator for Chintan Hart's readers. Playlist (3-4 songs) + Dedication.`;
@@ -214,32 +213,44 @@ export const callGeminiTTS = async (text: string): Promise<string | null> => {
     }
 };
 
+// --- FIX APPLIED HERE ---
 export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: string = "3:4"): Promise<string | null> => {
     const ai = getClient();
     if (!ai) return null;
     
     // Deconstruct context to fail gracefully if missing
-    const { vijayWardrobe, meenaWardrobe, setting, position, poseIntensity, mood, lighting, camera, style, interactionLine, customDetails, characterDescriptions } = promptContext || {};
+    const { vijayWardrobe, meenaWardrobe, setting, position, mood, lighting, style, interactionLine, customDetails, characterDescriptions } = promptContext || {};
 
     try {
         const finalPrompt = `Cinematic image of Vijay and Meena. 
-        Vijay: ${characterDescriptions?.Vijay}, Wearing ${vijayWardrobe?.outfit}. 
-        Meena: ${characterDescriptions?.Meena}, Wearing ${meenaWardrobe?.outfit}. 
-        Setting: ${setting}. Position: ${position}. Mood: ${mood}. Lighting: ${lighting}. 
-        Style: ${style}. Details: ${customDetails}. ${interactionLine}`;
+        Vijay: ${characterDescriptions?.Vijay || "Indian man"}, Wearing ${vijayWardrobe?.outfit || "Casual"}. 
+        Meena: ${characterDescriptions?.Meena || "Indian woman"}, Wearing ${meenaWardrobe?.outfit || "Saree"}. 
+        Setting: ${setting || "Garden"}. Position: ${position || "Standing"}. Mood: ${mood || "Romantic"}. Lighting: ${lighting || "Golden Hour"}. 
+        Style: ${style || "Photorealistic"}. Details: ${customDetails || ""}. ${interactionLine || ""}`;
 
         const response = await ai.models.generateContent({
             model: IMG_MODEL_NAME,
-            contents: { parts: [{ text: finalPrompt }] },
-            config: { imageConfig: { aspectRatio: aspectRatio } }
+            contents: [ // FIXED: Wrapped in array
+                { parts: [{ text: finalPrompt }] } 
+            ],
+            config: { 
+                // FIXED: Force IMAGE generation mode
+                responseModalities: [Modality.IMAGE], 
+                imageConfig: { aspectRatio: aspectRatio } 
+            }
         });
 
         for (const part of response.candidates?.[0]?.content?.parts || []) {
-            if (part.inlineData) return `data:image/png;base64,${part.inlineData.data}`;
+            if (part.inlineData) {
+                return `data:image/png;base64,${part.inlineData.data}`;
+            }
+            if (part.text) {
+                console.warn("[Gemini Image Gen] Model returned text instead of image:", part.text);
+            }
         }
         return null;
     } catch (error: any) {
-        console.error("[Gemini Image Gen] Failed:", JSON.stringify(error));
+        console.error("[Gemini Image Gen] Failed:", JSON.stringify(error, null, 2));
         return null;
     }
 };
