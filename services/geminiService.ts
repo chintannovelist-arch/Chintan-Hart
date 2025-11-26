@@ -1,4 +1,4 @@
-import { GoogleGenAI, Modality, HarmCategory, HarmBlockThreshold } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { NOVEL_SCENES } from '../constants';
 
 // --- DEBUGGING LOG ---
@@ -7,8 +7,6 @@ console.log("[Gemini Service] File loaded. Initializing...");
 const getAiClients = () => {
   const rawKeys = import.meta.env.VITE_GEMINI_API_KEY || "";
   const validKeys = rawKeys.split(',').map(key => key.trim()).filter(key => key.length > 10);
-
-  console.log(`[Gemini Service] Found ${validKeys.length} valid API keys available for rotation.`);
 
   if (validKeys.length === 0) {
       console.error("[Gemini Service] CRITICAL: No API keys found. AI will not work.");
@@ -22,16 +20,13 @@ const clients = getAiClients();
 // --- MODEL CONFIGURATION ---
 const MODEL_NAME = 'gemini-2.5-flash';
 const TTS_MODEL_NAME = 'gemini-2.5-flash-preview-tts';
-// CHANGED: 'gemini-2.0-flash-exp' is currently the most reliable for Free Tier images
+// Using the Experimental Flash model for better Free Tier image support
 const IMG_MODEL_NAME = 'gemini-2.0-flash-exp'; 
 
 // --- Helpers ---
 
 const getClient = () => {
-    if (clients.length === 0) {
-        console.error("[Gemini Service] getClient called but no clients available.");
-        return null;
-    }
+    if (clients.length === 0) return null;
     const randomIndex = Math.floor(Math.random() * clients.length);
     return clients[randomIndex];
 };
@@ -125,4 +120,138 @@ export const callGeminiChat = async (character: string, message: string) => {
 
 export const callGeminiDatePlanner = async (country: string, city: string, vibe: string, time: string) => {
     const system = "Romantic concierge. 3-step itinerary.";
-    return safeGenerate(`Plan ${
+    return safeGenerate(`Plan ${vibe} date in ${city}, ${country} for ${time}.`, system, "Date Planner", "Concierge unavailable.");
+};
+
+export const callGeminiTropeMatch = async (userFavorite: string) => {
+    const bookContext = Object.entries(NOVEL_SCENES).map(([key, val]) => `${key}: ${(val as string).substring(0, 150)}...`).join('\n');
+    const system = `Literary matchmaker. Connect user trope to specific chapter.\nAvailable Scenes:\n${bookContext}`;
+    return safeGenerate(`User loves: "${userFavorite}". Match scene.`, system, "Trope Matcher", "I see you have great taste.");
+};
+
+export const callGeminiCliffhanger = async (scenario: string) => {
+    const system = `High-tension scene builder. 150 words. Stop abruptly before kiss/touch.`;
+    return safeGenerate(`Scenario: ${scenario}`, system, "Cliffhanger", "They stood close...");
+};
+
+export const callGeminiTranslator = async (boringText: string) => {
+    const system = `Romantic novelist translator. Make it lush and sensory. Max 50 words.`;
+    return safeGenerate(`Transform: "${boringText}"`, system, "Translator", "Muse unavailable.");
+};
+
+export const callGeminiDecoder = async (textMessage: string) => {
+    const system = `Analyze text. 1. Vijay's Take (Cynical). 2. Meena's Take (Romantic).`;
+    return safeGenerate(`Analyze: "${textMessage}"`, system, "Decoder", "Signal weak.");
+};
+
+export const callGeminiDestinyMatch = async (name1: string, sign1: string, name2: string, sign2: string) => {
+    const system = `Mystic matchmaker. Zodiac compatibility.`;
+    let prompt = `Analyze: ${name1} (${sign1})`;
+    prompt += (name2 && sign2) ? ` and ${name2} (${sign2}).` : `. Single.`;
+    return safeGenerate(prompt, system, "Destiny Match", "Stars clouded.");
+};
+
+export const callGeminiLetter = async (recipient: string, vibe: string) => {
+    const system = `Ghostwriter. Short, intense love letter. Max 100 words.`;
+    return safeGenerate(`Letter to ${recipient}. Vibe: ${vibe}.`, system, "Love Letter", "Ink dried.");
+};
+
+export const callGeminiUnspokenThoughts = async (chapterTitle: string, sceneContext: string) => {
+    const lookupKey = chapterTitle.includes(':') ? chapterTitle.split(':')[0] : chapterTitle;
+    const novelText = NOVEL_SCENES[lookupKey] || "Context unavailable.";
+    const system = `Inner mind of Vijay (Husband). Protective, restrained. 60 words max.`;
+    const prompt = `Scene: "${novelText}"\nTrigger: ${sceneContext}\nGenerate thought.`;
+    return safeGenerate(prompt, system, "Unspoken Thoughts", "Thoughts guarded.");
+};
+
+export const callGeminiPOVShift = async (sceneKey: string, objectName: string) => {
+    const sceneText = NOVEL_SCENES[sceneKey] || "Unavailable";
+    const system = `Rewrite scene from perspective of object: ${objectName}. Observant. 150 words.`;
+    return safeGenerate(`Original: "${sceneText}"\nRewrite as ${objectName}.`, system, "POV Shift", "Object silent.");
+};
+
+export const callGeminiSensory = async (sense: string) => {
+    const system = `Sensory immersion engine. Describe moment involving requested sense. Lush.`;
+    return safeGenerate(`Describe moment: ${sense}`, system, "Sensory", "Sensation faint.");
+};
+
+export const callGeminiApology = async (mistake: string, character: string) => {
+    const system = `You are ${character}. Write heartfelt apology.`;
+    return safeGenerate(`Mistake: "${mistake}"`, system, "Apology", "Words stuck.");
+};
+
+export const callGeminiMemoryWeaver = async (keywords: string[]) => {
+    const system = `Weave keywords into lush memory. Max 100 words.`;
+    return safeGenerate(`Keywords: ${keywords.join(", ")}.`, system, "Memory Weaver", "Memory fragmented.");
+};
+
+export const callGeminiTTS = async (text: string): Promise<string | null> => {
+    const ai = getClient();
+    if (!ai) return null;
+    try {
+        const response = await ai.models.generateContent({
+            model: TTS_MODEL_NAME,
+            contents: { parts: [{ text }] },
+            config: {
+                responseModalities: ["AUDIO" as any], 
+                speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
+            },
+        });
+        return response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data || null;
+    } catch (error) {
+        console.error("[Gemini TTS] Failed:", error);
+        return null;
+    }
+};
+
+// --- ROBUST IMAGE GENERATION FUNCTION ---
+export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: string = "3:4"): Promise<string | null> => {
+    const ai = getClient();
+    if (!ai) return null;
+    
+    // Deconstruct context
+    const { vijayWardrobe, meenaWardrobe, setting, position, mood, lighting, style, interactionLine, customDetails, characterDescriptions } = promptContext || {};
+
+    // 1. SANITIZE PROMPT
+    const vijayDesc = characterDescriptions?.Vijay ? "A handsome Indian man, " + characterDescriptions.Vijay : "A handsome Indian man";
+    const meenaDesc = characterDescriptions?.Meena ? "A beautiful Indian woman, " + characterDescriptions.Meena : "A beautiful Indian woman";
+    
+    const finalPrompt = `Cinematic image. 
+    Male Character: ${vijayDesc}. Outfit: ${vijayWardrobe?.outfit || "Casual shirt"}. 
+    Female Character: ${meenaDesc}. Outfit: ${meenaWardrobe?.outfit || "Elegant saree"}. 
+    Setting: ${setting || "Garden"}. Mood: ${mood || "Romantic"}. Lighting: ${lighting || "Soft golden hour"}. 
+    Style: ${style || "Photorealistic, 8k"}. Action: ${interactionLine || "Standing close together"}. 
+    ${customDetails || ""}`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: IMG_MODEL_NAME, 
+            contents: [
+                { parts: [{ text: finalPrompt }] } 
+            ],
+            config: { 
+                // FORCE IMAGE MODE
+                responseModalities: ["IMAGE" as any], 
+                imageConfig: { aspectRatio: aspectRatio },
+                // RELAX SAFETY FILTERS (Using String Constants to prevent Build Errors)
+                safetySettings: [
+                    { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT' as any, threshold: 'BLOCK_ONLY_HIGH' as any },
+                    { category: 'HARM_CATEGORY_HARASSMENT' as any, threshold: 'BLOCK_ONLY_HIGH' as any },
+                    { category: 'HARM_CATEGORY_HATE_SPEECH' as any, threshold: 'BLOCK_ONLY_HIGH' as any },
+                    { category: 'HARM_CATEGORY_DANGEROUS_CONTENT' as any, threshold: 'BLOCK_ONLY_HIGH' as any }
+                ]
+            }
+        });
+
+        for (const part of response.candidates?.[0]?.content?.parts || []) {
+            if (part.inlineData) {
+                return `data:image/png;base64,${part.inlineData.data}`;
+            }
+        }
+        return null;
+
+    } catch (error: any) {
+        console.error("[Gemini Image Gen] API FAILURE:", JSON.stringify(error, null, 2));
+        return null;
+    }
+};
