@@ -9,7 +9,6 @@ const getAiClients = () => {
   const rawKeys = import.meta.env.VITE_GEMINI_API_KEY || "";
 
   // 2. Split the string by commas to get individual keys
-  // The .map(k => k.trim()) part removes accidental spaces if you copied them.
   const validKeys = rawKeys.split(',').map(key => key.trim()).filter(key => key.length > 10);
 
   console.log(`[Gemini Service] Found ${validKeys.length} valid API keys available for rotation.`);
@@ -24,9 +23,12 @@ const getAiClients = () => {
 };
 
 const clients = getAiClients();
+
+// --- MODEL CONFIGURATION ---
 const MODEL_NAME = 'gemini-2.5-flash';
 const TTS_MODEL_NAME = 'gemini-2.5-flash-preview-tts';
-const IMG_MODEL_NAME = 'gemini-2.5-flash-image';
+// FIX 1: Use the dedicated Imagen model (Gemini Flash cannot generate images)
+const IMG_MODEL_NAME = 'imagen-3.0-generate-001'; 
 
 // --- Helpers ---
 
@@ -35,7 +37,6 @@ const getClient = () => {
         console.error("[Gemini Service] getClient called but no clients available.");
         return null;
     }
-    // Randomly select one of the keys to distribute the workload
     const randomIndex = Math.floor(Math.random() * clients.length);
     return clients[randomIndex];
 };
@@ -213,12 +214,12 @@ export const callGeminiTTS = async (text: string): Promise<string | null> => {
     }
 };
 
-// --- FIX APPLIED HERE ---
+// --- IMAGE GENERATION (Corrected for Imagen 3) ---
 export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: string = "3:4"): Promise<string | null> => {
     const ai = getClient();
     if (!ai) return null;
     
-    // Deconstruct context to fail gracefully if missing
+    // Deconstruct context
     const { vijayWardrobe, meenaWardrobe, setting, position, mood, lighting, style, interactionLine, customDetails, characterDescriptions } = promptContext || {};
 
     try {
@@ -229,26 +230,34 @@ export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: 
         Style: ${style || "Photorealistic"}. Details: ${customDetails || ""}. ${interactionLine || ""}`;
 
         const response = await ai.models.generateContent({
-            model: IMG_MODEL_NAME,
-            contents: [ // FIXED: Wrapped in array
+            model: IMG_MODEL_NAME, // Now using 'imagen-3.0-generate-001'
+            contents: [
                 { parts: [{ text: finalPrompt }] } 
             ],
             config: { 
-                // FIXED: Force IMAGE generation mode
-                responseModalities: [Modality.IMAGE], 
-                imageConfig: { aspectRatio: aspectRatio } 
+                // FIX 2: Relax safety settings for romance content
+                safetySettings: [
+                    { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+                    { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' }
+                ],
+                // FIX 3: Correct config for Imagen
+                imageConfig: { 
+                    aspectRatio: aspectRatio,
+                    numberOfImages: 1
+                }
             }
         });
 
+        // Loop through parts to find the image data
         for (const part of response.candidates?.[0]?.content?.parts || []) {
             if (part.inlineData) {
                 return `data:image/png;base64,${part.inlineData.data}`;
             }
-            if (part.text) {
-                console.warn("[Gemini Image Gen] Model returned text instead of image:", part.text);
-            }
         }
+        
+        console.warn("[Gemini Image Gen] No image data found in response.");
         return null;
+
     } catch (error: any) {
         console.error("[Gemini Image Gen] Failed:", JSON.stringify(error, null, 2));
         return null;
