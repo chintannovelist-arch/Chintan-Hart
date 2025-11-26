@@ -139,6 +139,13 @@ const CharacterConnect: React.FC = () => {
     const [isTyping, setIsTyping] = useState(false);
     const chatEndRef = useRef<HTMLDivElement>(null);
     const activeCharRef = useRef(selectedChar);
+    const isMounted = useRef(true);
+
+    // Mount tracking to prevent state updates on unmounted component
+    useEffect(() => {
+        isMounted.current = true;
+        return () => { isMounted.current = false; };
+    }, []);
 
     // Keep ref in sync for race condition checks
     useEffect(() => {
@@ -159,8 +166,8 @@ const CharacterConnect: React.FC = () => {
 
         // Simulate "Delivered" then "Read" delay before AI starts typing
         setTimeout(() => {
-            // Guard clause: If user switched characters, don't continue in this chat context
-            if (activeCharRef.current !== currentCharacter) return;
+            // Guard clause: If user switched characters or unmounted, stop.
+            if (!isMounted.current || activeCharRef.current !== currentCharacter) return;
 
             setChatHistory(prev => prev.map(msg => 
                 msg.timestamp === timestamp ? { ...msg, status: 'delivered' } : msg
@@ -168,7 +175,7 @@ const CharacterConnect: React.FC = () => {
         }, 600);
 
         setTimeout(async () => {
-            if (activeCharRef.current !== currentCharacter) return;
+            if (!isMounted.current || activeCharRef.current !== currentCharacter) return;
 
             setChatHistory(prev => prev.map(msg => 
                 msg.timestamp === timestamp ? { ...msg, status: 'read' } : msg
@@ -181,7 +188,7 @@ const CharacterConnect: React.FC = () => {
                 const stream = callGeminiChatStream(currentCharacter, message);
                 
                 for await (const chunk of stream) {
-                    if (activeCharRef.current !== currentCharacter) break;
+                    if (!isMounted.current || activeCharRef.current !== currentCharacter) break;
 
                     setChatHistory(prev => {
                         const newHistory = [...prev];
@@ -203,7 +210,7 @@ const CharacterConnect: React.FC = () => {
             } catch (error) {
                 console.error(error);
             } finally {
-                if (activeCharRef.current === currentCharacter) {
+                if (isMounted.current && activeCharRef.current === currentCharacter) {
                     setIsTyping(false);
                 }
             }

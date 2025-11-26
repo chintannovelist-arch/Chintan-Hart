@@ -40,9 +40,6 @@ const SampleModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
                         {BOOK_SAMPLE.content.split('\n').map((para, i) => {
                             if (!para.trim()) return null;
                             const isHeader = para.startsWith('Chapter');
-                            // Heuristic: Apply drop cap to the first non-header paragraph after a header, or the very first non-header text.
-                            // In this simple version, we just check if it's the very first paragraph of content (index 1 usually, after title at index 0).
-                            // A more robust way for multiple chapters: Check if previous line was a header.
                             const prevLine = BOOK_SAMPLE.content.split('\n')[i-1];
                             const isAfterHeader = prevLine && prevLine.startsWith('Chapter');
                             const showDropCap = !isHeader && (i === 1 || isAfterHeader);
@@ -58,22 +55,25 @@ const SampleModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
                         })}
                     </div>
                     
-                    <div className="mt-16 pt-8 border-t border-white/5 text-center pb-8">
-                        <p className="italic text-slate-500 mb-8 font-display text-xl">"The story is just beginning..."</p>
+                    <div className="mt-16 pt-12 border-t border-white/5 text-center pb-8 relative">
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#0A0A0A] px-4 text-slate-600 font-display text-2xl">***</div>
                         
-                        {/* Added Kindle CTA as requested */}
-                        <p className="text-sm text-primary uppercase tracking-[0.2em] font-bold mb-6 animate-pulse">
-                            Asking for reading the remaining story in Amazon Kindle or Kindle Unlimited
-                        </p>
+                        <p className="italic text-slate-400 mb-8 font-serif text-lg">"The story is just beginning. Don't leave them hanging..."</p>
+                        
+                        <div className="flex flex-col items-center gap-4">
+                            <p className="text-xs text-primary uppercase tracking-[0.2em] font-bold animate-pulse">
+                                Read the full novel on Kindle Unlimited
+                            </p>
 
-                        <a 
-                            href={BOOKS[0].amazonLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-3 px-10 py-4 bg-primary/10 border border-primary/50 text-primary hover:text-white rounded-sm hover:bg-primary transition-all duration-500 uppercase tracking-widest text-xs font-bold shadow-[0_0_20px_rgba(37,150,190,0.2)] hover:shadow-[0_0_30px_rgba(37,150,190,0.6)] hover:scale-105"
-                        >
-                           <ShoppingBag size={16} /> Purchase Full Copy
-                        </a>
+                            <a 
+                                href={BOOKS[0].amazonLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-primary to-[#186a8a] border border-white/20 text-white rounded-sm hover:scale-105 transition-all duration-500 uppercase tracking-[0.2em] text-xs font-bold shadow-[0_0_30px_rgba(37,150,190,0.4)] hover:shadow-[0_0_50px_rgba(37,150,190,0.6)] group"
+                            >
+                               <ShoppingBag size={18} className="group-hover:animate-bounce" /> Purchase Full Copy
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
