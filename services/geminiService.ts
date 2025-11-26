@@ -22,7 +22,7 @@ const clients = getAiClients();
 const MODEL_NAME = 'gemini-2.5-flash';
 const TTS_MODEL_NAME = 'gemini-2.5-flash-preview-tts';
 // We use the Experimental Flash model as it allows image generation on some tiers
-const IMG_MODEL_NAME = 'gemini-2.0-flash-exp'; 
+const IMG_MODEL_NAME = 'gemini-2.5-flash-image'; 
 
 // --- Helpers ---
 
