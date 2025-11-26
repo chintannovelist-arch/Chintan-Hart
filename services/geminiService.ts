@@ -12,7 +12,7 @@ const getAiClients = () => {
       console.error("[Gemini Service] CRITICAL: No API keys found. AI will not work.");
       return [];
   }
-  // Create a client for EVERY key
+  // Create a client for EVERY key to enable rotation
   return validKeys.map(key => new GoogleGenAI({ apiKey: key }));
 };
 
@@ -21,11 +21,12 @@ const clients = getAiClients();
 // --- MODEL CONFIGURATION ---
 const MODEL_NAME = 'gemini-2.5-flash';
 const TTS_MODEL_NAME = 'gemini-2.5-flash-preview-tts';
+// We use the Experimental Flash model as it allows image generation on some tiers
 const IMG_MODEL_NAME = 'gemini-2.0-flash-exp'; 
 
 // --- Helpers ---
 
-// Get a random client for simple text tasks
+// Get a random client for simple text tasks to distribute load
 const getClient = () => {
     if (clients.length === 0) return null;
     return clients[Math.floor(Math.random() * clients.length)];
@@ -77,7 +78,6 @@ export const safeGenerateStream = async function* (
 };
 
 // --- API Functions (Text) ---
-// (These remain unchanged, but included for completeness)
 
 export const callGeminiPlaylist = async (mood: string) => {
     const system = `You are a musical curator for Chintan Hart's readers. Playlist (3-4 songs) + Dedication.`;
@@ -183,6 +183,7 @@ export const callGeminiTTS = async (text: string): Promise<string | null> => {
             model: TTS_MODEL_NAME,
             contents: { parts: [{ text }] },
             config: {
+                // Using "AUDIO" as a string to match the SDK expectation
                 responseModalities: ["AUDIO" as any], 
                 speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
             },
@@ -194,42 +195,47 @@ export const callGeminiTTS = async (text: string): Promise<string | null> => {
     }
 };
 
-// --- IMAGE GENERATION (With Round-Robin Retry) ---
+// --- IMAGE GENERATION (FIXED & Simplified) ---
 export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: string = "3:4"): Promise<string | null> => {
     if (clients.length === 0) return null;
     
+    // 1. Build the Prompt
     const { vijayWardrobe, meenaWardrobe, setting, mood, lighting, style, interactionLine, customDetails, characterDescriptions } = promptContext || {};
 
     const vijayDesc = characterDescriptions?.Vijay ? "A handsome Indian man, " + characterDescriptions.Vijay : "A handsome Indian man";
     const meenaDesc = characterDescriptions?.Meena ? "A beautiful Indian woman, " + characterDescriptions.Meena : "A beautiful Indian woman";
     
-    const finalPrompt = `Cinematic image. 
+    const finalPrompt = `Generate a cinematic image. 
     Male Character: ${vijayDesc}. Outfit: ${vijayWardrobe?.outfit || "Casual shirt"}. 
     Female Character: ${meenaDesc}. Outfit: ${meenaWardrobe?.outfit || "Elegant saree"}. 
     Setting: ${setting || "Garden"}. Mood: ${mood || "Romantic"}. Lighting: ${lighting || "Soft golden hour"}. 
     Style: ${style || "Photorealistic, 8k"}. Action: ${interactionLine || "Standing close together"}. 
     ${customDetails || ""}`;
 
-    // --- RETRY LOGIC START ---
+    // 2. Retry Logic (Active Rotation)
     // We try every key in the list until one works or all fail
     for (let i = 0; i < clients.length; i++) {
         const ai = clients[i];
         try {
             console.log(`[Gemini Image] Attempting with Key #${i + 1}...`);
+            
+            // FIX: Removed 'config' object entirely. 
+            // We rely on the text prompt to trigger image generation.
             const response = await ai.models.generateContent({
                 model: IMG_MODEL_NAME,
-                contents: [{ parts: [{ text: finalPrompt }] }],
-                config: { responseModalities: ["IMAGE" as any] }
+                contents: [{ parts: [{ text: finalPrompt }] }]
             });
 
+            // Check if we got an image back
             for (const part of response.candidates?.[0]?.content?.parts || []) {
                 if (part.inlineData) {
                     console.log(`[Gemini Image] Success with Key #${i + 1}!`);
                     return `data:image/png;base64,${part.inlineData.data}`;
                 }
             }
-            // If we are here, the model returned text (refusal) but no error. Stop retrying.
-            console.warn("[Gemini Image] Model refused (Safety/Text only).");
+            
+            // If we are here, the model returned text (refusal) but no error.
+            console.warn("[Gemini Image] Model returned text only (No Image).");
             break; 
 
         } catch (error: any) {
@@ -239,15 +245,15 @@ export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: 
                 continue; // Try the next key in the loop
             } else {
                 console.error("[Gemini Image] Fatal Error:", error);
-                break; // Stop retrying for other errors (like 400 Bad Request)
+                // If it's a 400 error or something else, we stop retrying to avoid spamming bad requests.
+                break; 
             }
         }
     }
-    // --- RETRY LOGIC END ---
 
-    // If all keys fail, we return null (or you can uncomment the fallback below)
-    console.error("[Gemini Image] All API keys exhausted.");
+    // 3. Fallback (If all keys fail)
+    console.error("[Gemini Image] All API keys exhausted or failed.");
     
-    // Change this URL if you want a different "Failure" image
+    // Return the fallback "Silhouette/Love Letter" image
     return "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=600&auto=format&fit=crop"; 
 };
