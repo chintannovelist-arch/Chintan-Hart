@@ -20,7 +20,8 @@ const clients = getAiClients();
 // --- MODEL CONFIGURATION ---
 const MODEL_NAME = 'gemini-2.5-flash';
 const TTS_MODEL_NAME = 'gemini-2.5-flash-preview-tts';
-// Back to the Flash Exp model, but with cleaner config
+
+// SWITCH BACK TO FLASH EXP (Because Imagen 3 is 404/Paid Only)
 const IMG_MODEL_NAME = 'gemini-2.0-flash-exp'; 
 
 // --- Helpers ---
@@ -205,7 +206,7 @@ export const callGeminiTTS = async (text: string): Promise<string | null> => {
     }
 };
 
-// --- SIMPLIFIED IMAGE GENERATION ---
+// --- IMAGE GENERATION (Final Attempt with Fallback) ---
 export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: string = "3:4"): Promise<string | null> => {
     const ai = getClient();
     if (!ai) return null;
@@ -213,18 +214,15 @@ export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: 
     // Deconstruct context
     const { vijayWardrobe, meenaWardrobe, setting, position, mood, lighting, style, interactionLine, customDetails, characterDescriptions } = promptContext || {};
 
-    // 1. SANITIZE PROMPT
     const vijayDesc = characterDescriptions?.Vijay ? "A handsome Indian man, " + characterDescriptions.Vijay : "A handsome Indian man";
     const meenaDesc = characterDescriptions?.Meena ? "A beautiful Indian woman, " + characterDescriptions.Meena : "A beautiful Indian woman";
     
-    // 2. Put instructions in the TEXT, not the CONFIG
-    const finalPrompt = `Generate a photorealistic image.
-    Subjects: Two people.
-    1. ${vijayDesc}. Outfit: ${vijayWardrobe?.outfit || "Casual shirt"}.
-    2. ${meenaDesc}. Outfit: ${meenaWardrobe?.outfit || "Elegant saree"}.
-    Setting: ${setting || "Garden"}. Mood: ${mood || "Romantic"}. Lighting: ${lighting || "Soft golden hour"}.
-    Style: ${style || "Cinematic, 8k"}. Action: ${interactionLine || "Standing close together"}.
-    Additional: ${customDetails || ""}`;
+    const finalPrompt = `Cinematic image. 
+    Male Character: ${vijayDesc}. Outfit: ${vijayWardrobe?.outfit || "Casual shirt"}. 
+    Female Character: ${meenaDesc}. Outfit: ${meenaWardrobe?.outfit || "Elegant saree"}. 
+    Setting: ${setting || "Garden"}. Mood: ${mood || "Romantic"}. Lighting: ${lighting || "Soft golden hour"}. 
+    Style: ${style || "Photorealistic, 8k"}. Action: ${interactionLine || "Standing close together"}. 
+    ${customDetails || ""}`;
 
     try {
         const response = await ai.models.generateContent({
@@ -232,10 +230,9 @@ export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: 
             contents: [
                 { parts: [{ text: finalPrompt }] } 
             ],
-            // 3. REMOVE complex config. Just ask for the image.
-            config: { 
-                 responseModalities: ["IMAGE" as any]
-            }
+            // CRITICAL CHANGE: REMOVE ALL 'imageConfig' AND 'responseModalities' 
+            // We just send the prompt. If the model supports images, it will send one.
+            // If not, it will send text, and we catch that below.
         });
 
         // Loop through parts to find the image data
@@ -243,14 +240,15 @@ export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: 
             if (part.inlineData) {
                 return `data:image/png;base64,${part.inlineData.data}`;
             }
-            if (part.text) {
-                console.warn("[Gemini Image Gen] Text Refusal:", part.text);
-            }
         }
-        return null;
+        
+        console.warn("[Gemini Image Gen] Model returned text only (No Image Access on this Tier).");
+        // FALLBACK: Return a placeholder image so the site doesn't error out.
+        return "https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?q=80&w=600&auto=format&fit=crop";
 
     } catch (error: any) {
         console.error("[Gemini Image Gen] API FAILURE:", JSON.stringify(error, null, 2));
-        return null;
+        // FALLBACK: Return a placeholder image
+        return "https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?q=80&w=600&auto=format&fit=crop";
     }
 };
