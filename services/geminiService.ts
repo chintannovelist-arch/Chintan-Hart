@@ -1,14 +1,11 @@
-import { GoogleGenAI, Modality } from "@google/genai";
+import { GoogleGenAI, Modality, HarmCategory, HarmBlockThreshold } from "@google/genai";
 import { NOVEL_SCENES } from '../constants';
 
 // --- DEBUGGING LOG ---
 console.log("[Gemini Service] File loaded. Initializing...");
 
 const getAiClients = () => {
-  // 1. Get the Raw String from Environment
   const rawKeys = import.meta.env.VITE_GEMINI_API_KEY || "";
-
-  // 2. Split the string by commas to get individual keys
   const validKeys = rawKeys.split(',').map(key => key.trim()).filter(key => key.length > 10);
 
   console.log(`[Gemini Service] Found ${validKeys.length} valid API keys available for rotation.`);
@@ -17,8 +14,6 @@ const getAiClients = () => {
       console.error("[Gemini Service] CRITICAL: No API keys found. AI will not work.");
       return [];
   }
-  
-  // 3. Create a Client for EVERY key found
   return validKeys.map(key => new GoogleGenAI({ apiKey: key }));
 };
 
@@ -27,8 +22,8 @@ const clients = getAiClients();
 // --- MODEL CONFIGURATION ---
 const MODEL_NAME = 'gemini-2.5-flash';
 const TTS_MODEL_NAME = 'gemini-2.5-flash-preview-tts';
-// FIX 1: Use the dedicated Imagen model (Gemini Flash cannot generate images)
-const IMG_MODEL_NAME = 'imagen-3.0-generate-001'; 
+// Using the Flash Image model as it is more likely to be available on standard keys
+const IMG_MODEL_NAME = 'gemini-2.5-flash-image'; 
 
 // --- Helpers ---
 
@@ -214,7 +209,7 @@ export const callGeminiTTS = async (text: string): Promise<string | null> => {
     }
 };
 
-// --- IMAGE GENERATION (Corrected for Imagen 3) ---
+// --- CORRECTED IMAGE GENERATION FUNCTION ---
 export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: string = "3:4"): Promise<string | null> => {
     const ai = getClient();
     if (!ai) return null;
@@ -230,36 +225,40 @@ export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: 
         Style: ${style || "Photorealistic"}. Details: ${customDetails || ""}. ${interactionLine || ""}`;
 
         const response = await ai.models.generateContent({
-            model: IMG_MODEL_NAME, // Now using 'imagen-3.0-generate-001'
+            model: IMG_MODEL_NAME, // gemini-2.5-flash-image
             contents: [
                 { parts: [{ text: finalPrompt }] } 
             ],
             config: { 
-                // FIX 2: Relax safety settings for romance content
+                // CRITICAL: Force the model to output an image
+                responseModalities: [Modality.IMAGE], 
+                imageConfig: { aspectRatio: aspectRatio },
+                // RELAX SAFETY FILTERS: This prevents "Romance" from being blocked
                 safetySettings: [
-                    { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
-                    { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' }
-                ],
-                // FIX 3: Correct config for Imagen
-                imageConfig: { 
-                    aspectRatio: aspectRatio,
-                    numberOfImages: 1
-                }
+                    { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                    { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                    { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+                    { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH }
+                ]
             }
         });
 
-        // Loop through parts to find the image data
+        // 1. Check for Image Data
         for (const part of response.candidates?.[0]?.content?.parts || []) {
             if (part.inlineData) {
                 return `data:image/png;base64,${part.inlineData.data}`;
             }
+            // 2. Log Text Refusals (Debugging)
+            if (part.text) {
+                console.warn("[Gemini Image Gen] Text received instead of image:", part.text);
+            }
         }
-        
-        console.warn("[Gemini Image Gen] No image data found in response.");
         return null;
 
     } catch (error: any) {
-        console.error("[Gemini Image Gen] Failed:", JSON.stringify(error, null, 2));
+        // 3. Log the ACTUAL error to help debugging
+        // If you see "403" or "400" in the console, it means Free Tier keys are restricted.
+        console.error("[Gemini Image Gen] API Error:", JSON.stringify(error, null, 2));
         return null;
     }
 };
