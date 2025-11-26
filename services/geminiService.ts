@@ -20,8 +20,8 @@ const clients = getAiClients();
 // --- MODEL CONFIGURATION ---
 const MODEL_NAME = 'gemini-2.5-flash';
 const TTS_MODEL_NAME = 'gemini-2.5-flash-preview-tts';
-// Using the Experimental Flash model for better Free Tier image support
-const IMG_MODEL_NAME = 'imagen-3.0-generate-001'; 
+// Back to the Flash Exp model, but with cleaner config
+const IMG_MODEL_NAME = 'gemini-2.0-flash-exp'; 
 
 // --- Helpers ---
 
@@ -193,6 +193,7 @@ export const callGeminiTTS = async (text: string): Promise<string | null> => {
             model: TTS_MODEL_NAME,
             contents: { parts: [{ text }] },
             config: {
+                // Safer string constant
                 responseModalities: ["AUDIO" as any], 
                 speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
             },
@@ -204,7 +205,7 @@ export const callGeminiTTS = async (text: string): Promise<string | null> => {
     }
 };
 
-// --- ROBUST IMAGE GENERATION FUNCTION (IMAGEN 3) ---
+// --- SIMPLIFIED IMAGE GENERATION ---
 export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: string = "3:4"): Promise<string | null> => {
     const ai = getClient();
     if (!ai) return null;
@@ -216,31 +217,24 @@ export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: 
     const vijayDesc = characterDescriptions?.Vijay ? "A handsome Indian man, " + characterDescriptions.Vijay : "A handsome Indian man";
     const meenaDesc = characterDescriptions?.Meena ? "A beautiful Indian woman, " + characterDescriptions.Meena : "A beautiful Indian woman";
     
-    const finalPrompt = `Cinematic image. 
-    Male Character: ${vijayDesc}. Outfit: ${vijayWardrobe?.outfit || "Casual shirt"}. 
-    Female Character: ${meenaDesc}. Outfit: ${meenaWardrobe?.outfit || "Elegant saree"}. 
-    Setting: ${setting || "Garden"}. Mood: ${mood || "Romantic"}. Lighting: ${lighting || "Soft golden hour"}. 
-    Style: ${style || "Photorealistic, 8k"}. Action: ${interactionLine || "Standing close together"}. 
-    ${customDetails || ""}`;
+    // 2. Put instructions in the TEXT, not the CONFIG
+    const finalPrompt = `Generate a photorealistic image.
+    Subjects: Two people.
+    1. ${vijayDesc}. Outfit: ${vijayWardrobe?.outfit || "Casual shirt"}.
+    2. ${meenaDesc}. Outfit: ${meenaWardrobe?.outfit || "Elegant saree"}.
+    Setting: ${setting || "Garden"}. Mood: ${mood || "Romantic"}. Lighting: ${lighting || "Soft golden hour"}.
+    Style: ${style || "Cinematic, 8k"}. Action: ${interactionLine || "Standing close together"}.
+    Additional: ${customDetails || ""}`;
 
     try {
         const response = await ai.models.generateContent({
-            model: IMG_MODEL_NAME, // 'imagen-3.0-generate-001'
+            model: IMG_MODEL_NAME, // gemini-2.0-flash-exp
             contents: [
                 { parts: [{ text: finalPrompt }] } 
             ],
+            // 3. REMOVE complex config. Just ask for the image.
             config: { 
-                // Imagen 3 does NOT use 'responseModalities'. It only needs 'imageConfig'.
-                // 'numberOfImages' must be 1 for the basic tier.
-                imageConfig: { aspectRatio: aspectRatio, numberOfImages: 1 },
-                
-                // RELAX SAFETY FILTERS
-                safetySettings: [
-                    { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT' as any, threshold: 'BLOCK_ONLY_HIGH' as any },
-                    { category: 'HARM_CATEGORY_HARASSMENT' as any, threshold: 'BLOCK_ONLY_HIGH' as any },
-                    { category: 'HARM_CATEGORY_HATE_SPEECH' as any, threshold: 'BLOCK_ONLY_HIGH' as any },
-                    { category: 'HARM_CATEGORY_DANGEROUS_CONTENT' as any, threshold: 'BLOCK_ONLY_HIGH' as any }
-                ]
+                 responseModalities: ["IMAGE" as any]
             }
         });
 
@@ -248,6 +242,9 @@ export const callGeminiImageGenerator = async (promptContext: any, aspectRatio: 
         for (const part of response.candidates?.[0]?.content?.parts || []) {
             if (part.inlineData) {
                 return `data:image/png;base64,${part.inlineData.data}`;
+            }
+            if (part.text) {
+                console.warn("[Gemini Image Gen] Text Refusal:", part.text);
             }
         }
         return null;
